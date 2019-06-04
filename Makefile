@@ -9,8 +9,10 @@ tag=duckietown/$(repo):$(branch)
 
 labels=$(shell ./labels.py)
 
+arch=arm32v7
+
 build:
-	docker build $(labels) -t $(tag) .
+	docker build $(labels) -t $(tag) --build-arg ARCH=$(arch) .
 
 push:
 	docker push $(tag)
