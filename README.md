@@ -1,3 +1,3 @@
-# rpi-commons
+# ros-commons
 
 Common libraries for Duckietown
