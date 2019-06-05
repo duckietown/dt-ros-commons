@@ -18,14 +18,18 @@ ROS_WS_SETUP="${SOURCE_DIR}/catkin_ws/devel/setup.bash"
 CODE_SETUP="${SOURCE_DIR}/setup.sh"
 
 # check the mandatory arguments
-if [ -z "${VEHICLE_NAME}" ]; then
+VEHICLE_NAME_IS_SET=1
+if [ ${#VEHICLE_NAME} -le 0 ]; then
+  VEHICLE_NAME_IS_SET=0
   VEHICLE_NAME=$(hostname)
   echo "The environment variable VEHICLE_NAME is not set. Using '${VEHICLE_NAME}'."
 fi
 export VEHICLE_NAME="${VEHICLE_NAME}"
 
 # configure hosts
-echo "127.0.0.1 ${VEHICLE_NAME}.local" >> /etc/hosts
+if [ "${VEHICLE_NAME_IS_SET}" -eq "0" ]; then
+  echo "127.0.0.1 ${VEHICLE_NAME} ${VEHICLE_NAME}.local" >> /etc/hosts
+fi
 
 # setup ros environment
 #TODO(andrea): check if necessary when we switch to ROS2
@@ -54,7 +58,7 @@ export ROS_IP=${CONTAINER_IP}
 # configure ROS MASTER URI
 #TODO(andrea): remove when we switch to ROS2
 if [ "${ROS_MASTER_URI_IS_SET}" -eq "0" ]; then
-  export ROS_MASTER_URI="http://${VEHICLE_NAME}.local:11311/"
+  export ROS_MASTER_URI="http://${VEHICLE_NAME}:11311/"
 fi
 
 # execute given commands (if any)
