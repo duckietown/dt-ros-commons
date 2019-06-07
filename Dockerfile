@@ -4,7 +4,7 @@ ARG ARCH=arm32v7
 ARG ROS_DISTRO=kinetic
 ARG BRANCH
 
-FROM duckietown/${ARCH}-rpi-ros-${ROS_DISTRO}-base:${BRANCH}
+FROM duckietown/rpi-ros-${ROS_DISTRO}-base:${BRANCH}-${ARCH}
 
 # configure environment
 ENV SOURCE_DIR /code
