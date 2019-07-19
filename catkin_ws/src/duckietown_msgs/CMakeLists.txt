@@ -26,8 +26,9 @@ add_message_files(
   IntersectionPoseImg.msg
   IntersectionPoseImgDebug.msg
 
+  DuckiebotLED.msg
+
   TurnIDandType.msg
-#  LEDControl.msg
   LEDDetection.msg
   MaintenanceState.msg
   LEDDetectionArray.msg
