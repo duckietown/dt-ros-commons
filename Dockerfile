@@ -1,14 +1,13 @@
-# Note: this container will have the name duckietown/XXX-commons
-
 ARG ARCH=arm32v7
 ARG ROS_DISTRO=kinetic
 
-FROM duckietown/rpi-ros-${ROS_DISTRO}-base:afdaniele-devel-${ARCH}
+FROM duckietown/rpi-ros-${ROS_DISTRO}-base:master19-${ARCH}
 
 # configure environment
 ENV SOURCE_DIR /code
 ENV INSTALL_DIR /usr/local
 ENV ROS_LANG_DISABLE=gennodejs:geneus:genlisp
+ENV READTHEDOCS True
 WORKDIR "${SOURCE_DIR}"
 
 # turn on ARM emulation
