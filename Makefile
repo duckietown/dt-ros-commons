@@ -29,6 +29,10 @@ build build-no-cache:
 		echo "Tagging image $(tag) as $(default_tag)."; \
 		docker tag $(tag) $(default_tag); \
 		echo "Done!"; \
+	else \
+		echo "Tagging image $(tag) as $(default_tag)-no-arm."; \
+		docker tag $(tag) $(default_tag)-no-arm; \
+		echo "Done!"; \
 	fi
 
 push:
@@ -36,4 +40,6 @@ push:
 
 	@if [ "$(arch)" = "$(default_arch)" ]; then \
 		docker push $(default_tag); \
+	else \
+		docker push $(default_tag)-no-arm; \
 	fi
