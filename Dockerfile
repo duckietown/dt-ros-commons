@@ -5,28 +5,30 @@ FROM duckietown/rpi-ros-${ROS_DISTRO}-base:master19-${ARCH}
 
 # configure environment
 ENV SOURCE_DIR /code
+ENV CATKIN_WS_DIR "${SOURCE_DIR}/catkin_ws"
 ENV INSTALL_DIR /usr/local
 ENV ROS_LANG_DISABLE=gennodejs:geneus:genlisp
 ENV READTHEDOCS True
-WORKDIR "${SOURCE_DIR}"
+WORKDIR "${CATKIN_WS_DIR}"
 
 # turn on ARM emulation
 RUN ["cross-build-start"]
 
-# create directories
-RUN mkdir -p "${SOURCE_DIR}"
+ARG REPO_PATH="${CATKIN_WS_DIR}/src/dt-ros-commons"
 
-# copy source code
-COPY ./catkin_ws "${SOURCE_DIR}/catkin_ws"
+# create repo directory
+RUN mkdir -p "${REPO_PATH}"
+
+# copy entire repo
+COPY ./ "${REPO_PATH}/"
 
 # build common packages
 RUN . /opt/ros/${ROS_DISTRO}/setup.sh && \
-  catkin_make \
-    -j \
-    -C ${SOURCE_DIR}/catkin_ws/ \
-    -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} \
-    install && \
-  rm -rf ${SOURCE_DIR}/catkin_ws
+  catkin config \
+    --install-space ${INSTALL_DIR} \
+    --install && \
+  catkin build \
+    --workspace ${CATKIN_WS_DIR}/
 
 # turn off ARM emulation
 RUN ["cross-build-end"]
