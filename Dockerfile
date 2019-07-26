@@ -20,13 +20,17 @@ ARG REPO_PATH="${CATKIN_WS_DIR}/src/dt-ros-commons"
 RUN mkdir -p "${REPO_PATH}"
 
 # copy entire repo
-COPY ./ "${REPO_PATH}/"
+COPY . "${REPO_PATH}/"
 
 # build common packages
+#RUN . /opt/ros/${ROS_DISTRO}/setup.sh && \
+#  catkin config \
+#    --install-space ${INSTALL_DIR} \
+#    --install && \
+#  catkin build \
+#    --workspace ${CATKIN_WS_DIR}/
+
 RUN . /opt/ros/${ROS_DISTRO}/setup.sh && \
-  catkin config \
-    --install-space ${INSTALL_DIR} \
-    --install && \
   catkin build \
     --workspace ${CATKIN_WS_DIR}/
 
