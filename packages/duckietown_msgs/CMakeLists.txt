@@ -16,69 +16,57 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
 add_message_files(
   FILES
-  CarControl.msg
-  CoordinationSignal.msg
-  CoordinationSignalETHZ17.msg
-  DuckieSensor.msg
-  LanePose.msg
-
-  IntersectionPose.msg
-  IntersectionPoseImg.msg
-  IntersectionPoseImgDebug.msg
-
-  DuckiebotLED.msg
-
-  TurnIDandType.msg
-  LEDDetection.msg
-  MaintenanceState.msg
-  LEDDetectionArray.msg
-  LEDDetectionDebugInfo.msg
-  WheelsCmd.msg
-  WheelsCmdStamped.msg
-  Pose2DStamped.msg
-  SignalsDetection.msg
-  SignalsDetectionETHZ17.msg
-  Twist2DStamped.msg
-  Twist2DStampedETHZ17.msg
-  AprilTagDetection.msg
-  AprilTagDetectionArray.msg
-  AprilTagsWithInfos.msg
-  TagInfo.msg
-  Pixel.msg
-  Vector2D.msg
-  Segment.msg
-  SegmentList.msg
-  Rect.msg
-  Rects.msg
-  SceneSegments.msg
-  SourceTargetNodes.msg
-  CoordinationClearance.msg
-  CoordinationClearanceETHZ17.msg
-#  IntersectionDetection.msg
-#  CoordinationSignal.msg
-#  TrafficLightDetection.msg
-  VehicleCorners.msg
-  VehiclePose.msg
-#  VehicleDetection.msg
-  FSMState.msg
-  BoolStamped.msg
-  BoolStampedETHZ17.msg
-  StopLineReading.msg
-  LEDInterpreter.msg
   AntiInstagramHealth.msg
   AntiInstagramTransform.msg
   AntiInstagramTransform_CB.msg
-  KinematicsWeights.msg
+  AprilTagDetection.msg
+  AprilTagDetectionArray.msg
+  AprilTagsWithInfos.msg
+  BoolStamped.msg
+  CarControl.msg
+  CoordinationClearance.msg
+  CoordinationSignal.msg
+  DuckiebotLED.msg
+  FSMState.msg
+  IntersectionPose.msg
+  IntersectionPoseImg.msg
+  IntersectionPoseImgDebug.msg
   KinematicsParameters.msg
-  ThetaDotSample.msg
-  Vsample.msg
-  Trajectory.msg
-  ObstacleType.msg
+  KinematicsWeights.msg
+  LanePose.msg
+  LEDDetection.msg
+  LEDDetectionArray.msg
+  LEDDetectionDebugInfo.msg
+  LEDInterpreter.msg
+  LEDPattern.msg
+  MaintenanceState.msg
   ObstacleImageDetection.msg
   ObstacleImageDetectionList.msg
   ObstacleProjectedDetection.msg
   ObstacleProjectedDetectionList.msg
-
+  ObstacleType.msg
+  Pixel.msg
+  Pose2DStamped.msg
+  Rect.msg
+  Rects.msg
+  SceneSegments.msg
+  Segment.msg
+  SegmentList.msg
+  SignalsDetection.msg
+  SignalsDetectionETHZ17.msg
+  SourceTargetNodes.msg
+  StopLineReading.msg
+  TagInfo.msg
+  ThetaDotSample.msg
+  Trajectory.msg
+  TurnIDandType.msg
+  Twist2DStamped.msg
+  Vector2D.msg
+  VehicleCorners.msg
+  VehiclePose.msg
+  Vsample.msg
+  WheelsCmd.msg
+  WheelsCmdStamped.msg
 )
 
 ## Generate services in the 'srv' folder
