@@ -23,13 +23,6 @@ RUN mkdir -p "${REPO_PATH}"
 COPY . "${REPO_PATH}/"
 
 # build common packages
-#RUN . /opt/ros/${ROS_DISTRO}/setup.sh && \
-#  catkin config \
-#    --install-space ${INSTALL_DIR} \
-#    --install && \
-#  catkin build \
-#    --workspace ${CATKIN_WS_DIR}/
-
 RUN . /opt/ros/${ROS_DISTRO}/setup.sh && \
   catkin build \
     --workspace ${CATKIN_WS_DIR}/
