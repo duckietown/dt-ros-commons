@@ -1,6 +1,7 @@
 ARG ARCH=arm32v7
+ARG MAJOR=devel20
 ARG ROS_DISTRO=kinetic
-ARG BASE_TAG=devel20-${ARCH}
+ARG BASE_TAG=${MAJOR}-${ARCH}
 
 FROM duckietown/dt-ros-${ROS_DISTRO}-base:${BASE_TAG}
 
