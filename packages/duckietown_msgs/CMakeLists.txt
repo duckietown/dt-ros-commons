@@ -80,6 +80,7 @@ add_service_files(
   LFstatus.srv
   ToFstatus.srv
   SensorsStatus.srv
+  SetFSMState.srv
 )
 
 
