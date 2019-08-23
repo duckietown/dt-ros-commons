@@ -34,7 +34,8 @@ class DTROS(object):
         check if any parameter has been updated
 
     Args:
-        parameters_update_period (floar): how often to check for new parameters (in seconds)
+        parameters_update_period (floar): how often to check for new parameters (in seconds). If
+           it is 0, it will not run checks at all
 
     Attributes:
         node_name (str): the name of the node
@@ -54,10 +55,11 @@ class DTROS(object):
 
         # Initialize parameters handling
         self.parameters = dict()
-        self.parametersChanged = True
-        self.__updateParametersTimer = rospy.Timer(period=rospy.Duration.from_sec(parameters_update_period),
-                                                   callback=self.updateParameters,
-                                                   oneshot=False)
+        self.parametersChanged = False
+        if parameters_update_period > 0:
+            self.__updateParametersTimer = rospy.Timer(period=rospy.Duration.from_sec(parameters_update_period),
+                                                       callback=self.updateParameters,
+                                                       oneshot=False)
 
 
     def log(self, msg, type='info'):
