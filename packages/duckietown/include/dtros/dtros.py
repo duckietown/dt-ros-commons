@@ -18,8 +18,11 @@ class DTROS(object):
         via `rospy.on_shutdown(nodeobject.onShutdown)`.
 
     Every children node should call the initializer of `DTROS`. This should be done
-    by having the following line at the top of the children node `__init__` method. The
-    DTROS initializer will:
+    by having the following line at the top of the children node `__init__` method::
+
+        super(ChildrenNode, self).__init__()
+
+    The DTROS initializer will:
 
     - Setup the `node_name` attribute to the node name passed by ROS (using `rospy.get_name()`)
     - Initialize an empty `parameters` dictionary where all configurable ROS parameters should
@@ -90,7 +93,7 @@ class DTROS(object):
         else:
             raise ValueError("Type argument value %s is not supported!" % type)
 
-    def updateParameters(self, event):
+    def updateParameters(self, event=None):
         """Keeping the node parameters up to date with the parameter server.
 
         Goes through all the node parameters and check if the value for any of them is changed
