@@ -90,7 +90,7 @@ class DTROS(object):
         else:
             raise ValueError("Type argument value %s is not supported!" % type)
 
-    def updateParameters(self, event):
+    def updateParameters(self, event=None):
         """Keeping the node parameters up to date with the parameter server.
 
         Goes through all the node parameters and check if the value for any of them is changed
