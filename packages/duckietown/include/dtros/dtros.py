@@ -52,8 +52,8 @@ class DTROS(object):
         # Initialize parameters handling
         self.parameters = dict()
         self.parametersChanged = True
-        self.__updateParametersTimer = rospy.Timer(period=parameters_update_period,
-                                                   callback=self.updateParameters(),
+        self.__updateParametersTimer = rospy.Timer(period=rospy.Duration.from_sec(parameters_update_period),
+                                                   callback=self.updateParameters,
                                                    oneshot=False)
 
 
