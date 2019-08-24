@@ -12,11 +12,13 @@ FROM duckietown/dt-ros-${ROS_DISTRO}-base:${BASE_TAG}
 # configure environment
 ENV SOURCE_DIR /code
 ENV CATKIN_WS_DIR "${SOURCE_DIR}/catkin_ws"
+ENV DUCKIEFLEET_ROOT "/data/config"
 ENV ROS_LANG_DISABLE gennodejs:geneus:genlisp
 ENV READTHEDOCS True
 WORKDIR "${CATKIN_WS_DIR}"
 
 # define repository path
+ARG REPO_NAME
 ARG REPO_PATH="${CATKIN_WS_DIR}/src/${REPO_NAME}"
 WORKDIR "${REPO_PATH}"
 
@@ -39,6 +41,7 @@ RUN . /opt/ros/${ROS_DISTRO}/setup.sh && \
     --workspace ${CATKIN_WS_DIR}/
 
 # configure entrypoint
-ENTRYPOINT ["entrypoint.sh"]
+COPY assets/entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
 
 LABEL maintainer="Andrea F. Daniele (afdaniele@ttic.edu)"
