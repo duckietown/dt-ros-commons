@@ -11,11 +11,9 @@ fi
 ROS_SETUP=(
   "/opt/ros/${ROS_DISTRO}/setup.bash"
   "${INSTALL_DIR}/setup.bash"
+  "${SOURCE_DIR}/catkin_ws/devel/setup.bash"
+  "${SOURCE_DIR}/setup.sh"
 )
-
-#TODO (andrea): replace `devel` with `build`
-ROS_WS_SETUP="${SOURCE_DIR}/catkin_ws/devel/setup.bash"
-CODE_SETUP="${SOURCE_DIR}/setup.sh"
 
 # check the mandatory arguments
 VEHICLE_NAME_IS_SET=1
@@ -25,6 +23,14 @@ if [ ${#VEHICLE_NAME} -le 0 ]; then
   echo "The environment variable VEHICLE_NAME is not set. Using '${VEHICLE_NAME}'."
 fi
 export VEHICLE_NAME="${VEHICLE_NAME}"
+
+# check optional arguments
+VEHICLE_IP_IS_SET=0
+if [ ${#VEHICLE_IP} -ne 0 ]; then
+  VEHICLE_IP_IS_SET=1
+  echo "The environment variable VEHICLE_IP is set to '${VEHICLE_IP}'. Adding to /etc/hosts."
+  echo "${VEHICLE_IP} ${VEHICLE_NAME} ${VEHICLE_NAME}.local" >> /etc/hosts
+fi
 
 # configure hosts
 if [ "${VEHICLE_NAME_IS_SET}" -eq "0" ]; then
@@ -38,17 +44,6 @@ for ROS_SETUP_FILE in "${ROS_SETUP[@]}"; do
     source "${ROS_SETUP_FILE}";
   fi
 done
-
-# setup ROS environment (if present)
-#TODO(andrea): check if necessary when we switch to ROS2
-if [ -f "${ROS_WS_SETUP}" ]; then
-  source "${ROS_WS_SETUP}"
-fi
-
-# setup custom environment (if present)
-if [ -f "${CODE_SETUP}" ]; then
-  source "${CODE_SETUP}"
-fi
 
 # configure ROS IP
 #TODO(andrea): remove when we switch to ROS2
