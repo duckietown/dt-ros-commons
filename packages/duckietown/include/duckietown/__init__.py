@@ -2,7 +2,7 @@
     DTROS
     -----
 
-    .. automodule:: duckietown.include.dtros.dtros
+    .. automodule:: duckietown.include.duckietown.dtros
 
 """
 from .dtros import *
