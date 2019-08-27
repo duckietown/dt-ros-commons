@@ -1,6 +1,6 @@
 """
-    DTROS
-    -----
+    duckietown
+    ----------
 
     .. automodule:: duckietown.include.duckietown.dtros
 
