@@ -24,7 +24,9 @@ class DTROS(object):
 
     The DTROS initializer will:
 
+    - Initialize the ROS node with name `node_name`
     - Setup the `node_name` attribute to the node name passed by ROS (using `rospy.get_name()`)
+    - Add a `rospy.on_shutdown` hook to the node's `onShutdown` method
     - Initialize an empty `parameters` dictionary where all configurable ROS parameters should
         be stored. A boolean attribute `parametersChanged` is also initialized. This will be set to
         `True` when the ... method detects a change in a parameter value in the
@@ -34,24 +36,27 @@ class DTROS(object):
         check if any parameter has been updated
 
     Args:
-        parameters_update_period (floar): how often to check for new parameters (in seconds). If
+        node_name (str): a unique, descriptive name for the node that ROS will use
+        parameters_update_period (float): how often to check for new parameters (in seconds). If
            it is 0, it will not run checks at all
 
     Attributes:
         node_name (str): the name of the node
         parameters (dict): a dictionary that holds pairs `('~param_name`: param_value)`. Note that
             parameters should be given in private namespace (starting with `~`)
-        parametersChanged (bool): a boolean indicator if the
+        parametersChanged (bool): a boolean indticator if the
         is_shutdown (bool): will be set to `True` when the `onShutdown` method is called
 
     """
 
-    def __init__(self, parameters_update_period=1.0):
+    def __init__(self, node_name, parameters_update_period=1.0):
 
         # Initialize
+        rospy.init_node(node_name, anonymous=False)
         self.node_name = rospy.get_name()
         self.log("Initializing...")
         self.is_shutdown = False
+        rospy.on_shutdown(self.onShutdown)
 
         # Initialize parameters handling
         self.parameters = dict()
@@ -60,7 +65,6 @@ class DTROS(object):
             self.__updateParametersTimer = rospy.Timer(period=rospy.Duration.from_sec(parameters_update_period),
                                                        callback=self.updateParameters,
                                                        oneshot=False)
-
 
     def log(self, msg, type='info'):
         """ Passes a logging message to the ROS logging methods.
