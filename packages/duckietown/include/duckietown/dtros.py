@@ -104,18 +104,22 @@ class DTROS(object):
     # Read-only properties for the private attributes
     @property
     def switch(self):
+        """Current state of the node on/off switch"""
         return self._switch
 
     @property
     def parameters_update_period(self):
+        """The parameters update period requiested in the node initializer"""
         return self._parameters_update_period
 
     @property
     def subscribers(self):
+        """A list of all the subscribers of the node"""
         return self._subscribers
 
     @property
     def publishers(self):
+        """A list of all the publishers of the node"""
         return self._publishers
 
     def log(self, msg, type='info'):
