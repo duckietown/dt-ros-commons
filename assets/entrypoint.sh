@@ -34,6 +34,7 @@ fi
 
 # configure hosts
 if [ "${VEHICLE_NAME_IS_SET}" -eq "0" ]; then
+  # vehicle name not set (assume vehicle is localhost)
   echo "127.0.0.1 ${VEHICLE_NAME} ${VEHICLE_NAME}.local" >> /etc/hosts
 fi
 
@@ -53,7 +54,7 @@ export ROS_IP=${CONTAINER_IP}
 # configure ROS MASTER URI
 #TODO(andrea): remove when we switch to ROS2
 if [ "${ROS_MASTER_URI_IS_SET}" -eq "0" ]; then
-  export ROS_MASTER_URI="http://${VEHICLE_NAME}:11311/"
+  export ROS_MASTER_URI="http://${VEHICLE_NAME}.local:11311/"
 fi
 
 # execute given commands (if any)
