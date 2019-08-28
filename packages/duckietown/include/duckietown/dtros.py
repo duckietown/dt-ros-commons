@@ -1,8 +1,8 @@
 import rospy
 from std_srvs.srv import SetBool, SetBoolResponse
 
-from dtpublisher import DTPublisher
-from dtsubscriber import DTSubscriber
+from .dtpublisher import DTPublisher
+from .dtsubscriber import DTSubscriber
 
 class DTROS(object):
     """Parent class for all Duckietown ROS nodes
