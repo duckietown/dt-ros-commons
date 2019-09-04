@@ -40,6 +40,7 @@ add_message_files(
   LEDDetectionDebugInfo.msg
   LEDInterpreter.msg
   LEDPattern.msg
+  LightSensor.msg
   MaintenanceState.msg
   ObstacleImageDetection.msg
   ObstacleImageDetectionList.msg
