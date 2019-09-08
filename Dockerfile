@@ -2,7 +2,7 @@
 ARG REPO_NAME="dt-ros-commons"
 
 ARG ARCH=arm32v7
-ARG MAJOR=devel20
+ARG MAJOR=daffy
 ARG ROS_DISTRO=kinetic
 ARG BASE_TAG=${MAJOR}-${ARCH}
 
