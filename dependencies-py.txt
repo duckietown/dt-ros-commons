@@ -6,3 +6,4 @@ QuickApp==1.3.17
 compmake==3.5.23
 SystemCmd==2.2.2
 picamera==1.13 
+networkx==2.2
