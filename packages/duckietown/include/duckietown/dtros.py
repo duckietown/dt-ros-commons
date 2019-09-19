@@ -151,7 +151,7 @@ class DTROS(object):
         else:
             raise ValueError('Type argument value %s is not supported!' % type)
 
-    def updateParameters(self, event=None):
+    def updateParameters(self, event=None, verbose=True):
         """Keeping the node parameters up to date with the parameter server.
 
         Goes through all the node parameters and check if the value for any of them is changed
@@ -171,7 +171,8 @@ class DTROS(object):
             if new_value != self.parameters[param_name]:
                 self.parameters[param_name] = new_value
                 self.parametersChanged = True
-                self.log('Setting parameter %s = %s ' % (param_name, new_value))
+                if verbose:
+                    self.log('Setting parameter %s = %s ' % (param_name, new_value))
 
     def srvSwitch(self, request):
         """
@@ -247,7 +248,3 @@ class DTROS(object):
         if self._parameters_update_period > 0:
             self._updateParametersTimer.shutdown()
         self.log('Shutdown.')
-
-
-
-
