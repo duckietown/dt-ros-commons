@@ -6,7 +6,7 @@ class DTSubscriber(rospy.Subscriber):
     """ A wrapper around `rospy.Subscriber`.
 
     This class is exactly the same as the standard
-    `rospy.Subscriber <http://docs.ros.org/api/rospy/html/rospy.topics.Subscriber-class.html`_
+    `rospy.Subscriber <http://docs.ros.org/api/rospy/html/rospy.topics.Subscriber-class.html>`_
     with the only difference of an `active` attribute being added. Whenever the `publish` method is used,
     an actual message will be send only if `active` is set to `True`.
 
@@ -52,13 +52,11 @@ class DTSubscriber(rospy.Subscriber):
                                      'resolved_name': self.resolved_name}
 
 
-    # Read-only property for the private attributes
-    @property
+    @property  #: Read-only property for the private attributes
     def active(self):
         return self._active
 
-    # Setter for the read-only property for the private attributes
-    @active.setter
+    @active.setter  #: Setter for the read-only property for the private attributes
     def active(self, new_status):
         if self._active==new_status:
             # Don't do anything if the status doesn't change

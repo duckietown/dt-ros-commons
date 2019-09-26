@@ -4,7 +4,7 @@ class DTPublisher(rospy.Publisher):
     """ A wrapper around `rospy.Publisher`.
 
     This class is exactly the same as the standard
-    `rospy.Publisher <http://docs.ros.org/api/rospy/html/rospy.topics.Publisher-class.html`_
+    `rospy.Publisher <http://docs.ros.org/api/rospy/html/rospy.topics.Publisher-class.html>`_
     with the only difference of an `active` attribute being added. Whenever the `publish` method is used,
     an actual message will be send only if `active` is set to `True`.
 

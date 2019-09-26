@@ -13,20 +13,21 @@ class DTROS(object):
     reliable behaviour of all ROS nodes in the Duckietown universe.
 
     In particular, the DTROS class provides:
+
     - Logging: DTROS provides the `log` method as a wrapper around the ROS logging
-       services. It will automatically append the ROS node name to the message.
+      services. It will automatically append the ROS node name to the message.
     - Parameters handling:  DTROS provides the `parameters` and `parametersChanged` attributes
-       and automatically updates them if it detects a change in the Parameter Server.
+      and automatically updates them if it detects a change in the Parameter Server.
     - Shutdown procedure: a common shutdown procedure for ROS nodes. Should be attached
-       via `rospy.on_shutdown(nodeobject.onShutdown)`.
+      via `rospy.on_shutdown(nodeobject.onShutdown)`.
     - Switchable Subscribers and Publishers: `DTROS.publisher()` and `DTROS.subscriber()` returns
-       modified subscribers and publishers that can be dynamically deactivated and reactivated
-       by requesting `False` or `True` to the `~switch` service respectively.
+      modified subscribers and publishers that can be dynamically deactivated and reactivated
+      by requesting `False` or `True` to the `~switch` service respectively.
     - Node deactivation and reactivation: through requesting `Falce` to the `~switch`
-       service all subscribers and publishers obtained through `DTROS.publisher()` and `DTROS.subscriber()`
-       will be deactivated and the `switch` attribute will be set to `False`. This switch can be
-       used by computationally expensive parts of the node code that are not in callbacks in ordert to
-       to pause their execution.
+      service all subscribers and publishers obtained through `DTROS.publisher()` and `DTROS.subscriber()`
+      will be deactivated and the `switch` attribute will be set to `False`. This switch can be
+      used by computationally expensive parts of the node code that are not in callbacks in ordert to
+      to pause their execution.
 
     Every children node should call the initializer of `DTROS`. This should be done
     by having the following line at the top of the children node `__init__` method::
@@ -39,12 +40,12 @@ class DTROS(object):
     - Setup the `node_name` attribute to the node name passed by ROS (using `rospy.get_name()`)
     - Add a `rospy.on_shutdown` hook to the node's `onShutdown` method
     - Initialize an empty `parameters` dictionary where all configurable ROS parameters should
-       be stored. A boolean attribute `parametersChanged` is also initialized. This will be set to
-       `True` when the `updateParameters` callback detects a change in a parameter value in the
-       `ROS Parameter Server <https://wiki.ros.org/Parameter%20Server>`_ and changes the value
-       of at least one parameter.
+      be stored. A boolean attribute `parametersChanged` is also initialized. This will be set to
+      `True` when the `updateParameters` callback detects a change in a parameter value in the
+      `ROS Parameter Server <https://wiki.ros.org/Parameter%20Server>`_ and changes the value
+      of at least one parameter.
     - Start a recurrent timer that calls `updateParameters` regularly to
-       check if any parameter has been updated
+      check if any parameter has been updated
     - Setup a `~switch` service that can be used to deactivate and reactivate the node
 
     Args:
