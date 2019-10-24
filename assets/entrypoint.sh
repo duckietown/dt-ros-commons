@@ -29,13 +29,21 @@ VEHICLE_IP_IS_SET=0
 if [ ${#VEHICLE_IP} -ne 0 ]; then
   VEHICLE_IP_IS_SET=1
   echo "The environment variable VEHICLE_IP is set to '${VEHICLE_IP}'. Adding to /etc/hosts."
-  echo "${VEHICLE_IP} ${VEHICLE_NAME} ${VEHICLE_NAME}.local" >> /etc/hosts
+  {
+      echo "${VEHICLE_IP} ${VEHICLE_NAME} ${VEHICLE_NAME}.local" >> /etc/hosts
+  } || {
+      echo "..."
+  }
 fi
 
 # configure hosts
 if [ "${VEHICLE_NAME_IS_SET}" -eq "0" ]; then
   # vehicle name not set (assume vehicle is localhost)
-  echo "127.0.0.1 ${VEHICLE_NAME} ${VEHICLE_NAME}.local" >> /etc/hosts
+    {
+        echo "127.0.0.1 ${VEHICLE_NAME} ${VEHICLE_NAME}.local" >> /etc/hosts
+    } || {
+        echo "..."
+    }
 fi
 
 # setup ros environment
