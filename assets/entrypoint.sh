@@ -32,7 +32,7 @@ if [ ${#VEHICLE_IP} -ne 0 ]; then
   {
       echo "${VEHICLE_IP} ${VEHICLE_NAME} ${VEHICLE_NAME}.local" >> /etc/hosts
   } || {
-      echo "..."
+      echo "Failed writing to /etc/hosts. Will continue anyway."
   }
 fi
 
@@ -42,7 +42,7 @@ if [ "${VEHICLE_NAME_IS_SET}" -eq "0" ]; then
     {
         echo "127.0.0.1 ${VEHICLE_NAME} ${VEHICLE_NAME}.local" >> /etc/hosts
     } || {
-        echo "..."
+        echo "Failed writing to /etc/hosts. Will continue anyway."
     }
 fi
 
