@@ -5,9 +5,10 @@ ARG ARCH=arm32v7
 ARG MAJOR=daffy
 ARG ROS_DISTRO=kinetic
 ARG BASE_TAG=${MAJOR}-${ARCH}
+ARG BASE_IMAGE=dt-ros-${ROS_DISTRO}-base
 
 # define base image
-FROM duckietown/dt-ros-${ROS_DISTRO}-base:${BASE_TAG}
+FROM duckietown/${BASE_IMAGE}:${BASE_TAG}
 
 # configure environment
 ENV SOURCE_DIR /code
@@ -51,8 +52,18 @@ COPY assets/entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
 # store module name
-LABEL DT_MODULE_NAME "${REPO_NAME}"
-ENV DT_MODULE_NAME "${REPO_NAME}"
+LABEL org.duckietown.label.module.type "${REPO_NAME}"
+ENV DT_MODULE_TYPE "${REPO_NAME}"
+
+# store module metadata
+ARG ARCH
+ARG MAJOR
+ARG BASE_TAG
+ARG BASE_IMAGE
+LABEL org.duckietown.label.architecture "${ARCH}"
+LABEL org.duckietown.label.code.location "${REPO_PATH}"
+LABEL org.duckietown.label.code.version.major "${MAJOR}"
+LABEL org.duckietown.label.base.image "${BASE_IMAGE}:${BASE_TAG}"
 
 # define maintainer
 LABEL maintainer="Andrea F. Daniele (afdaniele@ttic.edu)"
