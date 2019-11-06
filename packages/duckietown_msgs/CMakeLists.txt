@@ -28,6 +28,7 @@ add_message_files(
   CoordinationClearance.msg
   CoordinationSignal.msg
   DuckiebotLED.msg
+  EncoderStamped.msg
   FSMState.msg
   IntersectionPose.msg
   IntersectionPoseImg.msg
@@ -47,6 +48,7 @@ add_message_files(
   ObstacleProjectedDetection.msg
   ObstacleProjectedDetectionList.msg
   ObstacleType.msg
+  ParamTuner.msg
   Pixel.msg
   Pose2DStamped.msg
   Rect.msg
@@ -69,6 +71,8 @@ add_message_files(
   Vsample.msg
   WheelsCmd.msg
   WheelsCmdStamped.msg
+  WheelsCmdDBV2.msg
+  WheelsCmdDBV2Stamped.msg
 )
 
 ## Generate services in the 'srv' folder
