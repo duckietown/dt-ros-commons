@@ -74,14 +74,16 @@ add_message_files(
 ## Generate services in the 'srv' folder
 add_service_files(
   FILES
-  SetValue.srv
-  SetVariable.srv
+  ChangePattern.srv
   GetVariable.srv
   IMUstatus.srv
   LFstatus.srv
-  ToFstatus.srv
   SensorsStatus.srv
+  SetCustomLEDPattern.srv
   SetFSMState.srv
+  SetValue.srv
+  SetVariable.srv
+  ToFstatus.srv
 )
 
 
