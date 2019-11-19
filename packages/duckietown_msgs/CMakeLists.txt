@@ -71,7 +71,6 @@ add_message_files(
   Vsample.msg
   WheelsCmd.msg
   WheelsCmdStamped.msg
-  WheelsCmdDBV2.msg
   WheelsCmdDBV2Stamped.msg
 )
 
