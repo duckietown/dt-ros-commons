@@ -75,7 +75,7 @@ fi
 # reuse LAUNCHFILE as CMD if the var is set and the first argument is `--`
 if [ ${#LAUNCHFILE} -gt 0 ] && [ "$1" == "--" ]; then
   shift
-  exec bash -c "$LAUNCHFILE $@"
+  exec bash -c "$LAUNCHFILE $*"
 else
   exec "$@"
 fi
