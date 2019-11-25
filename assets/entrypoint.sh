@@ -72,5 +72,10 @@ if [ "${ROS_MASTER_URI_IS_SET}" -eq "0" ]; then
   export ROS_MASTER_URI="http://${VEHICLE_NAME}.local:11311/"
 fi
 
-# execute given commands (if any)
-exec "$@"
+# reuse LAUNCHFILE as CMD if the var is set and the first argument is `--`
+if [ ${#LAUNCHFILE} -gt 0 ] && [ "$1" == "--" ]; then
+  shift
+  exec bash -c "$LAUNCHFILE $@"
+else
+  exec "$@"
+fi
