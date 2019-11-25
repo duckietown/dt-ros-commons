@@ -18,6 +18,7 @@ ROS_SETUP=(
 # check the mandatory arguments
 VEHICLE_NAME_IS_SET=1
 if [ ${#VEHICLE_NAME} -le 0 ]; then
+  # vehicle name not set, use `hostname`
   VEHICLE_NAME_IS_SET=0
   VEHICLE_NAME=$(hostname)
   echo "The environment variable VEHICLE_NAME is not set. Using '${VEHICLE_NAME}'."
@@ -30,20 +31,26 @@ if [ ${#VEHICLE_IP} -ne 0 ]; then
   VEHICLE_IP_IS_SET=1
   echo "The environment variable VEHICLE_IP is set to '${VEHICLE_IP}'. Adding to /etc/hosts."
   {
-      echo "${VEHICLE_IP} ${VEHICLE_NAME} ${VEHICLE_NAME}.local" >> /etc/hosts
+    echo "${VEHICLE_IP} ${VEHICLE_NAME} ${VEHICLE_NAME}.local" >> /etc/hosts
   } || {
-      echo "Failed writing to /etc/hosts. Will continue anyway."
+    echo "Failed writing to /etc/hosts. Will continue anyway."
   }
+fi
+
+# if vehicle name is set, vehicle ip is then compulsory
+if [ "${VEHICLE_IP_IS_SET}" -eq "1" ] && [ "${VEHICLE_IP_IS_SET}" -eq "0" ]; then
+  echo "If you set the variable VEHICLE_NAME, you must set the variable VEHICLE_IP as well. Aborting..."
+  exit -1
 fi
 
 # configure hosts
 if [ "${VEHICLE_NAME_IS_SET}" -eq "0" ]; then
-  # vehicle name not set (assume vehicle is localhost)
-    {
-        echo "127.0.0.1 ${VEHICLE_NAME} ${VEHICLE_NAME}.local" >> /etc/hosts
-    } || {
-        echo "Failed writing to /etc/hosts. Will continue anyway."
-    }
+  # vehicle name is not set (assume vehicle is localhost)
+  {
+    echo "127.0.0.1 ${VEHICLE_NAME} ${VEHICLE_NAME}.local" >> /etc/hosts
+  } || {
+    echo "Failed writing to /etc/hosts. Will continue anyway."
+  }
 fi
 
 # setup ros environment
