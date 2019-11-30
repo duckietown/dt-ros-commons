@@ -1,1 +1,0 @@
-# Package `duckietown` {#package-duckietown}

@@ -4,8 +4,8 @@ pipeline {
     stage('Prepare') {
       steps {
         sh 'pip3 install --upgrade duckietown-shell'
+        sh 'dts --set-version daffy exit'
         sh 'dts update'
-    	  sh 'dts install devel'
       }
     }
     stage('Pre-Clean') {
@@ -15,7 +15,7 @@ pipeline {
     }
     stage('Build') {
       steps {
-        sh 'dts devel build --no-multiarch'
+        sh 'dts devel build --ci'
       }
     }
     stage('Push') {
