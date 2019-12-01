@@ -18,7 +18,6 @@ FROM duckietown/${BASE_IMAGE}:${BASE_TAG}
 
 # copy stuff from the super image
 COPY --from=dt-commons /environment.sh /environment.sh
-COPY --from=dt-commons /process.pid /process.pid
 
 # configure environment
 ENV SOURCE_DIR /code
