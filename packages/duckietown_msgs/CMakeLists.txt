@@ -42,6 +42,7 @@ add_message_files(
   LEDInterpreter.msg
   LEDPattern.msg
   LightSensor.msg
+  LineFollowerStamped.msg
   MaintenanceState.msg
   ObstacleImageDetection.msg
   ObstacleImageDetectionList.msg
@@ -62,6 +63,7 @@ add_message_files(
   StopLineReading.msg
   TagInfo.msg
   ThetaDotSample.msg
+  ToFStamped.msg
   Trajectory.msg
   TurnIDandType.msg
   Twist2DStamped.msg
