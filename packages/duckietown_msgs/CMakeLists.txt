@@ -23,6 +23,7 @@ add_message_files(
   AprilTagDetectionArray.msg
   AprilTagsWithInfos.msg
   AprilTagExtended.msg
+  BatteryStatus.msg
   BoolStamped.msg
   CarControl.msg
   CoordinationClearance.msg
