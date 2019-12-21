@@ -2,10 +2,9 @@
 ARG REPO_NAME="dt-ros-commons"
 
 ARG ARCH=arm32v7
-ARG MAJOR=daffy
-ARG ROS_DISTRO=kinetic
+ARG MAJOR=ente
 ARG BASE_TAG=${MAJOR}-${ARCH}
-ARG BASE_IMAGE=dt-ros-${ROS_DISTRO}-base
+ARG BASE_IMAGE=dt-ros-base
 
 # extend dt-commons
 ARG SUPER_IMAGE=dt-commons
