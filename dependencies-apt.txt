@@ -1,3 +1,6 @@
 # LIST YOUR APT PACKAGES HERE
-ros-kinetic-cv-bridge
-ros-kinetic-rospy
+#ros-melodic-cv-bridge
+#ros-melodic-rospy
+
+# matplotlib build dependency (arm32v7 only)
+libfreetype6-dev

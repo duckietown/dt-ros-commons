@@ -1,0 +1,4 @@
+# LIST YOUR ROS PACKAGES HERE
+cv_bridge
+
+# BLACKLIST
