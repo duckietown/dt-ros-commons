@@ -18,9 +18,7 @@ class InvalidQueryForUniverse(Exception):
     pass
 
 
-class Spec(object):
-    __metaclass__ = ABCMeta
-
+class Spec(object, metaclass=ABCMeta):
     def __init__(self, children):
         self.children = children
 
@@ -36,7 +34,7 @@ class Spec(object):
 
     def match_dict(self, stuff):
         res = OrderedDict()
-        for k, v in stuff.items():
+        for k, v in list(stuff.items()):
             if self.match(k):
                 res[k] = v
         return res
@@ -76,7 +74,7 @@ class Or(Spec):
         matches = OrderedDict()
         for option in self.children:
             theirs = option.match_dict(seq)
-            for k, v in theirs.items():
+            for k, v in list(theirs.items()):
                 if not k in matches:
                     matches[k] = v
         return matches
@@ -97,7 +95,7 @@ class And(Spec):
             theirs = option.match_dict(seq)
             children_answers.append(theirs)
 
-        for k, v in seq.items():
+        for k, v in list(seq.items()):
             ok = all(k in _ for _ in children_answers)
             if ok:
                 matches[k] = v
@@ -223,7 +221,7 @@ class Reverse(Spec):
 def _get_tag(x, tagname):
     if isinstance(x, dict):
         if not tagname in x:
-            msg = 'Cannot find %r in keys %r' % (tagname, x.keys())
+            msg = 'Cannot find %r in keys %r' % (tagname, list(x.keys()))
             raise InvalidQueryForUniverse(msg)
         return x[tagname]
     else:
@@ -278,7 +276,7 @@ class ByTag(Spec):
     def match(self, x):
         if isinstance(x, dict):
             if not self.tagname in x:
-                msg = 'Cannot find %r in keys %r' % (self.tagname, x.keys())
+                msg = 'Cannot find %r in keys %r' % (self.tagname, list(x.keys()))
                 raise InvalidQueryForUniverse(msg)
             val = x[self.tagname]
         else:
@@ -296,7 +294,7 @@ class ByTag(Spec):
 
     def match_dict(self, seq):
         matches = OrderedDict()
-        for k, v in seq.items():
+        for k, v in list(seq.items()):
             if self.match(v):
                 matches[k] = v
         return matches
@@ -454,7 +452,7 @@ def parse_match_spec(s, filters=None):
         msg = 'Cannot parse empty string.'
         raise ValueError(msg)
 
-    for k, F in filters.items():
+    for k, F in list(filters.items()):
         rs = '(.*)/' + k + '$'
         reg = re.compile(rs)
 
@@ -475,10 +473,10 @@ def parse_match_spec(s, filters=None):
 
     if '+' in s:
         tokens = s.split('+')
-        return Or(map(rec, tokens))
+        return Or(list(map(rec, tokens)))
     if ',' in s:
         tokens = s.split(',')
-        return And(map(rec, tokens))
+        return And(list(map(rec, tokens)))
 
     if s.startswith('contains:'):
         rest = remove_prefix(s, 'contains:')

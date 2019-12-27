@@ -111,7 +111,7 @@ def look_everywhere_for_config_files2(pattern, all_yaml):
     """
 
     results = OrderedDict()
-    for filename, contents in all_yaml.items():
+    for filename, contents in list(all_yaml.items()):
         if fnmatch.fnmatch(filename, pattern):
             results[filename] = contents
 

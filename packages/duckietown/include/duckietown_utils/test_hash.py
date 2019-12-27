@@ -1,8 +1,8 @@
 from collections import namedtuple
 import hashlib
 import os
-import urllib
-import urlparse
+import urllib.request, urllib.parse, urllib.error
+import urllib.parse
 
 from duckietown_utils.logging_logger import logger
 
@@ -57,10 +57,10 @@ def create_hash_url(fn):
     name = os.path.basename(fn)
     size = os.path.getsize(fn)
     qs = [ ('size', size), ('name', name) ]
-    query = urllib.urlencode(qs)
+    query = urllib.parse.urlencode(qs)
     fragment = None
 
-    url = urlparse.urlunparse((scheme, netloc, path, parameters, query, fragment))
+    url = urllib.parse.urlunparse((scheme, netloc, path, parameters, query, fragment))
     return url
 
 
@@ -68,12 +68,12 @@ HashUrl = namedtuple('HashUrl', 'size name sha1')
 
 
 def parse_hash_url(url):
-    parsed = (scheme, netloc, path, _parameters, query_string, _fragment) = urlparse.urlparse(url)
+    parsed = (scheme, netloc, path, _parameters, query_string, _fragment) = urllib.parse.urlparse(url)
 #    print (scheme, netloc, path, parameters, query_string, fragment)
     assert scheme == 'hash', parsed
     assert netloc == 'sha1', parsed
 
-    query = urlparse.parse_qs(query_string)
+    query = urllib.parse.parse_qs(query_string)
     sha1 = path.replace('/', '')
 
     size = query.get('size', None)  # this returns lists for some reason

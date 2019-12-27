@@ -74,13 +74,13 @@ def d8_image_resize_fit_in_rect(img, shape, bgcolor=(128, 128, 128)):
 def resize_small_images(image_dict):
     check_isinstance(image_dict, dict)
     max_H, max_W = 0, 0
-    for _, image in image_dict.items():
+    for _, image in list(image_dict.items()):
         H, W = image.shape[0:2]
         max_H = max(max_H, W)
         max_W = max(max_W, W)
 
     d = OrderedDict()
-    for k, image in image_dict.items():
+    for k, image in list(image_dict.items()):
         if len(image.shape) == 2:  # grayscale
             image = gray2rgb(image)
 
@@ -100,6 +100,6 @@ def resize_images_to_fit_in_rect(image_dict, shape, bgcolor):
     check_isinstance(image_dict, dict)
 
     d = OrderedDict()
-    for k, image in image_dict.items():
+    for k, image in list(image_dict.items()):
         d[k] = d8_image_resize_fit_in_rect(image, shape, bgcolor)
     return d
