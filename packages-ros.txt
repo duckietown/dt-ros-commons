@@ -1,4 +1,3 @@
 # LIST YOUR ROS PACKAGES HERE
 cv_bridge
-
-# BLACKLIST
+joystick_drivers
