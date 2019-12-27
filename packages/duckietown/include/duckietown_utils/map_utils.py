@@ -1,8 +1,4 @@
-# XXX: what is this?
-#!/usr/bin/python
-
 from scipy import signal
-
 import numpy as np
 
 
@@ -56,14 +52,3 @@ class RandomMapGenerator(object):
                 break
 
         return self.map;
-
-
-def main():
-    size = (4, 4)
-    rmg = RandomMapGenerator(size)
-    the_map = rmg.generate()
-    print(the_map)
-
-
-if __name__ == "__main__":
-    main()
