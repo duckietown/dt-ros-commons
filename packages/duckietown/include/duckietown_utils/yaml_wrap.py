@@ -29,9 +29,9 @@ def yaml_load_file(filename, plain_yaml=False):
     if not os.path.exists(filename):
         msg = 'File does not exist: %s' % friendly_path(filename)
         raise ValueError(msg)
-    with open(filename) as f:
+    with open(filename, 'r') as f:
         contents = f.read()
-    return interpret_yaml_file(filename, contents,
+        return interpret_yaml_file(filename, contents,
                                f=lambda _filename, data: data,
                                plain_yaml=plain_yaml)
 
@@ -171,4 +171,3 @@ def same_file_content(a, b):
     s1 = os.stat(a).st_size
     s2 = os.stat(b).st_size
     return s1 == s2
-
