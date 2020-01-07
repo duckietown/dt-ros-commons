@@ -1,6 +1,3 @@
 # LIST YOUR APT PACKAGES HERE
-#ros-melodic-cv-bridge
-#ros-melodic-rospy
-
-# matplotlib build dependency (arm32v7 only)
-libfreetype6-dev
+python3-matplotlib
+python3-scipy

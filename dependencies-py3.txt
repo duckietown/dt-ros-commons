@@ -1,10 +1,8 @@
 # LIST YOUR PYTHON PACKAGES HERE
 frozendict
 PyGeometry
-matplotlib
 QuickApp
 compmake
 SystemCmd
 picamera
 networkx
-scipy
