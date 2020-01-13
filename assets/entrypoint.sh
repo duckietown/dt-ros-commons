@@ -38,7 +38,7 @@ if [ ${#VEHICLE_IP} -ne 0 ]; then
 fi
 
 # if vehicle name is set, vehicle ip is then compulsory
-if [ "${VEHICLE_IP_IS_SET}" -eq "1" ] && [ "${VEHICLE_IP_IS_SET}" -eq "0" ]; then
+if [ "${VEHICLE_NAME_IS_SET}" -eq "1" ] && [ "${VEHICLE_IP_IS_SET}" -eq "0" ]; then
   echo "If you set the variable VEHICLE_NAME, you must set the variable VEHICLE_IP as well. Aborting..."
   exit -1
 fi
