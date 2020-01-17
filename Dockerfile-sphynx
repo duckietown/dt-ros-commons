@@ -1,7 +1,7 @@
 ARG REPO_NAME="dt-ros-commons"
 
 ARG ARCH=amd64
-ARG MAJOR=daffy
+ARG MAJOR=ente
 ARG ROS_DISTRO=kinetic
 ARG BASE_TAG=${MAJOR}-${ARCH}
 
