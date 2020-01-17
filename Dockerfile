@@ -8,7 +8,7 @@ ARG BASE_IMAGE=dt-ros-base
 
 # extend dt-commons
 ARG SUPER_IMAGE=dt-commons
-ARG SUPER_IMAGE_MAJOR=daffy
+ARG SUPER_IMAGE_MAJOR=ente
 ARG SUPER_IMAGE_TAG=${SUPER_IMAGE_MAJOR}-${ARCH}
 FROM duckietown/${SUPER_IMAGE}:${SUPER_IMAGE_TAG} as dt-commons
 
@@ -17,6 +17,7 @@ FROM duckietown/${BASE_IMAGE}:${BASE_TAG}
 
 # copy stuff from the super image
 COPY --from=dt-commons /environment.sh /environment.sh
+COPY --from=dt-commons /utils /utils
 
 # configure environment
 ENV SOURCE_DIR /code
