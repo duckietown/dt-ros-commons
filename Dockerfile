@@ -16,8 +16,15 @@ FROM duckietown/${SUPER_IMAGE}:${SUPER_IMAGE_TAG} as dt-commons
 FROM duckietown/${BASE_IMAGE}:${BASE_TAG}
 
 # copy stuff from the super image
+## 1. Environment script
 COPY --from=dt-commons /environment.sh /environment.sh
+## 2. Utils scripts
 COPY --from=dt-commons /utils /utils
+## 3. Raspberry Pi libraries
+COPY --from=dt-commons /opt/vc /opt/vc
+COPY --from=dt-commons /etc/ld.so.conf.d/00-vmcs.conf /etc/ld.so.conf.d/00-vmcs.conf
+## 4. Configure ld
+RUN ldconfig
 
 # configure environment
 ENV SOURCE_DIR /code
