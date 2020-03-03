@@ -40,7 +40,7 @@ fi
 # if vehicle name is set, vehicle ip is then compulsory
 if [ "${VEHICLE_IP_IS_SET}" -eq "1" ] && [ "${VEHICLE_IP_IS_SET}" -eq "0" ]; then
   echo "If you set the variable VEHICLE_NAME, you must set the variable VEHICLE_IP as well. Aborting..."
-  exit -1
+  exit 1
 fi
 
 # configure hosts
@@ -74,10 +74,10 @@ fi
 
 set +e
 
-# reuse LAUNCHFILE as CMD if the var is set and the first argument is `--`
-if [ ${#LAUNCHFILE} -gt 0 ] && [ "$1" == "--" ]; then
+# reuse LAUNCHER as CMD if the var is set and the first argument is `--`
+if [ ${#LAUNCHER} -gt 0 ] && [ "$1" == "--" ]; then
   shift
-  exec bash -c "$LAUNCHFILE $*"
+  exec bash -c "dt-launcher-$LAUNCHER $*"
 else
   exec "$@"
 fi

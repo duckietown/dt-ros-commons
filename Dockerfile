@@ -94,6 +94,10 @@ COPY assets/entrypoint.sh /entrypoint.sh
 RUN echo "source /entrypoint.sh" >> /etc/bash.bashrc
 ENTRYPOINT ["/entrypoint.sh"]
 
+# define default command
+ENV LAUNCHER "default"
+CMD ["bash", "-c", "dt-launcher-${LAUNCHER}"]
+
 # store module name
 LABEL org.duckietown.label.module.type="${REPO_NAME}"
 ENV DT_MODULE_TYPE "${REPO_NAME}"
