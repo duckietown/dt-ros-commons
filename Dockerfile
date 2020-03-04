@@ -29,6 +29,7 @@ RUN ldconfig
 
 # configure environment
 ENV SOURCE_DIR /code
+ENV LAUNCH_DIR /launch
 ENV CATKIN_WS_DIR "${SOURCE_DIR}/catkin_ws"
 ENV DUCKIEFLEET_ROOT "/data/config"
 ENV ROS_LANG_DISABLE gennodejs:geneus:genlisp
@@ -38,9 +39,11 @@ ENV DISABLE_CONTRACTS True
 # define repository path
 ARG REPO_NAME
 ARG REPO_PATH="${CATKIN_WS_DIR}/src/${REPO_NAME}"
+ARG LAUNCH_PATH="${LAUNCH_DIR}/${REPO_NAME}"
 
 # create repo directory
 RUN mkdir -p "${REPO_PATH}"
+RUN mkdir -p "${LAUNCH_PATH}"
 WORKDIR "${REPO_PATH}"
 
 # build ROS packages
@@ -93,6 +96,10 @@ HEALTHCHECK \
 COPY assets/entrypoint.sh /entrypoint.sh
 RUN echo "source /entrypoint.sh" >> /etc/bash.bashrc
 ENTRYPOINT ["/entrypoint.sh"]
+
+# install launcher scripts
+COPY ./launch/default.sh "${LAUNCH_PATH}/"
+RUN /utils/install_launchers "${LAUNCH_PATH}"
 
 # define default command
 ENV LAUNCHER "default"
