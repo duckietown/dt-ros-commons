@@ -4,6 +4,7 @@ from std_srvs.srv import SetBool, SetBoolResponse
 from .dtpublisher import DTPublisher
 from .dtsubscriber import DTSubscriber
 
+
 class DTROS(object):
     """Parent class for all Duckietown ROS nodes
 
@@ -89,18 +90,17 @@ class DTROS(object):
         self.parametersChanged = False
         self._parameters_update_period = parameters_update_period
         if self._parameters_update_period > 0:
-            self._updateParametersTimer = rospy.Timer(period=rospy.Duration.from_sec(self._parameters_update_period),
-                                                       callback=self.updateParameters,
-                                                       oneshot=False)
+            self._updateParametersTimer = rospy.Timer(
+                period=rospy.Duration.from_sec(self._parameters_update_period),
+                callback=self.updateParameters,
+                oneshot=False
+            )
 
         # Handle publishers, subscribers, and the state switch
         self._switch = True
         self._subscribers = list()
         self._publishers = list()
-        self.srv_switch = rospy.Service("~switch",
-                                        SetBool,
-                                        self.srvSwitch)
-
+        self.srv_switch = rospy.Service("~switch", SetBool, self.srvSwitch)
 
     # Read-only properties for the private attributes
     @property
@@ -140,18 +140,17 @@ class DTROS(object):
             ValueError: if the `type` argument is not one of the supported types
 
         """
-
         full_msg = '[%s] %s' % (self.node_name, msg)
 
-        if type=='debug':
+        if type == 'debug':
             rospy.logdebug(full_msg)
-        elif type=='info':
+        elif type == 'info':
             rospy.loginfo(full_msg)
-        elif type=='warn':
+        elif type == 'warn':
             rospy.logwarn(full_msg)
-        elif type=='err':
+        elif type == 'err':
             rospy.logerr(full_msg)
-        elif type=='fatal':
+        elif type == 'fatal':
             rospy.logfatal(full_msg)
         else:
             raise ValueError('Type argument value %s is not supported!' % type)
@@ -170,7 +169,6 @@ class DTROS(object):
             KeyError: if one of the parameters is not found in the parameter server
 
         """
-
         for param_name in self.parameters:
             new_value = rospy.get_param(param_name)
             if new_value != self.parameters[param_name]:
@@ -189,7 +187,6 @@ class DTROS(object):
             :obj:`std_srvs.srv.SetBoolResponse`: Response for successful feedback
 
         """
-
         old_state = self._switch
         new_state = request.data
 
@@ -199,9 +196,10 @@ class DTROS(object):
         for sub in self.subscribers:
             sub.active = self._switch
 
-
-        msg = 'Node switched from %s to %s' % ('on' if old_state else 'off',
-                                               'on' if new_state else 'off')
+        msg = 'Node switched from %s to %s' % (
+            'on' if old_state else 'off',
+            'on' if new_state else 'off'
+        )
         response = SetBoolResponse()
         response.success = True
         response.message = msg
@@ -220,12 +218,10 @@ class DTROS(object):
            DTSubscriber: the resulting subscriber instance
 
         """
-
         sub = DTSubscriber(*args, **kwargs)
         self._subscribers.append(sub)
 
         return sub
-
 
     def publisher(self, *args, **kwargs):
         """
@@ -238,13 +234,10 @@ class DTROS(object):
            DTPublisher: the resulting publisher instance
 
         """
-
         pub = DTPublisher(*args, **kwargs)
         self._publishers.append(pub)
 
         return pub
-
-
 
     def onShutdown(self):
         """Shutdown procedure."""

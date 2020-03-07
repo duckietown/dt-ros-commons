@@ -1,6 +1,10 @@
 import rospy
 
-class DTPublisher(rospy.Publisher):
+from .diagnostics import TopicDirection
+from .dttopic import DTTopic
+
+
+class DTPublisher(DTTopic, rospy.Publisher):
     """ A wrapper around `rospy.Publisher`.
 
     This class is exactly the same as the standard
@@ -34,9 +38,14 @@ class DTPublisher(rospy.Publisher):
     """
 
     def __init__(self, *args, **kwargs):
-
-        super(DTPublisher, self).__init__(*args, **kwargs)
+        ros_args = {k: v for k, v in kwargs.items() if not k.startswith('dt_')}
+        super(DTPublisher, self).__init__(*args, **ros_args)
+        # dt arguments
         self.active = True
+        # parse dt arguments
+        self._parse_dt_args(kwargs)
+        # register dt topic
+        self._register_dt_topic(TopicDirection.OUTBOUND)
 
     def publish(self, *args, **kwargs):
         """ A wrapper around the `rospy.Publisher.publish` method.
@@ -48,4 +57,5 @@ class DTPublisher(rospy.Publisher):
 
         """
         if self.active:
+            # call super publish
             super(DTPublisher, self).publish(*args, **kwargs)

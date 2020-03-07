@@ -27,6 +27,12 @@ add_message_files(
   CarControl.msg
   CoordinationClearance.msg
   CoordinationSignal.msg
+  DiagnosticsRosLink.msg
+  DiagnosticsRosLinkArray.msg
+  DiagnosticsRosParameter.msg
+  DiagnosticsRosParameterArray.msg
+  DiagnosticsRosTopic.msg
+  DiagnosticsRosTopicArray.msg
   DroneControl.msg
   DroneMode.msg  
   DuckiebotLED.msg
