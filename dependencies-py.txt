@@ -7,3 +7,6 @@ compmake==3.5.23
 SystemCmd==2.2.2
 picamera==1.13 
 networkx==2.2
+
+# Package: ros_http_api
+flask
