@@ -27,6 +27,8 @@ add_message_files(
   CarControl.msg
   CoordinationClearance.msg
   CoordinationSignal.msg
+  DroneControl.msg
+  DroneMode.msg  
   DuckiebotLED.msg
   EncoderStamped.msg
   FSMState.msg

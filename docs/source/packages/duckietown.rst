@@ -3,8 +3,8 @@ duckietown package
 
 .. contents::
 
-The `duckietown` package contains the `duckietown` library that supplies DTROS, the mother
-node for all Duckietown ROS nodes, and `duckietown-utils`, a number of convenient functions
+The ``duckietown`` package contains the :py:mod:`duckietown` library that supplies DTROS, the mother
+node for all Duckietown ROS nodes, and :py:mod:`duckietown-utils`, a number of convenient functions
 that you can use in your code.
 
 
@@ -20,4 +20,4 @@ duckietown-utils
 ^^^^^^^^^^^^^^^^
 
 Note:
-    Unfortunately the `duckietown-utils` is not documented yet.
+    Unfortunately `duckietown-utils` is not documented yet.
