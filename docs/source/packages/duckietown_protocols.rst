@@ -20,7 +20,11 @@ and the actual ``LED_protocol``. The latter has a dict of colors defined as ``[R
 0 to 1. This triplets are then reordered using the ``channel_order`` dependant on the robot type. The ``LED_protocol`` also
 specifies a set of fixed frequencies (remember the Nyquist frequency). Afterwards a set of ``signals`` is defined, in which
 each signal name has:
+
 - ``color_mask``: specifies to which LEDs to modify the color
+
 - ``color_list``: specifies which color should each LED have (one value means all of them)
+
 - ``frequency_mask``: in case of blinking LEDs, specifies which ones should blink
+
 - ``frequency``: pointer to the predefined frequencies, assigning one to each signal
