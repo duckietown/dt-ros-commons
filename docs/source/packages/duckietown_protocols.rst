@@ -18,7 +18,7 @@ LED protocol
 It defines three main points: the intensity to be used by LEDs, the channel ordering (``channel_order``) of each type of robot (using LEDs)
 and the actual ``LED_protocol``. The latter has a dict of colors defined as ``[R,G,B]`` triplets, where each entry ranges from
 0 to 1. This triplets are then reordered using the ``channel_order`` dependant on the robot type. The ``LED_protocol`` also
-specifies a set of fixed frequencies (remember the Nyquist frequency). Afterwards a set of ``signals`` is defined, in which
+specifies a set of fixed frequencies (`Nyquist frequency <https://en.wikipedia.org/wiki/Nyquist_frequency>`_). Afterwards a set of ``signals`` is defined, in which
 each signal name has:
 
 - ``color_mask``: specifies to which LEDs to modify the color
