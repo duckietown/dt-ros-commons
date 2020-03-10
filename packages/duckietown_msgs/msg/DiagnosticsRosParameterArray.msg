@@ -1,2 +1,2 @@
 Header header
-duckietown_msgs/DiagnosticsRosParameter[] params             # List of parameters
+duckietown_msgs/NodeParameter[] params             # List of parameters

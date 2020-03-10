@@ -29,12 +29,12 @@ add_message_files(
   CoordinationSignal.msg
   DiagnosticsRosLink.msg
   DiagnosticsRosLinkArray.msg
-  DiagnosticsRosParameter.msg
   DiagnosticsRosParameterArray.msg
   DiagnosticsRosTopic.msg
   DiagnosticsRosTopicArray.msg
   DroneControl.msg
-  DroneMode.msg  
+  DroneMode.msg
+  NodeParameter.msg
   DuckiebotLED.msg
   EncoderStamped.msg
   FSMState.msg
@@ -91,6 +91,8 @@ add_service_files(
   GetVariable.srv
   IMUstatus.srv
   LFstatus.srv
+  NodeGetParamsList.srv
+  NodeRequestParamsUpdate.srv
   SensorsStatus.srv
   SetCustomLEDPattern.srv
   SetFSMState.srv
