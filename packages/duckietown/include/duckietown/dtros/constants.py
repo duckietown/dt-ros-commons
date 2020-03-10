@@ -11,6 +11,8 @@ DIAGNOSTICS_ROS_PARAMETERS_TOPIC = '/diagnostics/ros/parameters'
 DIAGNOSTICS_ROS_LINKS_PUB_EVERY_SEC = 2.0
 DIAGNOSTICS_ROS_LINKS_TOPIC = '/diagnostics/ros/links'
 
+NODE_GET_PARAM_SERVICE_NAME = 'get_parameters_list'
+NODE_REQUEST_PARAM_UPDATE_SERVICE_NAME = 'request_parameters_update'
 
 class TopicDirection(Enum):
     INBOUND = 0

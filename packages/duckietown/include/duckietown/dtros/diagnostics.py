@@ -6,12 +6,11 @@ from .constants import *
 from .utils import get_namespace
 
 from duckietown_msgs.msg import \
+    NodeParameter, \
     DiagnosticsRosTopic,\
     DiagnosticsRosTopicArray,\
     DiagnosticsRosLink, \
     DiagnosticsRosLinkArray, \
-    DiagnosticsRosParameters, \
-    DiagnosticsRosParameter, \
     DiagnosticsRosParameterArray
 
 
@@ -241,9 +240,9 @@ class _DTROSDiagnosticsManager:
         try:
             self._params_stats_lock.acquire()
             for param, param_stats in self._params_stats.items():
-                msg.params.append(DiagnosticsRosTopic(
+                msg.params.append(NodeParameter(
                     node=rospy.get_name(),
-                    param=param,
+                    name=param,
                     **param_stats
                 ))
         finally:

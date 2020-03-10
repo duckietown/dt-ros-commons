@@ -79,7 +79,7 @@ class DTROS(object):
     def __init__(self, node_name, parameters_update_period=1.0):
 
         # Initialize the node
-        rospy.init_node(node_name, anonymous=False)
+        rospy.init_node(node_name)
         self.node_name = rospy.get_name()
         self.log('Initializing...')
         self.is_shutdown = False
