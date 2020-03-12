@@ -1,12 +1,27 @@
 import rospy
+from copy import copy
+
 from std_srvs.srv import SetBool, SetBoolResponse
+from duckietown_msgs.srv import \
+    NodeGetParamsList, \
+    NodeGetParamsListResponse, \
+    NodeRequestParamsUpdate, \
+    NodeRequestParamsUpdateResponse
+from duckietown_msgs.msg import NodeParameter
+from duckietown.dtros.constants import \
+    NODE_GET_PARAM_SERVICE_NAME, \
+    NODE_REQUEST_PARAM_UPDATE_SERVICE_NAME, \
+    NODE_SWITCH_SERVICE_NAME
 
 from .dtpublisher import DTPublisher
 from .dtsubscriber import DTSubscriber
+from .dtparam import DTParam
+from .constants import NodeHealth
 
 
 class DTROS(object):
-    """Parent class for all Duckietown ROS nodes
+    """
+    Parent class for all Duckietown ROS nodes
 
     All Duckietown ROS nodes should inherit this class. This class provides
     some basic common functionality that most of the ROS nodes need. By keeping
@@ -77,17 +92,22 @@ class DTROS(object):
     """
 
     def __init__(self, node_name, parameters_update_period=1.0):
-
+        # configure singleton
+        if rospy.__instance__ is not None:
+            raise RuntimeError('You cannot instantiate two objects of type DTROS')
+        rospy.__instance__ = self
         # Initialize the node
         rospy.init_node(node_name)
         self.node_name = rospy.get_name()
         self.log('Initializing...')
         self.is_shutdown = False
+        self._health = NodeHealth.UNKNOWN
+        self.set_health(NodeHealth.STARTING)
         rospy.on_shutdown(self.onShutdown)
 
         # Initialize parameters handling
-        self.parameters = dict()
-        self.parametersChanged = False
+        self._parameters = dict()
+        self._parametersChanged = False
         self._parameters_update_period = parameters_update_period
         if self._parameters_update_period > 0:
             self._updateParametersTimer = rospy.Timer(
@@ -100,13 +120,28 @@ class DTROS(object):
         self._switch = True
         self._subscribers = list()
         self._publishers = list()
-        self.srv_switch = rospy.Service("~switch", SetBool, self.srvSwitch)
+        self.srv_switch = rospy.Service(
+            "~%s" % NODE_SWITCH_SERVICE_NAME, SetBool, self.srvSwitch
+        )
+        # create services to manage parameters
+        self._srv_get_params = rospy.Service(
+            "~%s" % NODE_GET_PARAM_SERVICE_NAME, NodeGetParamsList, self.srvNodeGetParamsList
+        )
+        self._srv_request_params_update = rospy.Service(
+            "~%s" % NODE_REQUEST_PARAM_UPDATE_SERVICE_NAME,
+            NodeRequestParamsUpdate, self.srvNodeRequestParamsUpdate
+        )
 
     # Read-only properties for the private attributes
     @property
     def switch(self):
         """Current state of the node on/off switch"""
         return self._switch
+
+    @property
+    def parameters(self):
+        """List of parameters"""
+        return copy(list(self._parameters.values()))
 
     @property
     def parameters_update_period(self):
@@ -122,6 +157,13 @@ class DTROS(object):
     def publishers(self):
         """A list of all the publishers of the node"""
         return self._publishers
+
+    def set_health(self, health):
+        if not isinstance(health, NodeHealth):
+            raise ValueError('Argument \'health\' must be of type duckietown.NodeHealth. '
+                             'Got %s instead' % str(type(health)))
+        self.log('Health status changed [%s] -> [%s]' % (self._health.name, health.name))
+        self._health = health
 
     def log(self, msg, type='info'):
         """ Passes a logging message to the ROS logging methods.
@@ -141,7 +183,7 @@ class DTROS(object):
 
         """
         full_msg = '[%s] %s' % (self.node_name, msg)
-
+        # pipe to the right logger
         if type == 'debug':
             rospy.logdebug(full_msg)
         elif type == 'info':
@@ -162,24 +204,23 @@ class DTROS(object):
         in the parameter server. If there is a parameter that wasn't found, it will throw an `KeyError`
         exception.
 
-        If a value of a parameter is changed, it will be updated and `self.parametersChanged` will be set
+        If a value of a parameter is changed, it will be updated and `self._parametersChanged` will be set
         to `True` in order to inform other methods to adjust their behavior.
 
         Raises:
             KeyError: if one of the parameters is not found in the parameter server
 
         """
-        for param_name in self.parameters:
+        for param_name in self._parameters:
             new_value = rospy.get_param(param_name)
-            if new_value != self.parameters[param_name]:
-                self.parameters[param_name] = new_value
-                self.parametersChanged = True
+            if new_value != self._parameters[param_name]:
+                self._parameters[param_name] = new_value
+                self._parametersChanged = True
                 if verbose:
                     self.log('Setting parameter %s = %s ' % (param_name, new_value))
 
     def srvSwitch(self, request):
         """
-
         Args:
             request (:obj:`std_srvs.srv.SetBool`): The switch request from the `~switch` callback.
 
@@ -204,8 +245,47 @@ class DTROS(object):
         response.success = True
         response.message = msg
         self.log(msg)
-
         return response
+
+    def srvNodeGetParamsList(self, request):
+        """
+        Args:
+            request (:obj:`duckietown_msgs.srv.NodeGetParamsList`): Service request message.
+
+        Returns:
+            :obj:`duckietown_msgs.srv.NodeGetParamsList`: Parameters list
+
+        """
+        return NodeGetParamsListResponse(
+            parameters=[
+                NodeParameter(
+                    node=rospy.get_name(),
+                    name=p.name,
+                    type=p.type.value,
+                    **p.options()
+                ) for p in self.parameters
+            ]
+        )
+
+    def srvNodeRequestParamsUpdate(self, request):
+        """
+        Args:
+            request (:obj:`duckietown_msgs.srv.NodeRequestParamsUpdate`): Service request message.
+
+        Returns:
+            :obj:`duckietown_msgs.srv.NodeRequestParamsUpdate`: Success feedback
+
+        """
+        try:
+            self._parameters[request.parameter].force_update()
+            return NodeRequestParamsUpdateResponse(success=True)
+        except (KeyError, rospy.exceptions.ROSException):
+            return NodeRequestParamsUpdateResponse(success=False)
+
+    def _add_param(self, param):
+        if not isinstance(param, DTParam):
+            raise ValueError('Expected type duckietown.DTParam, got %s instead' % str(type(param)))
+        self._parameters[param] = DTParam
 
     def subscriber(self, *args, **kwargs):
         """
@@ -241,7 +321,6 @@ class DTROS(object):
 
     def onShutdown(self):
         """Shutdown procedure."""
-
         self.is_shutdown = True
         if self._parameters_update_period > 0:
             self._updateParametersTimer.shutdown()

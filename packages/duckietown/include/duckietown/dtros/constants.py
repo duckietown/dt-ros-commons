@@ -11,8 +11,10 @@ DIAGNOSTICS_ROS_PARAMETERS_TOPIC = '/diagnostics/ros/parameters'
 DIAGNOSTICS_ROS_LINKS_PUB_EVERY_SEC = 2.0
 DIAGNOSTICS_ROS_LINKS_TOPIC = '/diagnostics/ros/links'
 
+NODE_SWITCH_SERVICE_NAME = 'switch'
 NODE_GET_PARAM_SERVICE_NAME = 'get_parameters_list'
 NODE_REQUEST_PARAM_UPDATE_SERVICE_NAME = 'request_parameters_update'
+
 
 class TopicDirection(Enum):
     INBOUND = 0
@@ -31,6 +33,47 @@ class ModuleType(Enum):
     SWARM = 7
     BEHAVIOR = 8
     VISUALIZATION = 9
+    DIAGNOSTICS = 20
 
 
 TopicType = ModuleType
+
+
+# NOTE: this has to match duckietown_msgs.msg.NodeParameter
+class ParamType(Enum):
+    UNKNOWN = 0
+    STRING = 1
+    INT = 2
+    FLOAT = 3
+    BOOL = 4
+    LIST = 5
+    DICT = 6
+
+    _type_to_ptype = {
+        UNKNOWN: lambda x: x,
+        STRING: str,
+        INT: int,
+        FLOAT: float,
+        BOOL: bool,
+        LIST: lambda x: x,
+        DICT: lambda x: x
+    }
+
+    @staticmethod
+    def parse(param_type, value):
+        if value is None:
+            return None
+        if not isinstance(param_type, ParamType):
+            raise ValueError("Argument 'param_type' must be of type ParamType. "
+                             "Got %s instead." % str(type(param_type)))
+        # ---
+        return ParamType._type_to_ptype[param_type](value)
+
+
+class NodeHealth(Enum):
+    UNKNOWN = 0
+    STARTING = 1
+    HEALTHY = 2
+    WARNING = 3
+    ERROR = 4
+    FATAL = 5

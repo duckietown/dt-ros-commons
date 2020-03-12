@@ -1,3 +1,4 @@
+# Parameter type (this has to match duckietown.TopicType)
 uint8 PARAM_TYPE_UNKNOWN = 0
 uint8 PARAM_TYPE_STRING = 1
 uint8 PARAM_TYPE_INT = 2

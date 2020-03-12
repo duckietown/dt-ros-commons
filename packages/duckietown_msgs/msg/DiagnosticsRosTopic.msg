@@ -1,8 +1,8 @@
-# Topic direction
+# Topic direction (this has to match duckietown.TopicDirection)
 uint8 TOPIC_DIRECTION_INBOUND = 0
 uint8 TOPIC_DIRECTION_OUTBOUND = 1
 
-# Topic type (this has to match duckietown.constants.TopicType)
+# Topic type (this has to match duckietown.TopicType)
 uint8 TOPIC_TYPE_GENERIC = 0
 uint8 TOPIC_TYPE_DRIVER = 1
 uint8 TOPIC_TYPE_PERCEPTION = 2
@@ -13,6 +13,7 @@ uint8 TOPIC_TYPE_MAPPING = 6
 uint8 TOPIC_TYPE_SWARM = 7
 uint8 TOPIC_TYPE_BEHAVIOR = 8
 uint8 TOPIC_TYPE_VISUALIZATION = 9
+uint8 TOPIC_TYPE_DIAGNOSTICS = 20
 
 string node             # Node publishing this message
 string topic            # Topic object of the diagnostics

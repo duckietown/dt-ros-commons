@@ -14,4 +14,4 @@ or publisher on or off in a smart way (reducing significantly processing and net
 
 """
 
-from .dtros import DTROS
+from .dtros import DTROS, TopicType, ModuleType, ParamType

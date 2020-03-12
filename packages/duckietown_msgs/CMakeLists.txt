@@ -29,6 +29,7 @@ add_message_files(
   CoordinationSignal.msg
   DiagnosticsRosLink.msg
   DiagnosticsRosLinkArray.msg
+  DiagnosticsRosNode.msg
   DiagnosticsRosParameterArray.msg
   DiagnosticsRosTopic.msg
   DiagnosticsRosTopicArray.msg

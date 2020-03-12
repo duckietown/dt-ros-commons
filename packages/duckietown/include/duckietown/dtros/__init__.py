@@ -15,7 +15,15 @@ overhead).
 
 """
 
+import rospy
+rospy.__instance__ = None
+
+
+def get_instance():
+    return rospy.__instance__
+
+
 from .dtros import DTROS
 from .dtpublisher import DTPublisher
 from .dtsubscriber import DTSubscriber
-from .constants import TopicType, ModuleType
+from .constants import TopicType, ModuleType, ParamType, NodeHealth
