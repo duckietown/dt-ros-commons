@@ -49,3 +49,7 @@ class DTPublisher(rospy.Publisher):
         """
         if self.active:
             super(DTPublisher, self).publish(*args, **kwargs)
+
+    @property  #: True if at least one subscriber has subscribed to this topic
+    def any_subscribers(self):
+        return self.get_num_connections() > 0
