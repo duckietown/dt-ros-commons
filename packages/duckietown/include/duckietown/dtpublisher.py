@@ -27,6 +27,10 @@ class DTPublisher(rospy.Publisher):
        All standard rospy.Publisher attributes
        active (:obj:`bool`): A flag that if set to ``True`` will allow publishing`. If set to ``False``, any calls
           to :py:meth:`publish` will not result in a message being sent. Can be directly assigned.
+       num_of_subscribers: TODO
+       subs_changed_callbacks (:obj:`list`): A list of callbacks that will be called when the number of subscribers
+          to this topic changes. Custom callbacks can be appended. The callbacks should received the publisher object
+          as a sole input. Empty by default.
 
     Raises:
        ROSException: if parameters are invalid
@@ -37,6 +41,15 @@ class DTPublisher(rospy.Publisher):
 
         super(DTPublisher, self).__init__(*args, **kwargs)
         self.active = True
+
+        self.num_of_subscribers = None
+        self.cbChangeSubscribers()  # to initialize the number of subscribers
+        self.subs_changed_callbacks = list()
+
+        # Create a rospy.SubscribeListener object and link our custom method for dealing with change of subscribers
+        self.subscribe_listener = rospy.SubscribeListener
+        self.subscribe_listener.peer_subscribe = self.cbChangeSubscribers
+        self.subscribe_listener.peer_unsubscribe = self.cbChangeSubscribers
 
     def publish(self, *args, **kwargs):
         """ A wrapper around the ``rospy.Publisher.publish`` method.
@@ -50,6 +63,11 @@ class DTPublisher(rospy.Publisher):
         if self.active:
             super(DTPublisher, self).publish(*args, **kwargs)
 
+    def cbChangeSubscribers(self, *args, **kwargs):
+        self.num_of_subscribers = self.get_num_connections()
+        for cb_fun in self.subs_changed_callbacks:
+            cb_fun(self)
+
     @property  #: True if at least one subscriber has subscribed to this topic
     def any_subscribers(self):
-        return self.get_num_connections() > 0
+        return self.num_of_subscribers > 0
