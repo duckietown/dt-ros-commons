@@ -27,7 +27,8 @@ class DTPublisher(rospy.Publisher):
        All standard rospy.Publisher attributes
        active (:obj:`bool`): A flag that if set to ``True`` will allow publishing`. If set to ``False``, any calls
           to :py:meth:`publish` will not result in a message being sent. Can be directly assigned.
-       num_of_subscribers: TODO
+       num_of_subscribers (:obj:`int`): Number of current subscribers. Cached value
+          of ``rospy.publisher.get_num_connections()``.
        subs_changed_callbacks (:obj:`list`): A list of callbacks that will be called when the number of subscribers
           to this topic changes. Custom callbacks can be appended. The callbacks should received the publisher object
           as a sole input. Empty by default.
