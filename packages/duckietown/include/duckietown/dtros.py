@@ -1,8 +1,10 @@
 import rospy
 from std_srvs.srv import SetBool, SetBoolResponse
+from std_msgs.msg import String
 
 from .dtpublisher import DTPublisher
 from .dtsubscriber import DTSubscriber
+from .timer import PhaseTimer
 
 class DTROS(object):
     """Parent class for all Duckietown ROS nodes
@@ -81,6 +83,11 @@ class DTROS(object):
                 success (`bool`): ``True`` if the call succeeded
                 message (`str`): Used to give details about success
 
+    Publisher:
+        ~debug/phase_times (:obj:`std_msgs.msg.String`): A debug message with the timings of different
+           section. Generated only when subscribed.
+
+
     """
 
     def __init__(self, node_name, parameters_update_period=1.0):
@@ -109,6 +116,12 @@ class DTROS(object):
                                         SetBool,
                                         self.srvSwitch)
 
+        # Add a phase timer for profiling and a publisher topic
+        self.phasetimer = PhaseTimer()
+        self.phasetimer.start_recording()
+        self._pub_phasetime = self.publisher("~phase_times", String, queue_size=-1)
+        self._pub_phasetime.addSubscribersChangedCb(self.togglePhaseTiming)
+        self._phasetimeTimer = None
 
     # Read-only properties for the private attributes
     @property
@@ -186,19 +199,20 @@ class DTROS(object):
 
         """
 
-        _parametersChanged = False
-        for param_name in self.parameters:
-            new_value = rospy.get_param(param_name)
-            if new_value != self.parameters[param_name]:
-                self.parameters[param_name] = new_value
-                _parametersChanged = True
-                if verbose:
-                    self.log('Setting parameter %s = %s ' % (param_name, new_value))
+        with self.phasetimer.time_phase('updateParameters callback'):
+            _parametersChanged = False
+            for param_name in self.parameters:
+                new_value = rospy.get_param(param_name)
+                if new_value != self.parameters[param_name]:
+                    self.parameters[param_name] = new_value
+                    _parametersChanged = True
+                    if verbose:
+                        self.log('Setting parameter %s = %s ' % (param_name, new_value))
 
-        # call the callback and set the variable that the inherited nodes can read if the parameters changed
-        if _parametersChanged:
-            self.parametersChanged = True
-            self.cbParametersChanged()
+            # call the callback and set the variable that the inherited nodes can read if the parameters changed
+            if _parametersChanged:
+                self.parametersChanged = True
+                self.cbParametersChanged()
 
     def cbParametersChanged(self):
         """
@@ -283,3 +297,27 @@ class DTROS(object):
         if self._parameters_update_period > 0:
             self._updateParametersTimer.shutdown()
         self.log('Shutdown.')
+
+
+    def togglePhaseTiming(self, publisher):
+        if not publisher.any_subscribers:
+            self.phasetimer.stop_recording()
+            if not self._phasetimeTimer._shutdown:
+                self._phasetimeTimer.shutdown()
+
+        else:
+            self.phasetimer.start_recording()
+            if self._phasetimeTimer is None or self._phasetimeTimer._shutdown:
+                self._phasetimeTimer = rospy.Timer(period=rospy.Duration.from_sec(1),
+                                                   callback=self.pubPhaseTiming,
+                                                   oneshot=False)
+
+    def pubPhaseTiming(self, event=None):
+        phase_timings = self.phasetimer.get_statistics()
+
+        for phase_name in sorted(phase_timings.keys()):
+            single_phase_stats = phase_timings[phase_name]
+            self._pub_phasetime.publish(String(data="Phase: %s, Frequency: %.4f Hz, Avg Duration: %.04f ms" %
+                                                    (phase_name, single_phase_stats.frequency, single_phase_stats.avg_duration*1000)))
+        self._pub_phasetime.publish(String(data="---"))
+
