@@ -18,12 +18,23 @@ overhead).
 import rospy
 rospy.__instance__ = None
 
+# keep a copy to the original rospy objects
+setattr(rospy, '__init_node__', rospy.init_node)
+setattr(rospy, '__Publisher__', rospy.Publisher)
+setattr(rospy, '__Subscriber__', rospy.Subscriber)
+
 
 def get_instance():
     return rospy.__instance__
 
 
 from .dtros import DTROS
-from .dtpublisher import DTPublisher
-from .dtsubscriber import DTSubscriber
+from .dtparam import DTParam
+from .dtreminder import DTReminder
+
 from .constants import TopicType, ModuleType, ParamType, NodeHealth
+
+# perform rospy decoration
+from .decoration import rospy_decorate
+rospy_decorate()
+del rospy_decorate

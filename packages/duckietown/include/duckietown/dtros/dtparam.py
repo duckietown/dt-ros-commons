@@ -53,7 +53,11 @@ class DTParam:
                 'You cannot create a DTParam object before initializing a DTROS object'
             )
         # get parameter value
-        self._value = rospy.get_param(self._name, self._default_value)
+        if rospy.has_param(self._name):
+            self._value = rospy.get_param(self._name)
+        else:
+            self._value = self._default_value
+            rospy.set_param(self._name, self._default_value)
         # add param to current node
         node._add_param(self)
 
@@ -75,6 +79,10 @@ class DTParam:
     @property
     def name(self):
         return self._name
+
+    @property
+    def value(self):
+        return self._value
 
     @property
     def default(self):

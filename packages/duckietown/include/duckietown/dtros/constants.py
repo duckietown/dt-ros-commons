@@ -59,15 +59,15 @@ class ParamType(Enum):
         DICT: lambda x: x
     }
 
-    @staticmethod
-    def parse(param_type, value):
+    @classmethod
+    def parse(cls, param_type, value):
         if value is None:
             return None
         if not isinstance(param_type, ParamType):
             raise ValueError("Argument 'param_type' must be of type ParamType. "
                              "Got %s instead." % str(type(param_type)))
         # ---
-        return ParamType._type_to_ptype[param_type](value)
+        return cls._type_to_ptype.value[param_type.value](value)
 
 
 class NodeHealth(Enum):

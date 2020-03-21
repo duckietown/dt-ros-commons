@@ -4,7 +4,7 @@ from .diagnostics import TopicDirection
 from .dttopic import DTTopic
 
 
-class DTPublisher(DTTopic, rospy.Publisher):
+class DTPublisher(DTTopic, rospy.__Publisher__):
     """ A wrapper around `rospy.Publisher`.
 
     This class is exactly the same as the standard
@@ -39,13 +39,18 @@ class DTPublisher(DTTopic, rospy.Publisher):
 
     def __init__(self, *args, **kwargs):
         ros_args = {k: v for k, v in kwargs.items() if not k.startswith('dt_')}
-        super(DTPublisher, self).__init__(*args, **ros_args)
+        # call super constructor
+        rospy.__Publisher__.__init__(self, *args, **ros_args)
         # dt arguments
         self.active = True
         # parse dt arguments
         self._parse_dt_args(kwargs)
         # register dt topic
-        self._register_dt_topic(TopicDirection.OUTBOUND)
+        if not self._dt_is_ghost:
+            self._register_dt_topic(TopicDirection.OUTBOUND)
+
+    def anybody_listening(self):
+        return self.get_num_connections() > 0
 
     def publish(self, *args, **kwargs):
         """ A wrapper around the `rospy.Publisher.publish` method.

@@ -16,7 +16,7 @@ from duckietown.dtros.constants import \
 from .dtpublisher import DTPublisher
 from .dtsubscriber import DTSubscriber
 from .dtparam import DTParam
-from .constants import NodeHealth
+from .constants import NodeHealth, ModuleType
 
 
 class DTROS(object):
@@ -91,13 +91,17 @@ class DTROS(object):
 
     """
 
-    def __init__(self, node_name, parameters_update_period=1.0):
+    def __init__(self,
+                 node_name,
+                 #TODO: this needs to go
+                 parameters_update_period=1.0,
+                 type=ModuleType.GENERIC):
         # configure singleton
         if rospy.__instance__ is not None:
             raise RuntimeError('You cannot instantiate two objects of type DTROS')
         rospy.__instance__ = self
         # Initialize the node
-        rospy.init_node(node_name)
+        rospy.init_node(node_name, __dtros__=True)
         self.node_name = rospy.get_name()
         self.log('Initializing...')
         self.is_shutdown = False
@@ -211,7 +215,10 @@ class DTROS(object):
             KeyError: if one of the parameters is not found in the parameter server
 
         """
+        #TODO: this function has to go
         for param_name in self._parameters:
+            if not isinstance(param_name, str):
+                continue
             new_value = rospy.get_param(param_name)
             if new_value != self._parameters[param_name]:
                 self._parameters[param_name] = new_value

@@ -15,6 +15,7 @@ class DTTopic(rospy.topics.Topic):
         # parse dt arguments
         self._dt_healthy_freq = _arg(kwargs, 'dt_healthy_hz', -1)
         self._dt_topic_type = _arg(kwargs, 'dt_topic_type', [])
+        self._dt_is_ghost = _arg(kwargs, 'dt_ghost', False)
         # sanitize dt_type
         if not isinstance(self._dt_topic_type, ListType):
             self._dt_topic_type = [self._dt_topic_type]
@@ -32,6 +33,33 @@ class DTTopic(rospy.topics.Topic):
                 self._dt_healthy_freq,
                 self._dt_topic_type
             )
+
+    def set_healthy_freq(self, healthy_hz):
+        if DTROSDiagnostics.enabled():
+            DTROSDiagnostics.getInstance().update_topic(
+                self.resolved_name,
+                healthy_freq=healthy_hz
+            )
+        self._dt_healthy_freq = healthy_hz
+
+    def get_frequency(self):
+        # get frequency from the diagnostics manager
+        if DTROSDiagnostics.enabled():
+            return DTROSDiagnostics.getInstance().get_topic_frequency(self.resolved_name)
+        return -1
+
+    def get_bandwidth(self):
+        # get bandwidth from the diagnostics manager
+        if DTROSDiagnostics.enabled():
+            return DTROSDiagnostics.getInstance().get_topic_bandwidth(self.resolved_name)
+        return -1
+
+    def shutdown(self):
+        topic_name = self.resolved_name
+        self.unregister()
+        # unregister topic from diagnostics manager
+        if DTROSDiagnostics.enabled():
+            DTROSDiagnostics.getInstance().unregister_topic(topic_name)
 
 
 def _arg(kwargs, key, default):

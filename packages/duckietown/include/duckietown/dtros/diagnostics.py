@@ -48,17 +48,20 @@ class _DTROSDiagnosticsManager:
         self._topics_diagnostics_pub = rospy.Publisher(
             apply_ns(DIAGNOSTICS_ROS_TOPICS_TOPIC, 1),
             DiagnosticsRosTopicArray,
-            queue_size=1
+            queue_size=1,
+            dt_ghost=True
         )
         self._params_diagnostics_pub = rospy.Publisher(
             apply_ns(DIAGNOSTICS_ROS_PARAMETERS_TOPIC, 1),
-            DiagnosticsRosParameters,
-            queue_size=1
+            DiagnosticsRosParameterArray,
+            queue_size=1,
+            dt_ghost=True
         )
         self._links_diagnostics_pub = rospy.Publisher(
             apply_ns(DIAGNOSTICS_ROS_LINKS_TOPIC, 1),
             DiagnosticsRosLinkArray,
-            queue_size=1
+            queue_size=1,
+            dt_ghost=True
         )
         # topics diagnostics timer
         self._topics_diagnostics_timer = rospy.Timer(
@@ -91,6 +94,26 @@ class _DTROSDiagnosticsManager:
         finally:
             self._topics_stats_lock.release()
 
+    def update_topic(self, name, healthy_freq=None):
+        updated_info = {}
+        # update healthy frequency
+        if healthy_freq is not None:
+            updated_info['healthy_freq'] = healthy_freq
+        # update list of topics
+        try:
+            self._topics_stats_lock.acquire()
+            self._topics_stats[name].update(updated_info)
+        finally:
+            self._topics_stats_lock.release()
+
+    def unregister_topic(self, name):
+        try:
+            self._topics_stats_lock.acquire()
+            if name in self._topics_stats:
+                del self._topics_stats[name]
+        finally:
+            self._topics_stats_lock.release()
+
     def register_param(self, name):
         try:
             self._params_stats_lock.acquire()
@@ -104,6 +127,16 @@ class _DTROSDiagnosticsManager:
         if name in self._topics_stats:
             self._topics_stats[name]['enabled'] = switch_status
 
+    def get_topic_frequency(self, topic):
+        if topic in self._topics_stats:
+            return self._topics_stats[topic]['frequency']
+        return -1
+
+    def get_topic_bandwidth(self, topic):
+        if topic in self._topics_stats:
+            return self._topics_stats[topic]['bandwidth']
+        return -1
+
     def compute_topics_frequency(self):
         try:
             self._links_stats_lock.acquire()
@@ -116,12 +149,15 @@ class _DTROSDiagnosticsManager:
                     if link['topic'] == topic:
                         freq.append(link['frequency'])
                         bwidth.append(link['bandwidth'])
-                # compute frequency and bandwidth
+                # ---
                 self._topics_stats_lock.acquire()
+                # compute frequency
                 self._topics_stats[topic]['frequency'] = \
                     sum(freq) / (len(freq) if len(freq) else 1)
+                # compute bandwidth
                 self._topics_stats[topic]['bandwidth'] = \
                     sum(bwidth) / (len(bwidth) if len(bwidth) else 1)
+                # release lock
                 self._topics_stats_lock.release()
             # ---
         finally:

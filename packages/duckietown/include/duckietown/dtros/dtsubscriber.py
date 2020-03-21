@@ -7,7 +7,7 @@ from .diagnostics import TopicDirection, DTROSDiagnostics
 from .dttopic import DTTopic
 
 
-class DTSubscriber(DTTopic, rospy.Subscriber):
+class DTSubscriber(DTTopic, rospy.__Subscriber__):
     """ A wrapper around `rospy.Subscriber`.
 
     This class is exactly the same as the standard
@@ -52,18 +52,21 @@ class DTSubscriber(DTTopic, rospy.Subscriber):
         if DTROSDiagnostics.enabled():
             # replace the user callback with the decorated one
             callback = self._monitored_callback
-
-        super(DTSubscriber, self).__init__(name, data_class, callback=callback,
+        # call super constructor
+        rospy.__Subscriber__.__init__(self, name, data_class, callback=callback,
                                            callback_args=callback_args,
                                            queue_size=queue_size, buff_size=buff_size,
                                            tcp_nodelay=tcp_nodelay)
+
+
         # dt parameters
         self._active = True
 
         # parse dt arguments
         self._parse_dt_args(kwargs)
         # register dt topic
-        self._register_dt_topic(TopicDirection.INBOUND)
+        if not self._dt_is_ghost:
+            self._register_dt_topic(TopicDirection.INBOUND)
         # store attributes
         self._attributes_keeper = {
             'name': name,
@@ -94,6 +97,9 @@ class DTSubscriber(DTTopic, rospy.Subscriber):
         self._active = new_status
         if DTROSDiagnostics.enabled():
             DTROSDiagnostics.getInstance().set_topic_switch(self.resolved_name, new_status)
+
+    def anybody_publishing(self):
+        return self.get_num_connections() > 0
 
     def _monitored_callback(self, *args, **kwargs):
         # tick the diagnostics manager (used to compute the topic frequency)

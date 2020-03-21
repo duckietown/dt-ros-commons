@@ -14,4 +14,8 @@ or publisher on or off in a smart way (reducing significantly processing and net
 
 """
 
+#TODO: we don't want to decorate rospy when anything inside duckietown.* is imported, but
+# only when duckietown.dtros.* is imported. This means that DTROS cannot be exposed here.
+
+
 from .dtros import DTROS, TopicType, ModuleType, ParamType
