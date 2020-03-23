@@ -2,13 +2,16 @@ from enum import Enum
 
 DIAGNOSTICS_ENABLED = True
 
-DIAGNOSTICS_ROS_TOPICS_PUB_EVERY_SEC = 2.0
+DIAGNOSTICS_ROS_NODE_PUB_EVERY_SEC = 30.0
+DIAGNOSTICS_ROS_NODE_TOPIC = '/diagnostics/ros/node'
+
+DIAGNOSTICS_ROS_TOPICS_PUB_EVERY_SEC = 10.0
 DIAGNOSTICS_ROS_TOPICS_TOPIC = '/diagnostics/ros/topics'
 
-DIAGNOSTICS_ROS_PARAMETERS_PUB_EVERY_SEC = 2.0
+DIAGNOSTICS_ROS_PARAMETERS_PUB_EVERY_SEC = 30.0
 DIAGNOSTICS_ROS_PARAMETERS_TOPIC = '/diagnostics/ros/parameters'
 
-DIAGNOSTICS_ROS_LINKS_PUB_EVERY_SEC = 2.0
+DIAGNOSTICS_ROS_LINKS_PUB_EVERY_SEC = 10.0
 DIAGNOSTICS_ROS_LINKS_TOPIC = '/diagnostics/ros/links'
 
 NODE_SWITCH_SERVICE_NAME = 'switch'
@@ -59,6 +62,16 @@ class ParamType(Enum):
         DICT: lambda x: x
     }
 
+    _ptype_to_type = {
+        str: STRING,
+        int: INT,
+        float: FLOAT,
+        bool: BOOL,
+        list: LIST,
+        tuple: LIST,
+        dict: DICT
+    }
+
     @classmethod
     def parse(cls, param_type, value):
         if value is None:
@@ -68,6 +81,12 @@ class ParamType(Enum):
                              "Got %s instead." % str(type(param_type)))
         # ---
         return cls._type_to_ptype.value[param_type.value](value)
+
+    @classmethod
+    def guess_type(cls, param_value):
+        if type(param_value) in cls._ptype_to_type.value:
+            return cls(cls._ptype_to_type.value[type(param_value)])
+        return cls.UNKNOWN
 
 
 class NodeHealth(Enum):
