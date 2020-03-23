@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+export DT_MODULE_INSTANCE=$(basename $(cat /proc/1/cpuset))
+
 # check if ROS_MASTER_URI is set
 ROS_MASTER_URI_IS_SET=0
 if [ ! -z "${ROS_MASTER_URI}" ]; then
