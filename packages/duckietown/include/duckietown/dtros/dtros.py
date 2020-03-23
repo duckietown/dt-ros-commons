@@ -28,39 +28,47 @@ class DTROS(object):
 
     In particular, the DTROS class provides:
 
-    - Logging: DTROS provides the `log` method as a wrapper around the ROS logging
+    - Logging: DTROS provides the :py:meth:`log` method as a wrapper around the ROS logging
       services. It will automatically append the ROS node name to the message.
-    - Parameters handling:  DTROS provides the `parameters` and `parametersChanged` attributes
+    - Parameters handling:  DTROS provides the :py:attr:`parameters` and :py:attr:`parametersChanged` attributes
       and automatically updates them if it detects a change in the Parameter Server.
     - Shutdown procedure: a common shutdown procedure for ROS nodes. Should be attached
-      via `rospy.on_shutdown(nodeobject.onShutdown)`.
-    - Switchable Subscribers and Publishers: `DTROS.publisher()` and `DTROS.subscriber()` returns
+      via ``rospy.on_shutdown(nodeobject.onShutdown)``.
+    - Switchable Subscribers and Publishers: :py:meth:`publisher` and :py:meth:`subscriber` return
       modified subscribers and publishers that can be dynamically deactivated and reactivated
-      by requesting `False` or `True` to the `~switch` service respectively.
-    - Node deactivation and reactivation: through requesting `Falce` to the `~switch`
-      service all subscribers and publishers obtained through `DTROS.publisher()` and `DTROS.subscriber()`
-      will be deactivated and the `switch` attribute will be set to `False`. This switch can be
-      used by computationally expensive parts of the node code that are not in callbacks in ordert to
+      by requesting ``False`` or ``True`` to the ``~switch`` service respectively.
+    - Node deactivation and reactivation: through requesting ``False`` to the ``~switch``
+      service all subscribers and publishers obtained through :py:meth:`publisher` and :py:meth:`subscriber`
+      will be deactivated and the ``switch`` attribute will be set to ``False``. This switch can be
+      used by computationally expensive parts of the node code that are not in callbacks in order to
       to pause their execution.
 
-    Every children node should call the initializer of `DTROS`. This should be done
-    by having the following line at the top of the children node `__init__` method::
+    Every children node should call the initializer of DTROS. This should be done
+    by having the following line at the top of the children node ``__init__`` method::
 
         super(ChildrenNode, self).__init__(node_name='children_node_name')
 
     The DTROS initializer will:
 
-    - Initialize the ROS node with name `node_name`
-    - Setup the `node_name` attribute to the node name passed by ROS (using `rospy.get_name()`)
-    - Add a `rospy.on_shutdown` hook to the node's `onShutdown` method
-    - Initialize an empty `parameters` dictionary where all configurable ROS parameters should
-      be stored. A boolean attribute `parametersChanged` is also initialized. This will be set to
-      `True` when the `updateParameters` callback detects a change in a parameter value in the
+    - Initialize the ROS node with name ``node_name``
+    - Setup the ``node_name`` attribute to the node name passed by ROS (using ``rospy.get_name()``)
+    - Add a ``rospy.on_shutdown`` hook to the node's :py:meth:`onShutdown` method
+    - Initialize an empty :py:attr:`parameters` dictionary where all configurable ROS parameters should
+      be stored. A boolean attribute :py:attr:`parametersChanged` is also initialized. This will be set to
+      ``True`` when the :py:meth:`updateParameters` callback detects a change in a parameter value in the
       `ROS Parameter Server <https://wiki.ros.org/Parameter%20Server>`_ and changes the value
       of at least one parameter.
-    - Start a recurrent timer that calls `updateParameters` regularly to
+      Additionally,
+      the :py:meth:`cbParametersChanged` method will be called. This can be redefined by children classes
+      in order to implement custom behavior when a change in the parameters is detected.
+
+      Note:
+          Implementing the :py:meth:`cbParametersChanged` callback will not
+          automatically set :py:attr:`parametersChanged` to ``False``! If you rely on such behavior, you need to
+          set it in your redefined callback.
+    - Start a recurrent timer that calls :py:meth:`updateParameters` regularly to
       check if any parameter has been updated
-    - Setup a `~switch` service that can be used to deactivate and reactivate the node
+    - Setup a ``~switch`` service that can be used to deactivate and reactivate the node
 
     Args:
        node_name (:obj:`str`): a unique, descriptive name for the node that ROS will use
@@ -69,22 +77,22 @@ class DTROS(object):
 
     Attributes:
        node_name (:obj:`str`): the name of the node
-       parameters (:obj:`dict`): a dictionary that holds pairs `('~param_name`: param_value)`. Note that
-          parameters should be given in private namespace (starting with `~`)
-       parametersChanged (:obj:`bool`): a boolean indticator if the
-       is_shutdown (:obj:`bool`): will be set to `True` when the `onShutdown` method is called
+       parameters (:obj:`dict`): a dictionary that holds pairs ``('~param_name`: param_value)``. Note that
+          parameters should be given in private namespace (starting with ``~``)
+       parametersChanged (:obj:`bool`): a boolean indicator if the
+       is_shutdown (:obj:`bool`): will be set to ``True`` when the :py:meth:`onShutdown` method is called
        switch (:obj:`bool`): flag determining whether the node is active or not. Read-only, controlled through
-          the `~switch` service
+          the ``~switch`` service
 
     Service:
         ~switch:
-            Switches the node between active state and inative state.
+            Switches the node between active state and inactive state.
 
             input:
-                data ('bool`): The desired state. `True` for active, `False` for inactive.
+                data (`bool`): The desired state. ``True`` for active, ``False`` for inactive.
 
             outputs:
-                success (`bool`): `True` if the call succeeded
+                success (`bool`): ``True`` if the call succeeded
                 message (`str`): Used to give details about success
 
     """
@@ -183,16 +191,16 @@ class DTROS(object):
 
         Attaches the ros name to the beginning of the message and passes it to
         a suitable ROS logging method. Use the `type` argument to select the method
-        to be used (`debug` for `rospy.logdebug`,
-        `info` for `rospy.loginfo`, `warn` for `rospy.logwarn`,
-        `err` for `rospy.logerr`, `fatal` for `rospy.logfatal`).
+        to be used (``debug`` for ``rospy.logdebug``,
+        ``info`` for ``rospy.loginfo``, ``warn`` for ``rospy.logwarn``,
+        ``err`` for ``rospy.logerr``, ``fatal`` for ``rospy.logfatal``).
 
         Args:
-            msg (str): the message content
-            type (str): one of `debug`, `info`, `warn`, `err`, `fatal`
+            msg (`str`): the message content
+            type (`str`): one of ``debug``, ``info``, ``warn``, ``err``, ``fatal``
 
         Raises:
-            ValueError: if the `type` argument is not one of the supported types
+            ValueError: if the ``type`` argument is not one of the supported types
 
         """
         full_msg = '[%s] %s' % (self.node_name, msg)
@@ -216,7 +224,7 @@ class DTROS(object):
     def _srv_switch(self, request):
         """
         Args:
-            request (:obj:`std_srvs.srv.SetBool`): The switch request from the `~switch` callback.
+            request (:obj:`std_srvs.srv.SetBool`): The switch request from the ``~switch`` callback.
 
         Returns:
             :obj:`std_srvs.srv.SetBoolResponse`: Response for successful feedback

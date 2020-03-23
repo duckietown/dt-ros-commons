@@ -1,7 +1,8 @@
 """
-The `duckietown` library provides the parent class for all Duckietown ROS Nodes: `DTROS`,
-as well as customized ROS Publisher (`DTPublisher`) and ROS Subscriber (`DTSubscriber`) classes.
-These classes extend the original ROS classes by adding an `active` property that can set the subscriber
+
+The `duckietown` library provides the parent class for all Duckietown ROS Nodes: :py:class:`DTROS`,
+as well as customized ROS Publisher (:py:class:`DTPublisher`) and ROS Subscriber (:py:class:`DTSubscriber`) classes.
+These classes extend the original ROS classes by adding an ``active`` property that can set the subscriber
 or publisher on or off in a smart way (reducing significantly processing and network overhead).
 
 

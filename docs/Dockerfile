@@ -1,4 +1,4 @@
-FROM duckietown/dt-ros-commons:devel20
+FROM duckietown/dt-ros-commons:daffy
 
 RUN apt-get update; apt-get install -y git
 

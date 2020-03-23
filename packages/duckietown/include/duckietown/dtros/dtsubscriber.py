@@ -10,31 +10,31 @@ from .singleton import get_instance
 
 
 class DTSubscriber(DTTopic, rospy.__Subscriber__):
-    """ A wrapper around `rospy.Subscriber`.
+    """ A wrapper around ``rospy.Subscriber``.
 
     This class is exactly the same as the standard
     `rospy.Subscriber <http://docs.ros.org/api/rospy/html/rospy.topics.Subscriber-class.html>`_
-    with the only difference of an `active` attribute being added. Whenever the `publish` method is used,
-    an actual message will be send only if `active` is set to `True`.
+    with the only difference of an :py:attr:`active` attribute being added. Whenever the :py:meth:`publish` method is used,
+    an actual message will be send only if :py:attr:`active` is set to ``True``.
 
     Args:
        name (:obj:`str`): resource name of topic, e.g. 'laser'
        data_class (:obj:`ROS Message class`): message class for serialization
-       subscriber_listener (:obj:`SubscribeListener`): listener for subscription events. May be None
-       tcp_nodelay (:obj:`bool`): If `True`, sets `TCP_NODELAY` on publisher's socket (disables Nagle algorithm).
+       subscriber_listener (:obj:`SubscribeListener`): listener for subscription events. May be `None`
+       tcp_nodelay (:obj:`bool`): If ``True``, sets ``TCP_NODELAY`` on publisher's socket (disables Nagle algorithm).
           This results in lower latency publishing at the cost of efficiency.
-       latch (:obj:`bool`) - If `True`, the last message published is 'latched', meaning that any future subscribers
+       latch (:obj:`bool`) - If ``True``, the last message published is 'latched', meaning that any future subscribers
           will be sent that message immediately upon connection.
-       headers (:obj:`dict`) - If not `None`, a dictionary with additional header key-values being
+       headers (:obj:`dict`) - If not ``None``, a dictionary with additional header key-values being
           used for future connections.
        queue_size (:obj:`int`) - The queue size used for asynchronously publishing messages from different
           threads. A size of zero means an infinite queue, which can be dangerous. When the keyword is not
-          being used or when `None` is passed all publishing will happen synchronously and a warning message
+          being used or when ``None`` is passed all publishing will happen synchronously and a warning message
           will be printed.
 
     Attributes:
-       All standard `rospy.Publisher` attributes
-       active (:obj:`bool`): A flag that if set to `True` will allow publishing`. If set to `False`, any calls
+       All standard rospy.Publisher attributes
+       active (:obj:`bool`): A flag that if set to ``True`` will allow publishing. If set to ``False``, any calls
           to `publish` will not result in a message being sent. Can be directly assigned.
 
     Raises:
@@ -124,9 +124,9 @@ class DTSubscriber(DTTopic, rospy.__Subscriber__):
     def reregister(self):
         """
         Resets some of the attributes in order to restore the state of the object before
-        the `unregister` method was called
+        the ``unregister`` method was called
 
-        Reversing the `Topic.unregister()` and `Subscriber.unregister()` methods from
+        Reversing the ``Topic.unregister()`` and ``Subscriber.unregister()`` methods from
         `here <http://docs.ros.org/api/rospy/html/rospy.topics-pysrc.html>`_.
 
         """
