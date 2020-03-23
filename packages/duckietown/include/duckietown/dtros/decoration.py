@@ -8,12 +8,16 @@ import rospy
 # import objects decorating rospy
 from .dtpublisher import DTPublisher
 from .dtsubscriber import DTSubscriber
+from .dtparam import DTParam
+from .constants import ParamType
 
 
 def rospy_decorate():
     # decorate:
     # - rospy.init_node
     setattr(rospy, 'init_node', __rospy__init_node__)
+    # rospy.get_param
+    setattr(rospy, 'get_param', __rospy__get_param__)
     # - rospy.Publisher
     setattr(rospy, 'Publisher', DTPublisher)
     # - rospy.Subscriber
@@ -30,3 +34,15 @@ def __rospy__init_node__(*args, **kwargs):
         del kwargs['__dtros__']
     # ---
     return rospy.__init_node__(*args, **kwargs)
+
+
+def __rospy__get_param__(param_name, default=rospy.client._Unspecified):
+    # check singleton
+    if rospy.__instance__ is not None and not rospy.__instance__._has_param(param_name):
+        DTParam(
+            param_name,
+            param_type=ParamType.guess_type(default),
+            default=None if default in [None, rospy.client._Unspecified] else default
+        )
+    # call super method
+    return rospy.__get_param__(param_name, default)

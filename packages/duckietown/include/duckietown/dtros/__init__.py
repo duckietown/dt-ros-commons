@@ -16,17 +16,13 @@ overhead).
 """
 
 import rospy
-rospy.__instance__ = None
+from .singleton import get_instance
 
 # keep a copy to the original rospy objects
 setattr(rospy, '__init_node__', rospy.init_node)
+setattr(rospy, '__get_param__', rospy.get_param)
 setattr(rospy, '__Publisher__', rospy.Publisher)
 setattr(rospy, '__Subscriber__', rospy.Subscriber)
-
-
-def get_instance():
-    return rospy.__instance__
-
 
 from .dtros import DTROS
 from .dtparam import DTParam
