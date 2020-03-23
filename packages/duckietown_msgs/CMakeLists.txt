@@ -30,6 +30,8 @@ add_message_files(
   DiagnosticsRosLinkArray.msg
   DiagnosticsRosNode.msg
   DiagnosticsRosParameterArray.msg
+  DiagnosticsRosProfiling.msg
+  DiagnosticsRosProfilingUnit.msg
   DiagnosticsRosTopic.msg
   DiagnosticsRosTopicArray.msg
   DroneControl.msg
