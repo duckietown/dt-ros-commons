@@ -1,7 +1,8 @@
 import rospy
 
-from .diagnostics import TopicDirection
+from .constants import TopicDirection
 from .dttopic import DTTopic
+from .singleton import get_instance
 
 
 class DTPublisher(DTTopic, rospy.__Publisher__):
@@ -48,6 +49,9 @@ class DTPublisher(DTTopic, rospy.__Publisher__):
         # register dt topic
         if not self._dt_is_ghost:
             self._register_dt_topic(TopicDirection.OUTBOUND)
+        # register publisher
+        if get_instance() is not None:
+            get_instance()._register_publisher(self)
 
     def anybody_listening(self):
         return self.get_num_connections() > 0

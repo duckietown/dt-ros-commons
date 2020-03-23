@@ -3,8 +3,10 @@ import rospy
 from rospy.impl.tcpros import DEFAULT_BUFF_SIZE
 from rospy.impl.registration import get_topic_manager
 
-from .diagnostics import TopicDirection, DTROSDiagnostics
+from .constants import TopicDirection
+from .diagnostics import DTROSDiagnostics
 from .dttopic import DTTopic
+from .singleton import get_instance
 
 
 class DTSubscriber(DTTopic, rospy.__Subscriber__):
@@ -67,6 +69,9 @@ class DTSubscriber(DTTopic, rospy.__Subscriber__):
         # register dt topic
         if not self._dt_is_ghost:
             self._register_dt_topic(TopicDirection.INBOUND)
+        # register subscriber
+        if get_instance() is not None:
+            get_instance()._register_subscriber(self)
         # store attributes
         self._attributes_keeper = {
             'name': name,

@@ -1,3 +1,4 @@
+import os
 import gc
 import rospy
 
@@ -62,3 +63,13 @@ def get_namespace(level):
     if level > len(namespace_comps):
         level = len(namespace_comps)
     return '/{:s}'.format('/'.join(namespace_comps[:level]))
+
+
+def get_module_type():
+    # NOTE: This is defined in the Dockerfiles
+    return os.environ.get('DT_MODULE_TYPE', '')
+
+
+def get_module_instance():
+    # NOTE: This is defined in the entrypoint.sh and contains the container ID
+    return os.environ.get('DT_MODULE_INSTANCE', '')

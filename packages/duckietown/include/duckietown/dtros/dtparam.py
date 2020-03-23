@@ -2,6 +2,7 @@ import rospy
 
 from . import get_instance
 from .constants import ParamType
+from .diagnostics import DTROSDiagnostics
 
 MIN_MAX_SUPPORTED_TYPES = [ParamType.INT, ParamType.FLOAT]
 
@@ -54,16 +55,24 @@ class DTParam:
             )
         # get parameter value
         if rospy.has_param(self._name):
-            self._value = rospy.get_param(self._name)
+            self._value = rospy.__get_param__(self._name)
         else:
             self._value = self._default_value
             rospy.set_param(self._name, self._default_value)
         # add param to current node
         node._add_param(self)
+        # register node against diagnostics
+        if DTROSDiagnostics.enabled():
+            DTROSDiagnostics.getInstance().register_param(
+                self._name,
+                self._type,
+                self._min_value,
+                self._max_value
+            )
 
     def force_update(self):
         # get parameter value
-        self._value = rospy.get_param(self._name, self._default_value)
+        self._value = rospy.__get_param__(self._name, self._default_value)
 
     def options(self):
         options = {}

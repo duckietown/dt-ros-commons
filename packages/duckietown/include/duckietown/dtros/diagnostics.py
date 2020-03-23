@@ -3,10 +3,11 @@ import time
 from threading import Lock
 
 from .constants import *
-from .utils import get_namespace
+from .utils import get_namespace, get_module_type, get_module_instance
 
 from duckietown_msgs.msg import \
     NodeParameter, \
+    DiagnosticsRosNode,\
     DiagnosticsRosTopic,\
     DiagnosticsRosTopicArray,\
     DiagnosticsRosLink, \
@@ -38,46 +39,76 @@ class _DTROSDiagnosticsManager:
 
     def __init__(self):
         # initialize diagnostics data containers
+        self._node_stats = {}
         self._topics_stats = {}
         self._topics_stats_lock = Lock()
         self._links_stats = {}
         self._links_stats_lock = Lock()
         self._params_stats = {}
-        self._params_stats_lock = Lock()
         # initialize publishers
+        self._node_diagnostics_pub = rospy.Publisher(
+            apply_ns(DIAGNOSTICS_ROS_NODE_TOPIC, 1),
+            DiagnosticsRosNode,
+            queue_size=20,
+            latch=True,
+            dt_ghost=True
+        )
         self._topics_diagnostics_pub = rospy.Publisher(
             apply_ns(DIAGNOSTICS_ROS_TOPICS_TOPIC, 1),
             DiagnosticsRosTopicArray,
-            queue_size=1,
+            queue_size=20,
+            latch=True,
             dt_ghost=True
         )
         self._params_diagnostics_pub = rospy.Publisher(
             apply_ns(DIAGNOSTICS_ROS_PARAMETERS_TOPIC, 1),
             DiagnosticsRosParameterArray,
-            queue_size=1,
+            queue_size=20,
+            latch=True,
             dt_ghost=True
         )
         self._links_diagnostics_pub = rospy.Publisher(
             apply_ns(DIAGNOSTICS_ROS_LINKS_TOPIC, 1),
             DiagnosticsRosLinkArray,
-            queue_size=1,
+            queue_size=20,
+            latch=True,
             dt_ghost=True
         )
         # topics diagnostics timer
         self._topics_diagnostics_timer = rospy.Timer(
             period=rospy.Duration.from_sec(DIAGNOSTICS_ROS_TOPICS_PUB_EVERY_SEC),
             callback=self._publish_topics_diagnostics,
-            oneshot=False)
-        # parameters diagnostics timer
-        self._parameters_diagnostics_timer = rospy.Timer(
-            period=rospy.Duration.from_sec(DIAGNOSTICS_ROS_PARAMETERS_PUB_EVERY_SEC),
-            callback=self._publish_parameters_diagnostics,
-            oneshot=False)
+            oneshot=False
+        )
         # links diagnostics timer
         self._links_diagnostics_timer = rospy.Timer(
             period=rospy.Duration.from_sec(DIAGNOSTICS_ROS_LINKS_PUB_EVERY_SEC),
             callback=self._publish_links_diagnostics,
-            oneshot=False)
+            oneshot=False
+        )
+
+    def register_node(self, name, health):
+        self._node_stats = {
+            'name': name,
+            'health': health.value,
+            'health_reason': '',
+            'health_stamp': rospy.get_time(),
+            'enabled': True,
+            'module_type': get_module_type(),
+            'module_instance': get_module_instance()
+        }
+        # publish new node information
+        self._publish_node_diagnostics()
+
+    def update_node(self, health=None, health_reason=None, enabled=None):
+        if health is not None:
+            self._node_stats['health'] = health.value
+            self._node_stats['health_reason'] = health_reason or str(health_reason)
+            self._node_stats['health_stamp'] = rospy.get_time()
+        if enabled is not None:
+            self._node_stats['enabled'] = bool(enabled)
+        # publish new node information
+        self._publish_node_diagnostics()
 
     def register_topic(self, name, direction, healthy_freq, topic_types):
         try:
@@ -93,6 +124,8 @@ class _DTROSDiagnosticsManager:
             }
         finally:
             self._topics_stats_lock.release()
+        # force topic message update
+        self._publish_topics_diagnostics(force=True)
 
     def update_topic(self, name, healthy_freq=None):
         updated_info = {}
@@ -105,6 +138,8 @@ class _DTROSDiagnosticsManager:
             self._topics_stats[name].update(updated_info)
         finally:
             self._topics_stats_lock.release()
+        # force topic message update
+        self._publish_topics_diagnostics(force=False)
 
     def unregister_topic(self, name):
         try:
@@ -113,15 +148,17 @@ class _DTROSDiagnosticsManager:
                 del self._topics_stats[name]
         finally:
             self._topics_stats_lock.release()
+        # force topic message update
+        self._publish_topics_diagnostics(force=True)
 
-    def register_param(self, name):
-        try:
-            self._params_stats_lock.acquire()
-            self._params_stats[name] = {
-                # in the future, we will have param details
-            }
-        finally:
-            self._params_stats_lock.release()
+    def register_param(self, name, param_type, min_value, max_value):
+        self._params_stats[name] = {
+            'type': param_type.value,
+            'min_value': float(min_value) if isinstance(min_value, (int, float)) else -1.0,
+            'max_value': float(max_value) if isinstance(max_value, (int, float)) else -1.0
+        }
+        # force topic message update
+        self._publish_parameters_diagnostics(force=True)
 
     def set_topic_switch(self, name, switch_status):
         if name in self._topics_stats:
@@ -246,6 +283,7 @@ class _DTROSDiagnosticsManager:
         # update topic stats
         self.compute_topics_frequency()
 
+    # TODO: implement this using profiling context from AP once merged
     def update_topic_processing_time(self, name, proc_time):
         if name in self._topics_stats:
             lpt = self._topics_stats[name]['processing_time']
@@ -255,7 +293,17 @@ class _DTROSDiagnosticsManager:
             else:
                 self._topics_stats[name]['processing_time'] = proc_time
 
+    def _publish_node_diagnostics(self):
+        msg = DiagnosticsRosNode(
+            **self._node_stats
+        )
+        msg.header.stamp = rospy.Time.now()
+        self._node_diagnostics_pub.publish(msg)
+
     def _publish_topics_diagnostics(self, *args, **kwargs):
+        force = 'force' in kwargs and kwargs['force']
+        if not self._topics_diagnostics_pub.anybody_listening() and not force:
+            return
         msg = DiagnosticsRosTopicArray()
         msg.header.stamp = rospy.Time.now()
         try:
@@ -270,22 +318,22 @@ class _DTROSDiagnosticsManager:
             self._topics_stats_lock.release()
         self._topics_diagnostics_pub.publish(msg)
 
-    def _publish_parameters_diagnostics(self, *args, **kwargs):
+    def _publish_parameters_diagnostics(self, force=False):
+        if not self._params_diagnostics_pub.anybody_listening() and not force:
+            return
         msg = DiagnosticsRosParameterArray()
         msg.header.stamp = rospy.Time.now()
-        try:
-            self._params_stats_lock.acquire()
-            for param, param_stats in self._params_stats.items():
-                msg.params.append(NodeParameter(
-                    node=rospy.get_name(),
-                    name=param,
-                    **param_stats
-                ))
-        finally:
-            self._params_stats_lock.release()
+        for param, param_stats in self._params_stats.items():
+            msg.params.append(NodeParameter(
+                node=rospy.get_name(),
+                name=param,
+                **param_stats
+            ))
         self._params_diagnostics_pub.publish(msg)
 
     def _publish_links_diagnostics(self, *args, **kwargs):
+        if not self._links_diagnostics_pub.anybody_listening():
+            return
         self._compute_stats()
         msg = DiagnosticsRosLinkArray()
         msg.header.stamp = rospy.Time.now()
