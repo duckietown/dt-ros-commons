@@ -1,3 +1,4 @@
+import os
 import rospy
 from copy import copy
 
@@ -15,6 +16,7 @@ from duckietown.dtros.constants import \
 from .dtparam import DTParam
 from .constants import NodeHealth, ModuleType
 from .diagnostics import DTROSDiagnostics
+from .utils import get_ros_handler
 
 
 class DTROS(object):
@@ -118,10 +120,15 @@ class DTROS(object):
         self.is_shutdown = False
         self._health = NodeHealth.UNKNOWN
         self._health_reason = None
+        self._ros_handler = get_ros_handler()
 
         # Initialize parameters handling
         self._parameters = dict()
-
+        self._rh_paramUpdate = None
+        if self._ros_handler is not None:
+            # decorate the XMLRPC paramUpdate function
+            self._rh_paramUpdate = self._ros_handler.paramUpdate
+            setattr(self._ros_handler, 'paramUpdate', self._param_update)
         # Handle publishers, subscribers, and the state switch
         self._switch = True
         self._subscribers = list()
@@ -290,10 +297,29 @@ class DTROS(object):
         except (KeyError, rospy.exceptions.ROSException):
             return NodeRequestParamsUpdateResponse(success=False)
 
+    def _param_update(self, *args, **kwargs):
+        # call super method
+        if self._rh_paramUpdate is not None:
+            self._rh_paramUpdate(*args, **kwargs)
+        # check data
+        if len(args) < 3:
+            rospy.logdebug('Received invalid paramUpdate call from Master')
+            return
+        # get what changed
+        _, param_name, param_value = args[:3]
+        param_name = param_name.rstrip('/')
+        rospy.logdebug('Received paramUpdate("%s", %s)' % (param_name, str(param_value)))
+        # update parameter value
+        if param_name in self._parameters:
+            self._parameters[param_name].set_value(param_value)
+            rospy.logdebug('Parameter "%s" has now the value [%s]' % (
+                param_name, str(self._parameters[param_name].value)
+            ))
+
     def _add_param(self, param):
         if not isinstance(param, DTParam):
             raise ValueError('Expected type duckietown.DTParam, got %s instead' % str(type(param)))
-        self._parameters[param] = DTParam
+        self._parameters[param.name] = param
 
     def _has_param(self, param):
         return param in self._parameters

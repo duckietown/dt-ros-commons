@@ -42,7 +42,8 @@ def __rospy__get_param__(param_name, default=rospy.client._Unspecified):
         DTParam(
             param_name,
             param_type=ParamType.guess_type(default),
-            default=None if default in [None, rospy.client._Unspecified] else default
+            default=None if default in [None, rospy.client._Unspecified] else default,
+            __editable__=False  # only user-created DTParam objects result into subscribed params
         )
     # call super method
     return rospy.__get_param__(param_name, default)

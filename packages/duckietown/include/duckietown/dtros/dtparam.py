@@ -9,8 +9,9 @@ MIN_MAX_SUPPORTED_TYPES = [ParamType.INT, ParamType.FLOAT]
 
 class DTParam:
 
-    def __init__(self, name, default=None, param_type=ParamType.UNKNOWN, min_value=None, max_value=None):
+    def __init__(self, name, default=None, param_type=ParamType.UNKNOWN, min_value=None, max_value=None, __editable__=True):
         self._name = rospy.names.resolve_name(name)
+        self._editable = __editable__
         if not isinstance(param_type, ParamType):
             raise ValueError(
                 "Parameter 'param_type' must be an instance of duckietown.ParamType. "
@@ -61,6 +62,14 @@ class DTParam:
             rospy.set_param(self._name, self._default_value)
         # add param to current node
         node._add_param(self)
+        # register for changes (only for editable parameters)
+        if self._editable:
+            rospy.get_master().target.subscribeParam(
+                rospy.names.get_caller_id(),
+                rospy.core.get_node_uri(),
+                self._name
+            )
+            rospy.logdebug('Parameter "%s" was registered for updates' % self._name)
         # register node against diagnostics
         if DTROSDiagnostics.enabled():
             DTROSDiagnostics.getInstance().register_param(
@@ -69,6 +78,9 @@ class DTParam:
                 self._min_value,
                 self._max_value
             )
+
+    def set_value(self, value):
+        self._value = value
 
     def force_update(self):
         # get parameter value
