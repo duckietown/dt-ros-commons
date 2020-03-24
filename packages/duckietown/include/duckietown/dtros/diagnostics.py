@@ -3,7 +3,7 @@ import time
 from threading import Lock
 
 from .constants import *
-from .utils import get_namespace, get_module_type, get_module_instance
+from .utils import apply_namespace, get_module_type, get_module_instance
 
 from duckietown_msgs.msg import \
     NodeParameter, \
@@ -47,28 +47,28 @@ class _DTROSDiagnosticsManager:
         self._params_stats = {}
         # initialize publishers
         self._node_diagnostics_pub = rospy.Publisher(
-            apply_ns(DIAGNOSTICS_ROS_NODE_TOPIC, 1),
+            apply_namespace(DIAGNOSTICS_ROS_NODE_TOPIC, 1),
             DiagnosticsRosNode,
             queue_size=20,
             latch=True,
             dt_ghost=True
         )
         self._topics_diagnostics_pub = rospy.Publisher(
-            apply_ns(DIAGNOSTICS_ROS_TOPICS_TOPIC, 1),
+            apply_namespace(DIAGNOSTICS_ROS_TOPICS_TOPIC, 1),
             DiagnosticsRosTopicArray,
             queue_size=20,
             latch=True,
             dt_ghost=True
         )
         self._params_diagnostics_pub = rospy.Publisher(
-            apply_ns(DIAGNOSTICS_ROS_PARAMETERS_TOPIC, 1),
+            apply_namespace(DIAGNOSTICS_ROS_PARAMETERS_TOPIC, 1),
             DiagnosticsRosParameterArray,
             queue_size=20,
             latch=True,
             dt_ghost=True
         )
         self._links_diagnostics_pub = rospy.Publisher(
-            apply_ns(DIAGNOSTICS_ROS_LINKS_TOPIC, 1),
+            apply_namespace(DIAGNOSTICS_ROS_LINKS_TOPIC, 1),
             DiagnosticsRosLinkArray,
             queue_size=20,
             latch=True,
@@ -355,10 +355,3 @@ def _compute_f_b(new_read, old_read):
         'frequency': (new_read['messages'] - old_read['messages']) / (tnow - old_read['_time']),
         'bandwidth': (new_read['bytes'] - old_read['bytes']) / (tnow - old_read['_time'])
     }
-
-
-def apply_ns(name, ns_level):
-    return '{:s}/{:s}'.format(
-        get_namespace(ns_level).rstrip('/'),
-        name.strip('/')
-    )

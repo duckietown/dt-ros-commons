@@ -65,6 +65,13 @@ def get_namespace(level):
     return '/{:s}'.format('/'.join(namespace_comps[:level]))
 
 
+def apply_namespace(name, ns_level):
+    return '{:s}/{:s}'.format(
+        get_namespace(ns_level).rstrip('/'),
+        name.strip('/')
+    )
+
+
 def get_module_type():
     # NOTE: This is defined in the Dockerfiles
     return os.environ.get('DT_MODULE_TYPE', '')
