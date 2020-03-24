@@ -1,5 +1,6 @@
-import rospy
 import time
+import rospy
+import socket
 from threading import Lock
 
 from .constants import *
@@ -94,6 +95,7 @@ class _DTROSDiagnosticsManager:
             'health_reason': '',
             'health_stamp': rospy.get_time(),
             'enabled': True,
+            'machine': socket.gethostname(),
             'module_type': get_module_type(),
             'module_instance': get_module_instance()
         }
