@@ -113,7 +113,10 @@ class DTROS(object):
                 'got %s instead.' % str(type(node_type))
             )
         # Initialize the node
-        rospy.init_node(node_name, __dtros__=True)
+        log_level = rospy.INFO
+        if os.environ.get('DEBUG', 0) in ['1', 'true', 'True', 'enabled', 'Enabled', 'on', 'On']:
+            log_level = rospy.DEBUG
+        rospy.init_node(node_name, log_level=log_level, __dtros__=True)
         self.node_name = rospy.get_name()
         self.node_type = node_type
         self.log('Initializing...')
