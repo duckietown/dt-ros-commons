@@ -23,11 +23,11 @@ class Node:
         # start updating the list of parameters
         self._update_nodes_list_timer = rospy.Timer(
             period=rospy.Duration.from_sec(FETCH_NEW_PARAMS_EVERY_SECS),
-            callback=self._update_parameters_list,
+            callback=self.update_parameters_list,
             oneshot=False
         )
         # spin right away
-        self._update_parameters_list()
+        self.update_parameters_list()
 
     def request_update(self, param_name):
         if param_name not in self._parameters:
@@ -58,27 +58,42 @@ class Node:
             finally:
                 ntrial += 1
 
-    def _update_parameters_list(self, *args, **kwargs):
-        rospy.logdebug('Node "%s", updating list of parameters (%d/%d)' % (
-            self.name, self._parameters_num_fetch_ops+1, NUM_SUCCESSFUL_PARAM_FETCHING_ACTIONS
-        ))
-        if self._parameters_num_fetch_ops > NUM_SUCCESSFUL_PARAM_FETCHING_ACTIONS:
-            # stop the timer
-            self._update_nodes_list_timer.shutdown()
-            return
-        # try fetching the params list
-        get_params_service_name = os.path.join(self.name, NODE_GET_PARAM_SERVICE_NAME)
-        try:
-            rospy.wait_for_service(get_params_service_name, 5.0)
-        except Exception:
-            return
-        # call service
-        error_detected = False
+    def update_parameters_list(self, *args, **kwargs):
+        params = []
+        if 'params' in kwargs:
+            # this call comes from the diagnostics subscriber so it has the list of params already
+            params = kwargs['params']
+        else:
+            # this was called by the Timer, we need to interrogate the node for the list of params
+            rospy.logdebug('Node "%s", updating list of parameters (%d/%d)' % (
+                self.name, self._parameters_num_fetch_ops+1, NUM_SUCCESSFUL_PARAM_FETCHING_ACTIONS
+            ))
+            if self._parameters_num_fetch_ops > NUM_SUCCESSFUL_PARAM_FETCHING_ACTIONS:
+                # stop the timer
+                self._update_nodes_list_timer.shutdown()
+                return
+            # try fetching the params list
+            error_detected = False
+            get_params_service_name = os.path.join(self.name, NODE_GET_PARAM_SERVICE_NAME)
+            try:
+                rospy.wait_for_service(get_params_service_name, 5.0)
+            except rospy.exceptions.ROSException:
+                return
+            # call service
+            try:
+                get_params_service = rospy.ServiceProxy(get_params_service_name, NodeGetParamsList)
+                res = get_params_service()
+                params = [p.name for p in res.parameters]
+            except Exception:
+                error_detected = True
+            # stop if an error occurred
+            if error_detected:
+                return
+            # mark this attemp as successful
+            self._parameters_num_fetch_ops += 1
+        # merge new list of parameters with existing set
         self._parameters_lock.acquire()
         try:
-            get_params_service = rospy.ServiceProxy(get_params_service_name, NodeGetParamsList)
-            res = get_params_service()
-            params = [p.name for p in res.parameters]
             # find new parameters (need to add)
             new_params = set(params).difference(self._parameters)
             if len(new_params):
@@ -94,15 +109,9 @@ class Node:
             # add new params
             for param in new_params:
                 self._parameters.add(param)
+                # TODO: this is where we subscribe to this new parameter
             # remove old params
             for param in old_params:
                 self._parameters.remove(param)
-        except Exception:
-            error_detected = True
         finally:
             self._parameters_lock.release()
-        # stop if an error occurred
-        if error_detected:
-            return
-        # mark this attemp as successful
-        self._parameters_num_fetch_ops += 1
