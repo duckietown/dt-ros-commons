@@ -76,7 +76,8 @@ class DTParam:
                 self._name,
                 self._type,
                 self._min_value,
-                self._max_value
+                self._max_value,
+                self._editable
             )
 
     def set_value(self, value):

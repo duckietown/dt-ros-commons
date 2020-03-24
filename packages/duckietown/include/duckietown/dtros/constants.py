@@ -24,8 +24,8 @@ class TopicDirection(Enum):
     OUTBOUND = 1
 
 
-# NOTE: this has to match duckietown_msgs.msg.DiagnosticsRosTopic
-class ModuleType(Enum):
+# NOTE: this has to match duckietown_msgs.msg.DiagnosticsNode
+class NodeType(Enum):
     GENERIC = 0
     DRIVER = 1
     PERCEPTION = 2
@@ -36,10 +36,11 @@ class ModuleType(Enum):
     SWARM = 7
     BEHAVIOR = 8
     VISUALIZATION = 9
+    INFRASTRUCTURE = 10
     DIAGNOSTICS = 20
 
-
-TopicType = ModuleType
+# NOTE: this has to match duckietown_msgs.msg.DiagnosticsRosTopic
+TopicType = NodeType
 
 
 # NOTE: this has to match duckietown_msgs.msg.NodeParameter

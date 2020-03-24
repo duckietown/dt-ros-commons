@@ -151,11 +151,12 @@ class _DTROSDiagnosticsManager:
         # force topic message update
         self._publish_topics_diagnostics(force=True)
 
-    def register_param(self, name, param_type, min_value, max_value):
+    def register_param(self, name, param_type, min_value, max_value, editable):
         self._params_stats[name] = {
             'type': param_type.value,
             'min_value': float(min_value) if isinstance(min_value, (int, float)) else -1.0,
-            'max_value': float(max_value) if isinstance(max_value, (int, float)) else -1.0
+            'max_value': float(max_value) if isinstance(max_value, (int, float)) else -1.0,
+            'editable': editable
         }
         # force topic message update
         self._publish_parameters_diagnostics(force=True)

@@ -14,7 +14,7 @@ from duckietown.dtros.constants import \
     NODE_REQUEST_PARAM_UPDATE_SERVICE_NAME, \
     NODE_SWITCH_SERVICE_NAME
 from .dtparam import DTParam
-from .constants import NodeHealth, ModuleType
+from .constants import NodeHealth, NodeType
 from .diagnostics import DTROSDiagnostics
 from .utils import get_ros_handler
 
@@ -102,15 +102,15 @@ class DTROS(object):
     def __init__(self,
                  node_name,
                  # DT parameters from here
-                 node_type=ModuleType.GENERIC):
+                 node_type):
         # configure singleton
         if rospy.__instance__ is not None:
             raise RuntimeError('You cannot instantiate two objects of type DTROS')
         rospy.__instance__ = self
-        if not isinstance(node_type, ModuleType):
+        if not isinstance(node_type, NodeType):
             raise ValueError(
-                'DTROS \'node_type\' parameter must be of type \'duckietown.ModuleType\', '
-                'got %s instead.' % str(type(node_type))
+                "DTROS 'node_type' parameter must be of type 'duckietown.NodeType', "
+                "got %s instead." % str(type(node_type))
             )
         # Initialize the node
         log_level = rospy.INFO

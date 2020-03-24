@@ -19,4 +19,4 @@ or publisher on or off in a smart way (reducing significantly processing and net
 # only when duckietown.dtros.* is imported. This means that DTROS cannot be exposed here.
 
 
-from .dtros import DTROS, TopicType, ModuleType, ParamType
+from .dtros import DTROS, TopicType, NodeType, ParamType
