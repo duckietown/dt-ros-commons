@@ -52,6 +52,13 @@ class DTPublisher(DTTopic, rospy.__Publisher__):
         # register publisher
         if get_instance() is not None:
             get_instance()._register_publisher(self)
+        # TODO: register for new subscriptions and publish new links on event
+
+    def switch_off(self):
+        self.active = False
+
+    def switch_on(self):
+        self.active = True
 
     def anybody_listening(self):
         return self.get_num_connections() > 0
@@ -66,5 +73,6 @@ class DTPublisher(DTTopic, rospy.__Publisher__):
 
         """
         if self.active:
+            self._tick_frequency()
             # call super publish
             super(DTPublisher, self).publish(*args, **kwargs)

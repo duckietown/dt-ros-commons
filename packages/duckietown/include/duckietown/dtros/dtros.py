@@ -102,7 +102,8 @@ class DTROS(object):
     def __init__(self,
                  node_name,
                  # DT parameters from here
-                 node_type):
+                 node_type,
+                 dt_ghost=False):
         # configure singleton
         if rospy.__instance__ is not None:
             raise RuntimeError('You cannot instantiate two objects of type DTROS')
@@ -121,7 +122,8 @@ class DTROS(object):
         self.node_type = node_type
         self.log('Initializing...')
         self.is_shutdown = False
-        self._health = NodeHealth.UNKNOWN
+        self._is_ghost = dt_ghost
+        self._health = NodeHealth.STARTING
         self._health_reason = None
         self._ros_handler = get_ros_handler()
 
@@ -156,10 +158,16 @@ class DTROS(object):
                 self.node_name,
                 health=self._health
             )
-        # mark node as healthy and STARTING
-        self.set_health(NodeHealth.STARTING)
+        # mark node as healthy and STARTED
+        self.set_health(NodeHealth.STARTED)
         # register shutdown callback
         rospy.on_shutdown(self.onShutdown)
+
+    # Read-only properties for the private attributes
+    @property
+    def is_ghost(self):
+        """Whether this is a ghost node (diagnostics will skip it)"""
+        return self._is_ghost
 
     # Read-only properties for the private attributes
     @property

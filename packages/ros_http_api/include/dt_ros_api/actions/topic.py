@@ -1,25 +1,31 @@
-import rospy, rosgraph, rostopic as rt
-from flask import Blueprint, jsonify, request, abort
-
-import uuid
+import rospy, rostopic as rt
+from flask import Blueprint
 
 from dt_ros_api.utils import \
     response_ok,\
     response_error
+from dt_ros_api.knowledge_base import KnowledgeBase
+from dt_ros_api.constants import default_topic_type
 
 rostopic = Blueprint('topic', __name__)
 
 # API handlers
 #
-# - topic/list      (Supported)
-# - topic/type      (Supported)
-# - topic/find      (Supported)
-# - topic/info      (Supported)
-# - topic/bw        (Not Supported)     * Will be supported with diagnostics
-# - topic/delay     (Not Supported)     * Will be supported with diagnostics
-# - topic/hz        (Not Supported)     * Will be supported with diagnostics
-# - topic/echo      (Not Supported)
-# - topic/pub       (Not Supported)
+# > ROS Node CLI Endpoints
+#   - topic/list      (Supported)
+#   - topic/type      (Supported)
+#   - topic/find      (Supported)
+#   - topic/info      (Supported)
+#   - topic/hz        (Supported)     * Enabled by Diagnostics
+#   - topic/bw        (Supported)     * Enabled by Diagnostics
+#   - topic/delay     (Not Supported)
+#   - topic/echo      (Not Supported)
+#   - topic/pub       (Not Supported)
+#
+# > Duckietown Endpoints
+#   - topic/publishers
+#   - topic/subscribers
+#   - topic/types
 #
 
 
@@ -43,7 +49,8 @@ def _type(topic):
         _topic_type, _, _ = rt.get_topic_type(topic)
         if _topic_type:
             return response_ok({
-                'type': _topic_type
+                'topic': topic,
+                'message_type': _topic_type
             })
         else:
             return response_error("Topic '{:s}' not found".format(topic))
@@ -55,6 +62,7 @@ def _type(topic):
 def _find(msg_type):
     try:
         return response_ok({
+            'message_type': msg_type,
             'topics': rt.find_by_type(msg_type)
         })
     except Exception as e:
@@ -64,25 +72,83 @@ def _find(msg_type):
 @rostopic.route('/topic/info/<path:topic>')
 def _info(topic):
     topic = '/' + topic
+    key = lambda x: '/topic/%s%s' % (x, topic)
     try:
-        master = rosgraph.Master(uuid.uuid4())
-        pubs, subs, _ = master.getSystemState()
         info = {
             'topic': topic,
-            'type': rt.get_topic_type(topic)[0]
+            'types': KnowledgeBase.get(key('types'), []),
+            'publishers': KnowledgeBase.get(key('publishers'), []),
+            'subscribers': KnowledgeBase.get(key('subscribers'), [])
         }
-        # get publishers
-        for _topic, _topic_pubs in pubs:
-            if _topic == topic:
-                info['publishers'] = _topic_pubs
-                break
-        # get subscribers
-        for _topic, _topic_subs in subs:
-            if _topic == topic:
-                info['subscribers'] = _topic_subs
-                break
-        # return
+        info.update(KnowledgeBase.get(key('info'), {}))
+        info['message_type'] = rt.get_topic_type(topic)[0]
         return response_ok(info)
+    except Exception as e:
+        return response_error(str(e))
+
+
+@rostopic.route('/topic/hz/<path:topic>')
+def _hz(topic):
+    key = '/topic/hz/' + topic
+    try:
+        hz_time, hz = KnowledgeBase.get(key, None, get_time=True)
+        # return
+        return response_ok({
+            'topic': '/' + topic,
+            'frequency': hz,
+            'secs_since_update': hz_time
+        })
+    except Exception as e:
+        return response_error(str(e))
+
+
+@rostopic.route('/topic/bw/<path:topic>')
+def _bw(topic):
+    key = '/topic/bw/' + topic
+    try:
+        bw_time, bw = KnowledgeBase.get(key, None, get_time=True)
+        # return
+        return response_ok({
+            'topic': '/' + topic,
+            'bandwidth': bw,
+            'secs_since_update': bw_time
+        })
+    except Exception as e:
+        return response_error(str(e))
+
+
+@rostopic.route('/topic/publishers/<path:topic>')
+def _publishers(topic):
+    topic = '/' + topic
+    try:
+        return response_ok({
+            'topic': topic,
+            'publishers': KnowledgeBase.get('/topic/publishers%s' % topic, [])
+        })
+    except Exception as e:
+        return response_error(str(e))
+
+
+@rostopic.route('/topic/subscribers/<path:topic>')
+def _subscribers(topic):
+    topic = '/' + topic
+    try:
+        return response_ok({
+            'topic': topic,
+            'subscribers': KnowledgeBase.get('/topic/subscribers%s' % topic, [])
+        })
+    except Exception as e:
+        return response_error(str(e))
+
+
+@rostopic.route('/topic/types/<path:topic>')
+def _types(topic):
+    topic = '/' + topic
+    try:
+        return response_ok({
+            'topic': topic,
+            'types': KnowledgeBase.get('/topic/types%s' % topic, [default_topic_type(topic)])
+        })
     except Exception as e:
         return response_error(str(e))
 

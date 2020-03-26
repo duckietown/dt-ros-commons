@@ -15,10 +15,11 @@ uint8 NODE_TYPE_DIAGNOSTICS = 20
 # Node health (this has to match duckietown.NodeHealth)
 uint8 NODE_HEALTH_UNKNOWN = 0
 uint8 NODE_HEALTH_STARTING = 1
-uint8 NODE_HEALTH_HEALTHY = 2
-uint8 NODE_HEALTH_WARNING = 3
-uint8 NODE_HEALTH_ERROR = 4
-uint8 NODE_HEALTH_FATAL = 5
+uint8 NODE_HEALTH_STARTED = 2
+uint8 NODE_HEALTH_HEALTHY = 3
+uint8 NODE_HEALTH_WARNING = 4
+uint8 NODE_HEALTH_ERROR = 5
+uint8 NODE_HEALTH_FATAL = 6
 
 Header header
 string name             # Node publishing this message

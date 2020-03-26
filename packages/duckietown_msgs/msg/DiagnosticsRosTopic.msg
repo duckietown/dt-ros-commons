@@ -17,12 +17,12 @@ uint8 TOPIC_TYPE_INFRASTRUCTURE = 10
 uint8 TOPIC_TYPE_DIAGNOSTICS = 20
 
 string node                     # Node publishing this message
-string topic                    # Topic object of the diagnostics
+string name                     # Topic object of the diagnostics
 uint8[] types                   # Topic types
 uint8 direction                 # Topic direction
 float32 frequency               # Topic frequency (Hz)
 float32 effective_frequency     # Topic (effective) frequency (Hz)
-float32 healthy_freq            # Frequency at which this topic can be considered healthy
+float32 healthy_frequency       # Frequency at which this topic can be considered healthy
 float32 bandwidth               # Topic bandwidth (byte/s)
 float32 processing_time         # Callback time (for INBOUND topics only)
 bool enabled                    # Topic switch

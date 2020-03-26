@@ -5,6 +5,7 @@ from threading import Lock
 
 from .constants import *
 from .utils import apply_namespace, get_module_type, get_module_instance
+from . import get_instance
 
 from duckietown_msgs.msg import \
     NodeParameter, \
@@ -25,7 +26,7 @@ class DTROSDiagnostics:
 
     @classmethod
     def getInstance(cls):
-        if not DIAGNOSTICS_ENABLED:
+        if not cls.enabled():
             return None
         if cls.instance is None:
             cls.instance = _DTROSDiagnosticsManager()
@@ -33,7 +34,7 @@ class DTROSDiagnostics:
 
     @classmethod
     def enabled(cls):
-        return DIAGNOSTICS_ENABLED
+        return DIAGNOSTICS_ENABLED and (get_instance() is not None and not get_instance().is_ghost)
 
 
 class _DTROSDiagnosticsManager:
@@ -42,6 +43,7 @@ class _DTROSDiagnosticsManager:
         # initialize diagnostics data containers
         self._node_stats = {}
         self._topics_stats = {}
+        self._topics_monitor = {}
         self._topics_stats_lock = Lock()
         self._links_stats = {}
         self._links_stats_lock = Lock()
@@ -112,18 +114,23 @@ class _DTROSDiagnosticsManager:
         # publish new node information
         self._publish_node_diagnostics()
 
-    def register_topic(self, name, direction, healthy_freq, topic_types):
+    def register_topic(self, name, direction, healthy_freq, topic_types, topic_monitor):
+        if name in ROS_INFRA_TOPICS:
+            return
+        # ---
+        self._topics_stats_lock.acquire()
         try:
-            self._topics_stats_lock.acquire()
             self._topics_stats[name] = {
                 'types': [t.value for t in topic_types],
                 'direction': direction.value,
                 'frequency': 0.0,
-                'healthy_freq': healthy_freq,
+                'effective_frequency': 0.0,
+                'healthy_frequency': healthy_freq,
                 'bandwidth': -1.0,
                 'processing_time': -1.0,
                 'enabled': True
             }
+            self._topics_monitor[name] = topic_monitor
         finally:
             self._topics_stats_lock.release()
         # force topic message update
@@ -133,15 +140,13 @@ class _DTROSDiagnosticsManager:
         updated_info = {}
         # update healthy frequency
         if healthy_freq is not None:
-            updated_info['healthy_freq'] = healthy_freq
+            updated_info['healthy_frequency'] = healthy_freq
         # update list of topics
+        self._topics_stats_lock.acquire()
         try:
-            self._topics_stats_lock.acquire()
             self._topics_stats[name].update(updated_info)
         finally:
             self._topics_stats_lock.release()
-        # force topic message update
-        self._publish_topics_diagnostics(force=False)
 
     def unregister_topic(self, name):
         try:
@@ -178,9 +183,8 @@ class _DTROSDiagnosticsManager:
         return -1
 
     def compute_topics_frequency(self):
+        self._links_stats_lock.acquire()
         try:
-            self._links_stats_lock.acquire()
-            # ---
             # topic frequency is computed as the average of the frequencies on all its connections
             for topic in list(self._topics_stats.keys()):
                 freq = []
@@ -192,11 +196,9 @@ class _DTROSDiagnosticsManager:
                 # ---
                 self._topics_stats_lock.acquire()
                 # compute frequency
-                self._topics_stats[topic]['frequency'] = \
-                    sum(freq) / (len(freq) if len(freq) else 1)
+                self._topics_stats[topic]['effective_frequency'] = sum(freq) / max(len(freq), 1)
                 # compute bandwidth
-                self._topics_stats[topic]['bandwidth'] = \
-                    sum(bwidth) / (len(bwidth) if len(bwidth) else 1)
+                self._topics_stats[topic]['bandwidth'] = sum(bwidth) / max(len(bwidth), 1)
                 # release lock
                 self._topics_stats_lock.release()
             # ---
@@ -209,7 +211,8 @@ class _DTROSDiagnosticsManager:
         pub_stats, sub_stats = rospy.impl.registration.get_topic_manager().get_pub_sub_stats()
         # ---
         _conn_direction = lambda d: {
-            'i': TopicDirection.INBOUND.value, 'o': TopicDirection.OUTBOUND.value
+            'i': TopicDirection.INBOUND.value,
+            'o': TopicDirection.OUTBOUND.value
         }[d]
         # connections stats
         # From (_TopicImpl:get_stats_info):
@@ -309,12 +312,16 @@ class _DTROSDiagnosticsManager:
             return
         msg = DiagnosticsRosTopicArray()
         msg.header.stamp = rospy.Time.now()
+        self._topics_stats_lock.acquire()
         try:
-            self._topics_stats_lock.acquire()
             for topic, topic_stats in self._topics_stats.items():
+                topic_stats['frequency'] = self._topics_monitor[topic].get_frequency()
+                topic_stats['effective_frequency'] = min(
+                    topic_stats['effective_frequency'], topic_stats['frequency']
+                )
                 msg.topics.append(DiagnosticsRosTopic(
                     node=rospy.get_name(),
-                    topic=topic,
+                    name=topic,
                     **topic_stats
                 ))
         finally:
@@ -335,9 +342,14 @@ class _DTROSDiagnosticsManager:
         self._params_diagnostics_pub.publish(msg)
 
     def _publish_links_diagnostics(self, *args, **kwargs):
-        if not self._links_diagnostics_pub.anybody_listening():
+        if not self._links_diagnostics_pub.anybody_listening() and \
+           not self._topics_diagnostics_pub.anybody_listening():
             return
         self._compute_stats()
+        # publish only if somebody is listening
+        if not self._links_diagnostics_pub.anybody_listening():
+            return
+        # ---
         msg = DiagnosticsRosLinkArray()
         msg.header.stamp = rospy.Time.now()
         try:
@@ -355,6 +367,8 @@ class _DTROSDiagnosticsManager:
 def _compute_f_b(new_read, old_read):
     tnow = time.time()
     return {
-        'frequency': (new_read['messages'] - old_read['messages']) / (tnow - old_read['_time']),
-        'bandwidth': (new_read['bytes'] - old_read['bytes']) / (tnow - old_read['_time'])
+        'frequency':
+            (new_read['messages'] - old_read['messages']) / (tnow - old_read['_time']),
+        'bandwidth':
+            (new_read['bytes'] - old_read['bytes']) / (tnow - old_read['_time'])
     }

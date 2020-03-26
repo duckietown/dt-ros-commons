@@ -1,12 +1,12 @@
 from flask import Flask
 
 from .actions.topic import rostopic
-from .diagnostics import ROSDiagnosticsListener
+from .actions.node import rosnode
 
 
-class ROS_HTTP_API(object):
+class ROS_HTTP_API(Flask):
 
     def __init__(self):
-        # super(ROS_HTTP_API, self).__init__(__name__)
-        # self.register_blueprint(rostopic)
-        self.ros_listener = ROSDiagnosticsListener()
+        super(ROS_HTTP_API, self).__init__(__name__)
+        self.register_blueprint(rostopic)
+        self.register_blueprint(rosnode)

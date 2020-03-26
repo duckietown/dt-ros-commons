@@ -18,6 +18,15 @@ NODE_SWITCH_SERVICE_NAME = 'switch'
 NODE_GET_PARAM_SERVICE_NAME = 'get_parameters_list'
 NODE_REQUEST_PARAM_UPDATE_SERVICE_NAME = 'request_parameters_update'
 
+MIN_TOPIC_FREQUENCY_SUPPORTED = 0.1
+MAX_TOPIC_FREQUENCY_SUPPORTED = 200.0
+
+ROS_INFRA_TOPICS = [
+    '/rosout',
+    '/rosout_agg',
+    '/tf'
+]
+
 
 class TopicDirection(Enum):
     INBOUND = 0
@@ -38,6 +47,7 @@ class NodeType(Enum):
     VISUALIZATION = 9
     INFRASTRUCTURE = 10
     DIAGNOSTICS = 20
+
 
 # NOTE: this has to match duckietown_msgs.msg.DiagnosticsRosTopic
 TopicType = NodeType
@@ -93,7 +103,8 @@ class ParamType(Enum):
 class NodeHealth(Enum):
     UNKNOWN = 0
     STARTING = 1
-    HEALTHY = 2
-    WARNING = 3
-    ERROR = 4
-    FATAL = 5
+    STARTED = 2
+    HEALTHY = 3
+    WARNING = 4
+    ERROR = 5
+    FATAL = 6

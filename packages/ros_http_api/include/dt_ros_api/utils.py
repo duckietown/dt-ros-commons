@@ -11,7 +11,7 @@ def response_ok(data, *args, **kwargs):
 
 def response_error(message, *args, **kwargs):
     return jsonify({
-        'status': 'ok',
+        'status': 'error',
         'message': message,
         'data': None
     })
