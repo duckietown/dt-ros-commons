@@ -1,8 +1,6 @@
 import rosnode as rn
 from flask import Blueprint
 
-from duckietown.dtros import NodeHealth, NodeType
-
 from dt_ros_api.utils import \
     response_ok,\
     response_error
@@ -35,7 +33,7 @@ rosnode = Blueprint('node', __name__)
 def _list():
     try:
         return response_ok({
-            'nodes': rn.get_node_names()
+            'nodes': sorted(rn.get_node_names())
         })
     except rn.ROSNodeIOException as e:
         return response_error(str(e))

@@ -35,7 +35,7 @@ def _list():
         return response_ok({
             'topics': {
                 _rostopic: _rostopic_type
-                for _rostopic, _rostopic_type in rospy.get_published_topics()
+                for _rostopic, _rostopic_type in sorted(rospy.get_published_topics())
             }
         })
     except Exception as e:

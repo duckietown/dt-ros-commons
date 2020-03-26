@@ -1,4 +1,4 @@
-import rospy, rosparam as rp
+import rosparam as rp
 from flask import Blueprint
 
 from dt_ros_api.utils import \
@@ -30,7 +30,7 @@ def _list(ns=''):
     ns = '/' + ns
     try:
         return response_ok({
-            'params': rp.list_params(ns)
+            'params': sorted(rp.list_params(ns))
         })
     except Exception as e:
         return response_error(str(e))
