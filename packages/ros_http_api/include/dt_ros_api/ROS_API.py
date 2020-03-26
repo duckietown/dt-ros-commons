@@ -3,6 +3,7 @@ from flask import Flask
 from .actions.topic import rostopic
 from .actions.node import rosnode
 from .actions.param import rosparam
+from .actions.service import rosservice
 
 
 class ROS_HTTP_API(Flask):
@@ -12,3 +13,4 @@ class ROS_HTTP_API(Flask):
         self.register_blueprint(rostopic)
         self.register_blueprint(rosnode)
         self.register_blueprint(rosparam)
+        self.register_blueprint(rosservice)
