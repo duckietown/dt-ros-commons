@@ -5,6 +5,7 @@ from dt_ros_api.utils import \
     response_ok,\
     response_error
 from dt_ros_api.knowledge_base import KnowledgeBase
+from dt_ros_api.constants import default_param_info
 
 rosparam = Blueprint('param', __name__)
 
@@ -52,9 +53,10 @@ def _info(param):
     param = '/' + param
     try:
         info = {
-            'param': param
+            'param': param,
+            'value': rp.get_param(param)
         }
-        info.update(KnowledgeBase.get('/param%s' % param, {}))
+        info.update(KnowledgeBase.get('/param/info%s' % param, default_param_info()))
         return response_ok(info)
     except Exception as e:
         return response_error(str(e))
