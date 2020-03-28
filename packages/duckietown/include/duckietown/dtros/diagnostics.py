@@ -97,6 +97,7 @@ class _DTROSDiagnosticsManager:
             'health_reason': '',
             'health_stamp': rospy.get_time(),
             'enabled': True,
+            'uri': rospy.get_node_uri().rstrip('/'),
             'machine': socket.gethostname(),
             'module_type': get_module_type(),
             'module_instance': get_module_instance()
