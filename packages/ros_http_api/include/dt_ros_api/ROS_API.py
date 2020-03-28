@@ -1,9 +1,11 @@
 from flask import Flask
+from flask_cors import CORS
 
 from .actions.topic import rostopic
 from .actions.node import rosnode
 from .actions.param import rosparam
 from .actions.service import rosservice
+from .actions.graph import rosgraph
 
 
 class ROS_HTTP_API(Flask):
@@ -14,3 +16,6 @@ class ROS_HTTP_API(Flask):
         self.register_blueprint(rosnode)
         self.register_blueprint(rosparam)
         self.register_blueprint(rosservice)
+        self.register_blueprint(rosgraph)
+        # apply CORS settings
+        CORS(self)
