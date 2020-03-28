@@ -5,7 +5,8 @@ from duckietown.dtros import TopicDirection
 from duckietown.dtros.dtsubscriber import DTSubscriber
 
 from .knowledge_base import KnowledgeBase
-from .constants import DataProvider, default_topic_info, default_service_info
+from .constants import DataProvider, default_node_info, default_topic_info, default_service_info, is_infra_topic, is_infra_node
+from socket import error
 
 
 class TimedDataProvider(DataProvider):
@@ -60,7 +61,7 @@ class RosGraphProvider(DataProvider):
         # create master handler
         self._master = rosgraph.Master(rospy.get_name())
         # subscriber monitor timer
-        self._hearth_beat = rospy.Timer(
+        self._heart_beat = rospy.Timer(
             period=rospy.Duration.from_sec(30),
             callback=self._fetch_system_status,
             oneshot=False
@@ -72,48 +73,93 @@ class RosGraphProvider(DataProvider):
         topic_key = lambda x, t: '/topic/%s%s' % (x, t)
         service_key = lambda x, s: '/service/%s%s' % (x, s)
         node_key = lambda x, n: '/node/%s%s' % (x, n)
-        pubs, subs, srvs = self._master.getSystemState()
+        try:
+            pubs, subs, srvs = self._master.getSystemState()
+        except (rosgraph.masterapi.Error, rosgraph.masterapi.Failure, Exception, error):
+            return
         # create a node -> topics mapping
         node_to_topic = {}
         node_to_service = {}
         topics = {}
         services = {}
+        all_nodes = set()
+        all_topics = set()
+        all_services = set()
 
         # process publishers
         for topic, publishers in pubs:
+            if is_infra_topic(topic):
+                continue
+            # ---
             KnowledgeBase.set(topic_key('publishers', topic), publishers)
             # populate node -> topics map
             for pub in publishers:
+                if is_infra_node(pub):
+                    continue
+                # ---
                 if pub not in node_to_topic:
                     node_to_topic[pub] = {}
                 node_to_topic[pub][topic] = default_topic_info(topic, TopicDirection.OUTBOUND)
+                # populate node/list
+                all_nodes.add(pub)
             # add topic to list of topics (if not present)
             if not KnowledgeBase.has(topic_key('info', topic)):
                 topics[topic] = default_topic_info(topic, None, node_agnostic=True)
+            # populate topic/list
+            all_topics.add(topic)
 
         # process subscribers
         for topic, subscribers in subs:
+            if is_infra_topic(topic):
+                continue
+            # ---
             KnowledgeBase.set(topic_key('subscribers', topic), subscribers)
             # populate node -> topics map
             for sub in subscribers:
+                if is_infra_node(sub):
+                    continue
+                # ---
                 if sub not in node_to_topic:
                     node_to_topic[sub] = {}
                 node_to_topic[sub][topic] = default_topic_info(topic, TopicDirection.INBOUND)
+                # populate node/list
+                all_nodes.add(sub)
             # add topic to list of topics (if not present)
             if not KnowledgeBase.has(topic_key('info', topic)):
                 topics[topic] = default_topic_info(topic, None, node_agnostic=True)
+            # populate topic/list
+            all_topics.add(topic)
 
         # process services
         for service, providers in srvs:
             KnowledgeBase.set(service_key('providers', service), providers)
             # populate node -> service map
             for prov in providers:
+                if is_infra_node(prov):
+                    continue
+                # ---
                 if prov not in node_to_service:
                     node_to_service[prov] = []
                 node_to_service[prov].append(service)
+                # populate node/list
+                all_nodes.add(prov)
             # add service to list of services (if not present)
             if not KnowledgeBase.has(service_key('info', service)):
                 services[service] = default_service_info()
+            # create topic/list
+            all_services.add(service)
+
+        # store /node/list
+        KnowledgeBase.set(node_key('list', ''), all_nodes)
+        # store /topic/list
+        KnowledgeBase.set(topic_key('list', ''), all_topics)
+        # store /topic/list
+        KnowledgeBase.set(service_key('list', ''), all_services)
+
+        # store /node/info
+        for node in all_nodes:
+            if not KnowledgeBase.has(node_key('info', node)):
+                KnowledgeBase.set(node_key('info', node), default_node_info())
 
         # store /topic/info
         for topic, topic_info in topics.items():

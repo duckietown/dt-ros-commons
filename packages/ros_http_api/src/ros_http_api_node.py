@@ -18,6 +18,7 @@ from duckietown_msgs.msg import \
 
 from dt_ros_api.providers import SubscriberProvider, RosGraphProvider
 from dt_ros_api.knowledge_base import KnowledgeBase
+from dt_ros_api.constants import is_infra_node, is_infra_topic
 from dt_ros_api import ROS_HTTP_API
 
 ROS_HTTP_API_PORT = 8084
@@ -82,13 +83,19 @@ class ROS_HTTP_API_Node(DTROS):
         KnowledgeBase.register_provider('/topic/publishers/', self._graph_provider)
         KnowledgeBase.register_provider('/topic/subscribers/', self._graph_provider)
         KnowledgeBase.register_provider('/topic/info/', self._graph_provider)
-        KnowledgeBase.register_provider('/service/providers/', self._graph_provider)
+        KnowledgeBase.register_provider('/topic/list/', self._graph_provider)
+        KnowledgeBase.register_provider('/service/list/', self._graph_provider)
         KnowledgeBase.register_provider('/service/info/', self._graph_provider)
+        KnowledgeBase.register_provider('/service/providers/', self._graph_provider)
+        KnowledgeBase.register_provider('/node/list/', self._graph_provider)
         KnowledgeBase.register_provider('/node/topics/', self._graph_provider)
         KnowledgeBase.register_provider('/node/services/', self._graph_provider)
 
     @staticmethod
     def _diagnostics_node_cb(data):
+        if is_infra_node(data.name):
+            return
+        # ---
         key = '/node/info%s' % data.name
         # store info about nodes
         info = {
@@ -114,6 +121,9 @@ class ROS_HTTP_API_Node(DTROS):
         node = data.topics[0].node
         topics = KnowledgeBase.get(node_key(node), {})
         for topic in data.topics:
+            if is_infra_topic(topic.name):
+                continue
+            # ---
             old_types = KnowledgeBase.get(topic_key('types', topic.name), [])
             # TODO: this will likely break in Python3
             new_types = [TopicType(ord(t)).name for t in topic.types]
@@ -187,7 +197,9 @@ class ROS_HTTP_API_Node(DTROS):
                 'bytes': link.bytes,
                 'frequency': link.frequency,
                 'bandwidth': link.bandwidth
-            } for link in data.links
+            }
+            for link in data.links
+            if not is_infra_topic(link.topic)
         ]
         # ---
         KnowledgeBase.set(node_key(node), links)

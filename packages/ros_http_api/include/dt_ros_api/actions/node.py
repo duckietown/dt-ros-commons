@@ -1,4 +1,3 @@
-import rosnode as rn
 from flask import Blueprint
 
 from dt_ros_api.utils import \
@@ -33,9 +32,9 @@ rosnode = Blueprint('node', __name__)
 def _list():
     try:
         return response_ok({
-            'nodes': sorted(rn.get_node_names())
+            'nodes': sorted(KnowledgeBase.get('/node/list', []))
         })
-    except rn.ROSNodeIOException as e:
+    except Exception as e:
         return response_error(str(e))
 
 
@@ -70,7 +69,7 @@ def _topics(node):
             'node': '/' + node,
             'topics': KnowledgeBase.get('/node/topics/%s' % node, {})
         })
-    except rn.ROSNodeIOException as e:
+    except Exception as e:
         return response_error(str(e))
 
 
@@ -81,7 +80,7 @@ def _params(node):
             'node': '/' + node,
             'params': KnowledgeBase.get('/node/params/%s' % node, {})
         })
-    except rn.ROSNodeIOException as e:
+    except Exception as e:
         return response_error(str(e))
 
 
@@ -92,5 +91,5 @@ def _services(node):
             'node': '/' + node,
             'services': KnowledgeBase.get('/node/services/%s' % node, {})
         })
-    except rn.ROSNodeIOException as e:
+    except Exception as e:
         return response_error(str(e))

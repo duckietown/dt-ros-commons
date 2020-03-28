@@ -1,4 +1,4 @@
-import rospy, rostopic as rt
+import rostopic as rt
 from flask import Blueprint
 
 from dt_ros_api.utils import \
@@ -33,10 +33,7 @@ rostopic = Blueprint('topic', __name__)
 def _list():
     try:
         return response_ok({
-            'topics': {
-                _rostopic: _rostopic_type
-                for _rostopic, _rostopic_type in sorted(rospy.get_published_topics())
-            }
+            'topics': sorted(KnowledgeBase.get('/topic/list', []))
         })
     except Exception as e:
         return response_error(str(e))
@@ -151,6 +148,3 @@ def _types(topic):
         })
     except Exception as e:
         return response_error(str(e))
-
-
-

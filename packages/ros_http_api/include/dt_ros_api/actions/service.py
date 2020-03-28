@@ -27,7 +27,7 @@ rosservice = Blueprint('service', __name__)
 def _list():
     try:
         return response_ok({
-            'services': sorted(rs.get_service_list())
+            'services': sorted(sorted(KnowledgeBase.get('/service/list', [])))
         })
     except Exception as e:
         return response_error(str(e))

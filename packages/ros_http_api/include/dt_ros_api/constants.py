@@ -1,4 +1,8 @@
+import rospy
+
 from duckietown.dtros import TopicType, TopicDirection, ParamType, NodeType, NodeHealth
+
+from duckietown.dtros.constants import ROS_INFRA_NODES, ROS_INFRA_TOPICS
 
 
 class DataProvider(object):
@@ -65,3 +69,15 @@ def default_topic_type(topic):
         return TopicType.DIAGNOSTICS.name
     else:
         return TopicType.GENERIC.name
+
+
+def is_infra_node(node):
+    return \
+        node in ROS_INFRA_NODES \
+        or node == rospy.get_name()
+
+
+def is_infra_topic(topic):
+    return \
+        topic in ROS_INFRA_TOPICS \
+        or default_topic_type(topic) == TopicType.DIAGNOSTICS.name
