@@ -27,6 +27,11 @@ ROS_INFRA_TOPICS = [
     '/tf'
 ]
 
+ROS_INFRA_NODES = [
+    '/rosout',
+    '/rosapi'
+]
+
 
 class TopicDirection(Enum):
     INBOUND = 0
