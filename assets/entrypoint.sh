@@ -72,6 +72,14 @@ if [ "${ROS_MASTER_URI_IS_SET}" -eq "0" ]; then
   export ROS_MASTER_URI="http://${VEHICLE_NAME}.local:11311/"
 fi
 
+# robot_type - directory set in init_sd_card/command.py
+ROBOT_TYPE_FILE=/data/stats/init_sd_card/parameters/robot_type
+if [ -f "${ROBOT_TYPE_FILE}" ]; then
+    export ROBOT_TYPE=`cat ${ROBOT_TYPE_FILE}`
+else
+    echo "Warning: robot_type file does not exist."
+fi
+
 # reuse LAUNCHFILE as CMD if the var is set and the first argument is `--`
 if [ ${#LAUNCHFILE} -gt 0 ] && [ "$1" == "--" ]; then
   shift
