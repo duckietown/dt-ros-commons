@@ -1,3 +1,9 @@
-int32 id
-float64 size
-geometry_msgs/PoseStamped pose
+geometry_msgs/Transform transform
+int32 tag_id
+string tag_family
+int32 hamming
+float32 decision_margin
+float32[9] homography
+float32[2] center
+float32[8] corners
+float32 pose_error

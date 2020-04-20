@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+export DT_MODULE_INSTANCE=$(basename $(cat /proc/1/cpuset))
+
 # check if ROS_MASTER_URI is set
 ROS_MASTER_URI_IS_SET=0
 if [ ! -z "${ROS_MASTER_URI}" ]; then
@@ -73,12 +75,15 @@ if [ "${ROS_MASTER_URI_IS_SET}" -eq "0" ]; then
 fi
 
 # robot_type - directory set in init_sd_card/command.py
-ROBOT_TYPE_FILE=/data/stats/init_sd_card/parameters/robot_type
+ROBOT_TYPE_FILE=/data/config/robot_type
 if [ -f "${ROBOT_TYPE_FILE}" ]; then
-    export ROBOT_TYPE=`cat ${ROBOT_TYPE_FILE}`
+    export ROBOT_TYPE=$(cat ${ROBOT_TYPE_FILE})
 else
-    echo "Warning: robot_type file does not exist."
+    echo "Warning: robot_type file does not exist. Using 'duckiebot' as default type."
+    export ROBOT_TYPE="duckiebot"
 fi
+
+set +e
 
 # reuse LAUNCHFILE as CMD if the var is set and the first argument is `--`
 if [ ${#LAUNCHFILE} -gt 0 ] && [ "$1" == "--" ]; then

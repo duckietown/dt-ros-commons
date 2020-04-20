@@ -1,6 +1,11 @@
 import rospy
 
-class DTPublisher(rospy.Publisher):
+from .constants import TopicDirection
+from .dttopic import DTTopic
+from .singleton import get_instance
+
+
+class DTPublisher(DTTopic, rospy.__Publisher__):
     """ A wrapper around ``rospy.Publisher``.
 
     This class is exactly the same as the standard
@@ -34,9 +39,29 @@ class DTPublisher(rospy.Publisher):
     """
 
     def __init__(self, *args, **kwargs):
-
-        super(DTPublisher, self).__init__(*args, **kwargs)
+        ros_args = {k: v for k, v in kwargs.items() if not k.startswith('dt_')}
+        # call super constructor
+        rospy.__Publisher__.__init__(self, *args, **ros_args)
+        # dt arguments
         self.active = True
+        # parse dt arguments
+        self._parse_dt_args(kwargs)
+        # register dt topic
+        if not self._dt_is_ghost:
+            self._register_dt_topic(TopicDirection.OUTBOUND)
+        # register publisher
+        if get_instance() is not None:
+            get_instance()._register_publisher(self)
+        # TODO: register for new subscriptions and publish new links on event
+
+    def switch_off(self):
+        self.active = False
+
+    def switch_on(self):
+        self.active = True
+
+    def anybody_listening(self):
+        return self.get_num_connections() > 0
 
     def publish(self, *args, **kwargs):
         """ A wrapper around the ``rospy.Publisher.publish`` method.
@@ -48,4 +73,6 @@ class DTPublisher(rospy.Publisher):
 
         """
         if self.active:
+            self._tick_frequency()
+            # call super publish
             super(DTPublisher, self).publish(*args, **kwargs)
