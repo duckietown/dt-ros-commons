@@ -52,6 +52,7 @@ class DTSubscriber(DTTopic, rospy.__Subscriber__):
         # store the user callback, a decorated one will be used instead
         self._user_callback = callback
         # call super constructor
+        DTTopic.__init__(self)
         rospy.__Subscriber__.__init__(
             self,
             name,
