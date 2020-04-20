@@ -1,6 +1,5 @@
 import time
 import rospy
-from types import ListType
 
 from .constants import TopicType, MIN_TOPIC_FREQUENCY_SUPPORTED, MAX_TOPIC_FREQUENCY_SUPPORTED
 from .diagnostics import DTROSDiagnostics
@@ -13,21 +12,19 @@ class DTTopic(rospy.topics.Topic):
     """
     def __init__(self, *args, **kwargs):
         self._dt_healthy_freq = -1
-        self._dt_topic_type = []
+        self._dt_topic_type = TopicType.GENERIC
         self._dt_is_ghost = False
 
     def _parse_dt_args(self, kwargs):
         # parse dt arguments
         self._dt_healthy_freq = _arg(kwargs, 'dt_healthy_hz', -1)
-        self._dt_topic_type = _arg(kwargs, 'dt_topic_type', [])
+        self._dt_topic_type = _arg(kwargs, 'dt_topic_type', TopicType.GENERIC)
         self._dt_is_ghost = _arg(kwargs, 'dt_ghost', False)
         # sanitize dt_type
-        if not isinstance(self._dt_topic_type, ListType):
-            self._dt_topic_type = [self._dt_topic_type]
-        for t in self._dt_topic_type:
-            if not isinstance(t, TopicType):
-                rospy.logerror('The type "{:s}" is not supported. '.format(str(t)) +
-                               'An instance of duckietown.TopicType is expected')
+        if not isinstance(self._dt_topic_type, TopicType):
+            rospy.logerror('The type "{:s}" is not supported. '.format(str(self._dt_topic_type)) +
+                           'An instance of duckietown.TopicType is expected')
+            self._dt_topic_type = TopicType.GENERIC
         # topic statistics
         self._last_frequency_tick = -1
         self._frequency = 0.0

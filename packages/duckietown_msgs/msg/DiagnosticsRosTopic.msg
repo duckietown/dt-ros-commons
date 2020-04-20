@@ -18,7 +18,7 @@ uint8 TOPIC_TYPE_DIAGNOSTICS = 20
 
 string node                     # Node publishing this message
 string name                     # Topic object of the diagnostics
-uint8[] types                   # Topic types
+uint8 type                      # Topic type
 uint8 direction                 # Topic direction
 float32 frequency               # Topic frequency (Hz)
 float32 effective_frequency     # Topic (effective) frequency (Hz)

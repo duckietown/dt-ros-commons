@@ -35,7 +35,7 @@ def default_node_info():
 def default_topic_info(name, direction, node_agnostic=False):
     info = {
         'message_type': None,
-        'types': [default_topic_type(name)],
+        'type': default_topic_type(name),
         'frequency': None,
         'effective_frequency': None
     }

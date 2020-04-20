@@ -25,7 +25,7 @@ rostopic = Blueprint('topic', __name__)
 # > Duckietown Endpoints
 #   - topic/publishers
 #   - topic/subscribers
-#   - topic/types
+#   - topic/type
 #
 
 
@@ -73,7 +73,7 @@ def _info(topic):
     try:
         info = {
             'topic': topic,
-            'types': KnowledgeBase.get(key('types'), []),
+            'type': KnowledgeBase.get(key('type'), default_topic_type(topic)),
             'publishers': KnowledgeBase.get(key('publishers'), []),
             'subscribers': KnowledgeBase.get(key('subscribers'), [])
         }
@@ -138,13 +138,13 @@ def _subscribers(topic):
         return response_error(str(e))
 
 
-@rostopic.route('/topic/types/<path:topic>')
-def _types(topic):
+@rostopic.route('/topic/type/<path:topic>')
+def _type(topic):
     topic = '/' + topic
     try:
         return response_ok({
             'topic': topic,
-            'types': KnowledgeBase.get('/topic/types%s' % topic, [default_topic_type(topic)])
+            'type': KnowledgeBase.get('/topic/type%s' % topic, default_topic_type(topic))
         })
     except Exception as e:
         return response_error(str(e))

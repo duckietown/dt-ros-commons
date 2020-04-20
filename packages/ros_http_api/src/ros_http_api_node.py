@@ -53,7 +53,7 @@ class ROS_HTTP_API_Node(DTROS):
             dt_timeout=20
         )
         KnowledgeBase.register_provider('/node/topics/', self._diagnostics_topics_sub)
-        KnowledgeBase.register_provider('/topic/types/', self._diagnostics_topics_sub)
+        KnowledgeBase.register_provider('/topic/type/', self._diagnostics_topics_sub)
         KnowledgeBase.register_provider('/topic/info/', self._diagnostics_topics_sub)
         KnowledgeBase.register_provider('/topic/hz/', self._diagnostics_topics_sub)
         KnowledgeBase.register_provider('/topic/bw/', self._diagnostics_topics_sub)
@@ -124,16 +124,13 @@ class ROS_HTTP_API_Node(DTROS):
             if is_infra_topic(topic.name):
                 continue
             # ---
-            old_types = KnowledgeBase.get(topic_key('types', topic.name), [])
-            # TODO: this will likely break in Python3
-            new_types = [TopicType(ord(t)).name for t in topic.types]
-            # merge types with what is in the KB
-            types = list(set(old_types + new_types))
-            KnowledgeBase.set(topic_key('types', topic.name), types)
+            # store topic type
+            topic_type_str = TopicType(ord(topic.type)).name
+            KnowledgeBase.set(topic_key('type', topic.name), topic_type_str)
             # compile topic info
             info = {
                 'message_type': None,
-                'types': list(new_types),
+                'type': topic_type_str,
                 # TODO: these should be averaged
                 'frequency': topic.frequency,
                 'effective_frequency': topic.effective_frequency

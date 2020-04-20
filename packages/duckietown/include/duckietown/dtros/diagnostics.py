@@ -115,14 +115,14 @@ class _DTROSDiagnosticsManager:
         # publish new node information
         self._publish_node_diagnostics()
 
-    def register_topic(self, name, direction, healthy_freq, topic_types, topic_monitor):
+    def register_topic(self, name, direction, healthy_freq, topic_type, topic_monitor):
         if name in ROS_INFRA_TOPICS:
             return
         # ---
         self._topics_stats_lock.acquire()
         try:
             self._topics_stats[name] = {
-                'types': [t.value for t in topic_types],
+                'type': topic_type.value,
                 'direction': direction.value,
                 'frequency': 0.0,
                 'effective_frequency': 0.0,
