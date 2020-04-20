@@ -6,4 +6,4 @@ RUN python -m pip install sphinx==1.7.0 sphinx-rtd-theme sphinx-autobuild mock
 
 RUN cd /; git clone https://github.com/AleksandarPetrov/napoleon; cd /napoleon; python setup.py install -f
 
-CMD "/ros_entrypoint.sh "
+CMD "/ros_entrypoint.sh"
