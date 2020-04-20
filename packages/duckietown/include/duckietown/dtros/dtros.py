@@ -161,7 +161,7 @@ class DTROS(object):
         # mark node as healthy and STARTED
         self.set_health(NodeHealth.STARTED)
         # register shutdown callback
-        rospy.on_shutdown(self.onShutdown)
+        rospy.on_shutdown(self._on_shutdown)
 
     # Read-only properties for the private attributes
     @property
@@ -238,6 +238,21 @@ class DTROS(object):
             rospy.logfatal(full_msg)
         else:
             raise ValueError('Type argument value %s is not supported!' % type)
+
+    def loginfo(self, msg):
+        self.log(msg, type='info')
+
+    def logerr(self, msg):
+        self.log(msg, type='err')
+
+    def logfatal(self, msg):
+        self.log(msg, type='fatal')
+
+    def logwarn(self, msg):
+        self.log(msg, type='warn')
+
+    def logdebug(self, msg):
+        self.log(msg, type='debug')
 
     def _srv_switch(self, request):
         """
@@ -341,7 +356,10 @@ class DTROS(object):
     def _register_subscriber(self, subscriber):
         self._subscribers.append(subscriber)
 
-    def onShutdown(self):
-        """Shutdown procedure."""
+    def _on_shutdown(self):
+        self.log('Received shutdown request.')
         self.is_shutdown = True
-        self.log('Shutdown.')
+        self.on_shutdown()
+
+    def on_shutdown(self):
+        pass
