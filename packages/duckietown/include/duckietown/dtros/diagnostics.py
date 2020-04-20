@@ -54,28 +54,32 @@ class _DTROSDiagnosticsManager:
             DiagnosticsRosNode,
             queue_size=20,
             latch=True,
-            dt_ghost=True
+            dt_ghost=True,
+            dt_topic_type=TopicType.DEBUG
         )
         self._topics_diagnostics_pub = rospy.Publisher(
             apply_namespace(DIAGNOSTICS_ROS_TOPICS_TOPIC, 1),
             DiagnosticsRosTopicArray,
             queue_size=20,
             latch=True,
-            dt_ghost=True
+            dt_ghost=True,
+            dt_topic_type=TopicType.DEBUG
         )
         self._params_diagnostics_pub = rospy.Publisher(
             apply_namespace(DIAGNOSTICS_ROS_PARAMETERS_TOPIC, 1),
             DiagnosticsRosParameterArray,
             queue_size=20,
             latch=True,
-            dt_ghost=True
+            dt_ghost=True,
+            dt_topic_type=TopicType.DEBUG
         )
         self._links_diagnostics_pub = rospy.Publisher(
             apply_namespace(DIAGNOSTICS_ROS_LINKS_TOPIC, 1),
             DiagnosticsRosLinkArray,
             queue_size=20,
             latch=True,
-            dt_ghost=True
+            dt_ghost=True,
+            dt_topic_type=TopicType.DEBUG
         )
         # topics diagnostics timer
         self._topics_diagnostics_timer = rospy.Timer(

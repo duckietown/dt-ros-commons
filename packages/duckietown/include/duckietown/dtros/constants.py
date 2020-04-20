@@ -51,7 +51,7 @@ class NodeType(Enum):
     BEHAVIOR = 8
     VISUALIZATION = 9
     INFRASTRUCTURE = 10
-    DIAGNOSTICS = 20
+    DEBUG = 20
 
 
 # NOTE: this has to match duckietown_msgs.msg.DiagnosticsRosTopic
