@@ -14,7 +14,7 @@ uint8 TOPIC_TYPE_SWARM = 7
 uint8 TOPIC_TYPE_BEHAVIOR = 8
 uint8 TOPIC_TYPE_VISUALIZATION = 9
 uint8 TOPIC_TYPE_INFRASTRUCTURE = 10
-uint8 TOPIC_TYPE_DEBUG = 11
+uint8 TOPIC_TYPE_DEBUG = 20
 
 string node                     # Node publishing this message
 string name                     # Topic object of the diagnostics

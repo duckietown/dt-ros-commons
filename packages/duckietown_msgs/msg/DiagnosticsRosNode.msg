@@ -10,7 +10,7 @@ uint8 NODE_TYPE_SWARM = 7
 uint8 NODE_TYPE_BEHAVIOR = 8
 uint8 NODE_TYPE_VISUALIZATION = 9
 uint8 NODE_TYPE_INFRASTRUCTURE = 10
-uint8 NODE_TYPE_DIAGNOSTICS = 20
+uint8 NODE_TYPE_DEBUG = 20
 
 # Node health (this has to match duckietown.NodeHealth)
 uint8 NODE_HEALTH_UNKNOWN = 0
