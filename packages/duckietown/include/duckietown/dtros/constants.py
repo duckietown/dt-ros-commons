@@ -51,6 +51,7 @@ class NodeType(Enum):
     BEHAVIOR = 8
     VISUALIZATION = 9
     INFRASTRUCTURE = 10
+    COMMUNICATION = 11
     DEBUG = 20
 
 
