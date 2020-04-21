@@ -94,9 +94,10 @@ class _DTROSDiagnosticsManager:
             oneshot=False
         )
 
-    def register_node(self, name, health):
+    def register_node(self, name, type, health):
         self._node_stats = {
             'name': name,
+            'type': type.value,
             'health': health.value,
             'health_reason': '',
             'health_stamp': rospy.get_time(),

@@ -156,6 +156,7 @@ class DTROS(object):
         if DTROSDiagnostics.enabled():
             DTROSDiagnostics.getInstance().register_node(
                 self.node_name,
+                self.node_type,
                 health=self._health
             )
         # mark node as healthy and STARTED
