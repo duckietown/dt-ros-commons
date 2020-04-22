@@ -330,16 +330,16 @@ class DTROS(object):
             self._rh_paramUpdate(*args, **kwargs)
         # check data
         if len(args) < 3:
-            rospy.logdebug('Received invalid paramUpdate call from Master')
+            self.logdebug('Received invalid paramUpdate call from Master')
             return
         # get what changed
         _, param_name, param_value = args[:3]
         param_name = param_name.rstrip('/')
-        rospy.logdebug('Received paramUpdate("%s", %s)' % (param_name, str(param_value)))
+        self.logdebug('Received paramUpdate("%s", %s)' % (param_name, str(param_value)))
         # update parameter value
         if param_name in self._parameters:
             self._parameters[param_name].set_value(param_value)
-            rospy.logdebug('Parameter "%s" has now the value [%s]' % (
+            self.loginfo('Parameter "%s" has now the value [%s]' % (
                 param_name, str(self._parameters[param_name].value)
             ))
 

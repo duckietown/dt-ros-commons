@@ -3,6 +3,7 @@ import rospy
 
 from .constants import TopicType, MIN_TOPIC_FREQUENCY_SUPPORTED, MAX_TOPIC_FREQUENCY_SUPPORTED
 from .diagnostics import DTROSDiagnostics
+from .singleton import get_instance
 
 
 class DTTopic(rospy.topics.Topic):
@@ -14,6 +15,12 @@ class DTTopic(rospy.topics.Topic):
         self._dt_healthy_freq = -1
         self._dt_topic_type = TopicType.GENERIC
         self._dt_is_ghost = False
+        # get the singleton (DT) ROS node
+        self._node = get_instance()
+        if self._node is None:
+            raise ValueError(
+                'Cannot create an object of type DTTopic before a DTROS node is initialized.'
+            )
 
     def _parse_dt_args(self, kwargs):
         # parse dt arguments
@@ -22,8 +29,10 @@ class DTTopic(rospy.topics.Topic):
         self._dt_is_ghost = _arg(kwargs, 'dt_ghost', False)
         # sanitize dt_type
         if not isinstance(self._dt_topic_type, TopicType):
-            rospy.logerror('The type "{:s}" is not supported. '.format(str(self._dt_topic_type)) +
-                           'An instance of duckietown.TopicType is expected')
+            self._node.logerror(
+                'The type "{:s}" is not supported. '.format(str(self._dt_topic_type)) +
+                'An instance of duckietown.TopicType is expected'
+            )
             self._dt_topic_type = TopicType.GENERIC
         # topic statistics
         self._last_frequency_tick = -1
