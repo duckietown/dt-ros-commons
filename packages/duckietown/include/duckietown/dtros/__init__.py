@@ -8,9 +8,9 @@ overhead).
 
 .. autoclass:: duckietown.DTROS
 
-.. autoclass:: duckietown.DTPublisher
-
-.. autoclass:: duckietown.DTSubscriber
+# .. autoclass:: duckietown.DTPublisher
+#
+# .. autoclass:: duckietown.DTSubscriber
 
 
 """

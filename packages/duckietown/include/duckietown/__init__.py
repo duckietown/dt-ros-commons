@@ -8,9 +8,9 @@ These classes extend the original ROS classes by adding extra functionalities.
 
 .. autoclass:: duckietown.dtros.DTROS
 
-.. autoclass:: duckietown.dtros.DTPublisher
-
-.. autoclass:: duckietown.dtros.DTSubscriber
+# .. autoclass:: duckietown.dtros.DTPublisher
+#
+# .. autoclass:: duckietown.dtros.DTSubscriber
 
 
 """
