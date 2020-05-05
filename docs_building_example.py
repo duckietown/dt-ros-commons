@@ -38,7 +38,7 @@ image, _ = client.images.build(path='%s/docs-sphinx-builder/docs' % dirpath,
 print('image id: %s' % image.id)
 
 container = client.containers.run(image=image.id,
-                                  command='bash -c "echo "HEEEEEREEEEEEE"; ls /docs/source; pwd; cp -r /docs docs; cd docs; ls; make html; cp -r build /docs/build"',
+                                  command='bash -c "cp -r /docs docs; cd docs; make html; cp -r build /docs/build"',
                                   volumes={'%s/docs-sphinx-builder/docs' % dirpath: {'bind': '/docs', 'mode': 'rw'}},
                                   detach=True)
 
