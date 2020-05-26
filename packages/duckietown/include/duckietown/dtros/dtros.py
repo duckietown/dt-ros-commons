@@ -134,6 +134,8 @@ class DTROS(object):
             # decorate the XMLRPC paramUpdate function
             self._rh_paramUpdate = self._ros_handler.paramUpdate
             setattr(self._ros_handler, 'paramUpdate', self._param_update)
+        # Initialize a list of callbacks to be called on parameter change
+        self._param_change_cbs = list()
         # Handle publishers, subscribers, and the state switch
         self._switch = True
         self._subscribers = list()
@@ -190,6 +192,19 @@ class DTROS(object):
     def publishers(self):
         """A list of all the publishers of the node"""
         return self._publishers
+
+    def register_parameter_callback(self, cb):
+        """
+        Registers a callback that will be called any time a parameter has changed value. Multiple callbacks can
+        registered at the same time.
+
+        Args:
+            cb: A function, to be called when a parameter's value has changed
+
+        """
+
+        if cb is not None:
+            self._param_change_cbs.append(cb)
 
     def set_health(self, health, reason=None):
         if not isinstance(health, NodeHealth):
@@ -342,6 +357,12 @@ class DTROS(object):
             self.loginfo('Parameter "%s" has now the value [%s]' % (
                 param_name, str(self._parameters[param_name].value)
             ))
+        # call each of the user-defined callbacks
+        for cb in self._param_change_cbs:
+            try:
+                cb()
+            except Exception as e:
+                self.logerr("Parameter update callback %s resulted in an error: %s" % (cb.__name__, str(e)))
 
     def _add_param(self, param):
         if not isinstance(param, DTParam):
