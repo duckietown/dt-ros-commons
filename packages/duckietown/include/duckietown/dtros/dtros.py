@@ -1,6 +1,5 @@
 import os
 import rospy
-import numpy as np
 from copy import copy
 
 from std_srvs.srv import SetBool, SetBoolResponse
@@ -392,8 +391,7 @@ class DTROS(object):
                 single_phase_msg.frequency = single_phase_stats.frequency
                 single_phase_msg.avg_duration = single_phase_stats.avg_duration
                 single_phase_msg.filename = single_phase_stats.filename
-                single_phase_msg.line_nums = [np.uint16(single_phase_stats.line_nums[0]),
-                                              np.uint16(single_phase_stats.line_nums[1])]
+                single_phase_msg.line_nums = [single_phase_stats.line_nums[0], single_phase_stats.line_nums[1]]
 
                 array_msg.phases.append(single_phase_msg)
 
