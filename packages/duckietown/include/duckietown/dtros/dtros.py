@@ -392,8 +392,6 @@ class DTROS(object):
                 single_phase_msg.frequency = single_phase_stats.frequency
                 single_phase_msg.avg_duration = single_phase_stats.avg_duration
                 single_phase_msg.filename = single_phase_stats.filename
-                self.loginfo(str(single_phase_stats.line_nums))
-                self.loginfo(str(single_phase_stats))
                 single_phase_msg.line_nums = [np.uint16(single_phase_stats.line_nums[0]),
                                               np.uint16(single_phase_stats.line_nums[1])]
 
