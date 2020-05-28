@@ -55,7 +55,8 @@ class PhaseTimer:
                 code_lines = code_lines[start_called_from_frame_line-start_idx:end_called_from_frame_line-start_idx+1]
                 self.phases[phase_name].add_context(filename=called_from_file,
                                                     lines=code_lines,
-                                                    line_nums=(start_called_from_frame_line, end_called_from_frame_line))
+                                                    line_nums=(start_called_from_frame_line,
+                                                               end_called_from_frame_line))
             except Exception as e:
                 print("Error in extracting the source code of the timing context (end): %s" % str(e))
 
@@ -64,7 +65,10 @@ class PhaseTimer:
         yield
 
     def get_statistics(self):
-        return {phase_name: phase_timer.get_statistics() for phase_name, phase_timer in self.phases.iteritems()}
+        return {phase_name: phase_timer.get_statistics()
+                for phase_name, phase_timer
+                in self.phases.iteritems()
+                if phase_timer.context_set}
 
 class SinglePhaseTimer:
 
@@ -77,7 +81,7 @@ class SinglePhaseTimer:
         # store the information about where the timing context was called from
         self.context_filename = ""
         self.context_lines = []
-        self.context_line_nums = (None,None)
+        self.context_line_nums = (None, None)
         self.context_set = False
 
     def reset(self):
