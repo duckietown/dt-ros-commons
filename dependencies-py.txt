@@ -1,5 +1,4 @@
 # LIST YOUR PYTHON PACKAGES HERE
-numpy==1.16.6
 frozendict
 PyGeometry==1.3
 QuickApp==1.3.17
