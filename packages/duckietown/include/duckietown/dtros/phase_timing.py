@@ -1,5 +1,4 @@
 import time
-import numpy as np
 import inspect
 from collections import namedtuple, defaultdict
 from contextlib import contextmanager
@@ -112,7 +111,8 @@ class SinglePhaseTimer:
             frequency = 0
 
         if num_events > 0:
-            avg_duration = np.average([event.end - event.start for event in self.events])
+            durations = [event.end - event.start for event in self.events]
+            avg_duration = float(np.sum(durations)) / len(durations)
         else:
             avg_duration = 0
 
