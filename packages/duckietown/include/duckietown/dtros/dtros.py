@@ -351,7 +351,7 @@ class DTROS(object):
         _, param_name, param_value = args[:3]
         param_name = param_name.rstrip('/')
         self.logdebug('Received paramUpdate("%s", %s)' % (param_name, str(param_value)))
-        # update parameter valuex
+        # update parameter value
         if param_name in self._parameters:
             self._parameters[param_name].set_value(param_value)
             self.loginfo('Parameter "%s" has now the value [%s]' % (
