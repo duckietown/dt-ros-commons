@@ -18,6 +18,7 @@ class DTParam:
                 'Got %s instead.' % str(type(param_type))
             )
         self._type = param_type
+        self._update_listeners = []
         # parse optional args
         # - min value
         if min_value is not None and param_type not in MIN_MAX_SUPPORTED_TYPES:
@@ -82,6 +83,14 @@ class DTParam:
 
     def set_value(self, value):
         self._value = value
+        # notify listeners
+        for cb in self._update_listeners:
+            try:
+                cb()
+            except Exception as e:
+                rospy.logerr(
+                    "Parameter update callback %s resulted in error: %s" % (cb.__name__, str(e))
+                )
 
     def force_update(self):
         # get parameter value
@@ -97,6 +106,27 @@ class DTParam:
             options['max_value'] = self.max_value
         # ---
         return options
+
+    def register_update_callback(self, cb):
+        """
+        Registers a callback that will be called any time the parameter's value has changed.
+        Multiple callbacks can registered against the same parameter.
+
+        Args:
+            cb: A function, to be called when the parameter's value has changed.
+        """
+        if cb is not None and callable(cb):
+            self._update_listeners.append(cb)
+
+    def unregister_update_callback(self, cb):
+        """
+        Unregisters a previouslt registered callback.
+
+        Args:
+            cb: The callback function to unregister.
+        """
+        if cb in self._update_listeners:
+            self._update_listeners.remove(cb)
 
     @property
     def name(self):
