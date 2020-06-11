@@ -117,6 +117,8 @@ class DTParam:
         """
         if cb is not None and callable(cb):
             self._update_listeners.append(cb)
+        else:
+            rospy.logerr('Callback for parameter %s not registered because it is None or not callable!' % self._name)
 
     def unregister_update_callback(self, cb):
         """
