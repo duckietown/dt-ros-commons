@@ -122,7 +122,7 @@ class DTParam:
 
     def unregister_update_callback(self, cb):
         """
-        Unregisters a previouslt registered callback.
+        Unregisters a previously registered callback.
 
         Args:
             cb: The callback function to unregister.
