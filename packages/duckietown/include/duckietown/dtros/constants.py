@@ -38,7 +38,7 @@ class TopicDirection(Enum):
     OUTBOUND = 1
 
 
-# NOTE: this has to match duckietown_msgs.msg.DiagnosticsNode
+# NOTE: this has to match duckietown_msgs.msg.DiagnosticsRosNode
 class NodeType(Enum):
     GENERIC = 0
     DRIVER = 1
@@ -52,6 +52,7 @@ class NodeType(Enum):
     VISUALIZATION = 9
     INFRASTRUCTURE = 10
     COMMUNICATION = 11
+    DIAGNOSTICS = 12
     DEBUG = 20
 
 
