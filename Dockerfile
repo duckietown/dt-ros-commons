@@ -60,6 +60,12 @@ RUN . /opt/ros/${ROS_DISTRO}/setup.sh && \
 COPY assets/entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
+# define launch script
+ENV LAUNCHFILE "${REPO_PATH}/launch.sh"
+
+# define command
+CMD ["bash", "-c", "${LAUNCHFILE}"]
+
 # store module name
 LABEL org.duckietown.label.module.type "${REPO_NAME}"
 ENV DT_MODULE_TYPE "${REPO_NAME}"
