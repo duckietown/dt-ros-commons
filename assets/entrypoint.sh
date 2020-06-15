@@ -1,11 +1,14 @@
 #!/bin/bash
+
+# if anything weird happens from now on, exit
 set -e
 
-export DT_MODULE_INSTANCE=$(basename $(cat /proc/1/cpuset))
+DT_MODULE_INSTANCE=$(basename "$(cat /proc/1/cpuset)")
+export DT_MODULE_INSTANCE
 
 # check if ROS_MASTER_URI is set
 ROS_MASTER_URI_IS_SET=0
-if [ ! -z "${ROS_MASTER_URI}" ]; then
+if [ -n "${ROS_MASTER_URI}" ]; then
   ROS_MASTER_URI_IS_SET=1
 fi
 
@@ -42,7 +45,7 @@ fi
 # if vehicle name is set, vehicle ip is then compulsory
 if [ "${VEHICLE_NAME_IS_SET}" -eq "1" ] && [ "${VEHICLE_IP_IS_SET}" -eq "0" ]; then
   echo "If you set the variable VEHICLE_NAME, you must set the variable VEHICLE_IP as well. Aborting..."
-  exit -1
+  exit 1
 fi
 
 # configure hosts
@@ -74,15 +77,27 @@ if [ "${ROS_MASTER_URI_IS_SET}" -eq "0" ]; then
   export ROS_MASTER_URI="http://${VEHICLE_NAME}.local:11311/"
 fi
 
-# robot_type - directory set in init_sd_card/command.py
+# robot_type
 ROBOT_TYPE_FILE=/data/config/robot_type
 if [ -f "${ROBOT_TYPE_FILE}" ]; then
-    export ROBOT_TYPE=$(cat ${ROBOT_TYPE_FILE})
+    ROBOT_TYPE=$(cat ${ROBOT_TYPE_FILE})
+    export ROBOT_TYPE
 else
     echo "Warning: robot_type file does not exist. Using 'duckiebot' as default type."
     export ROBOT_TYPE="duckiebot"
 fi
 
+# robot_configuration
+ROBOT_CONFIGURATION_FILE=/data/config/robot_configuration
+if [ -f "${ROBOT_CONFIGURATION_FILE}" ]; then
+    ROBOT_CONFIGURATION=$(cat ${ROBOT_CONFIGURATION_FILE})
+    export ROBOT_CONFIGURATION
+else
+    echo "Warning: robot_configuration file does not exist."
+    export ROBOT_CONFIGURATION="__NOTSET__"
+fi
+
+# if anything weird happens from now on, keep going
 set +e
 
 # reuse LAUNCHFILE as CMD if the var is set and the first argument is `--`
