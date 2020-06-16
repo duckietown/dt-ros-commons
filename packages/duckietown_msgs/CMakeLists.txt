@@ -81,6 +81,7 @@ add_message_files(
   VehicleCorners.msg
   VehiclePose.msg
   Vsample.msg
+  WheelEncoderStamped.msg
   WheelsCmd.msg
   WheelsCmdStamped.msg
   WheelsCmdDBV2Stamped.msg
