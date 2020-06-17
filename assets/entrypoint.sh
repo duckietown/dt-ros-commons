@@ -52,9 +52,9 @@ fi
 if [ "${VEHICLE_NAME_IS_SET}" -eq "0" ]; then
   # vehicle name is not set (assume vehicle is localhost)
   {
-    echo "127.0.0.1 ${VEHICLE_NAME} ${VEHICLE_NAME}.local" >> /etc/hosts
+    echo "127.0.0.1 ${VEHICLE_NAME} ${VEHICLE_NAME}.local" | dd of=/etc/hosts &>/dev/null
   } || {
-    echo "Failed writing to /etc/hosts. Will continue anyway."
+    echo "WARNING: Failed writing to /etc/hosts. Will continue anyway."
   }
 fi
 
@@ -83,7 +83,7 @@ if [ -f "${ROBOT_TYPE_FILE}" ]; then
     ROBOT_TYPE=$(cat ${ROBOT_TYPE_FILE})
     export ROBOT_TYPE
 else
-    echo "Warning: robot_type file does not exist. Using 'duckiebot' as default type."
+    echo "WARNING: robot_type file does not exist. Using 'duckiebot' as default type."
     export ROBOT_TYPE="duckiebot"
 fi
 
@@ -93,7 +93,7 @@ if [ -f "${ROBOT_CONFIGURATION_FILE}" ]; then
     ROBOT_CONFIGURATION=$(cat ${ROBOT_CONFIGURATION_FILE})
     export ROBOT_CONFIGURATION
 else
-    echo "Warning: robot_configuration file does not exist."
+    echo "WARNING: robot_configuration file does not exist."
     export ROBOT_CONFIGURATION="__NOTSET__"
 fi
 
