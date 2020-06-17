@@ -1,3 +1,10 @@
+"""
+
+The `duckietown_utils` library provides utilities and common functionalities used by
+many Python modules in Duckietown.
+
+"""
+
 import geometry as geo
 
 from .tcp_communication import *

@@ -1,5 +1,5 @@
-dt-ros-commons
-==============
+Duckietown Module: dt-ros-commons
+=================================
 
 .. toctree::
    :glob:
