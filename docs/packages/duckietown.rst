@@ -11,13 +11,13 @@ that you can use in your code.
 Python Packages
 ------------------
 
-Python Package: duckietown
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+duckietown
+^^^^^^^^^^
 
 .. automodule:: duckietown
 
 
-Python Package: duckietown_utils
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+duckietown_utils
+^^^^^^^^^^^^^^^^
 
 .. automodule:: duckietown_utils

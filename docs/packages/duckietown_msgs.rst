@@ -1,9 +1,10 @@
-duckietown_msgs package
-=======================
+ROS Package: duckietown_msgs
+============================
 
 .. contents::
 
-The `duckietown_msgs` package contains all messages that are used for inter-node communication in Duckietown.
+The `duckietown_msgs` package contains all messages that are used for inter-node communication
+via ROS in Duckietown.
 
 
 Messages
