@@ -67,8 +67,8 @@ def _info(service):
     try:
         info = {
             'service': service,
-            'providers': KnowledgeBase.get(key('providers'), []),
-            'message_type': rs.get_service_type(service)
+            'message_type': rs.get_service_type(service),
+            'providers': KnowledgeBase.get(key('providers'), [])
         }
         info.update(KnowledgeBase.get(key('info'), {}))
         return response_ok(info)

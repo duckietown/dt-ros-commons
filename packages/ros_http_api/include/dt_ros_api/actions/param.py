@@ -30,7 +30,7 @@ def _list(ns=''):
     ns = '/' + ns
     try:
         return response_ok({
-            'params': sorted(rp.list_params(ns))
+            'parameters': sorted(rp.list_params(ns))
         })
     except Exception as e:
         return response_error(str(e))
@@ -41,7 +41,7 @@ def _get(param):
     param = '/' + param
     try:
         return response_ok({
-            'param': param,
+            'parameter': param,
             'value': rp.get_param(param)
         })
     except Exception as e:
@@ -60,6 +60,3 @@ def _info(param):
         return response_ok(info)
     except Exception as e:
         return response_error(str(e))
-
-
-

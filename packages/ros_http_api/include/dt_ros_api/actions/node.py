@@ -39,7 +39,7 @@ def _list():
 
 
 @rosnode.route('/node/info/<path:node>')
-def _type(node):
+def _info(node):
     node = '/' + node
     key = lambda x: '/node/%s%s' % (x, node)
     try:

@@ -144,7 +144,7 @@ def _dttype(topic):
     try:
         return response_ok({
             'topic': topic,
-            'dttype': KnowledgeBase.get('/topic/type%s' % topic, default_topic_type(topic))
+            'type': KnowledgeBase.get('/topic/type%s' % topic, default_topic_type(topic))
         })
     except Exception as e:
         return response_error(str(e))
