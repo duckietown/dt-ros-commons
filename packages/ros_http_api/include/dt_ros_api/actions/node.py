@@ -78,7 +78,7 @@ def _params(node):
     try:
         return response_ok({
             'node': '/' + node,
-            'params': KnowledgeBase.get('/node/params/%s' % node, {})
+            'parameters': KnowledgeBase.get('/node/params/%s' % node, {})
         })
     except Exception as e:
         return response_error(str(e))
