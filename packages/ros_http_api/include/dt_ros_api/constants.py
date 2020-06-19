@@ -20,13 +20,12 @@ def default_node_info():
         'health': NodeHealth.UNKNOWN.name,
         'health_reason': None,
         # TODO: Turn health_stamp into elapsed time `secs_since_health`
-        'health_stamp': None,
+        # 'health_stamp': None,
         'enabled': None,
         'machine': None,
         'module_type': None,
         'module_instance': None,
         'topics': [],
-        'params': [],
         'services': [],
         'parameters': []
     }
