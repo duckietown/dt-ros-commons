@@ -1,5 +1,6 @@
 # parameters
 ARG REPO_NAME="dt-ros-commons"
+ARG MAINTAINER="Andrea F. Daniele (afdaniele@ttic.edu)"
 
 ARG ARCH=arm32v7
 ARG MAJOR=daffy
@@ -17,7 +18,20 @@ FROM duckietown/${SUPER_IMAGE}:${SUPER_IMAGE_TAG} as dt-commons
 FROM duckietown/${BASE_IMAGE}:${BASE_TAG}
 
 # copy stuff from the super image
+COPY --from=dt-commons /entrypoint.sh /entrypoint.sh
 COPY --from=dt-commons /environment.sh /environment.sh
+COPY --from=dt-commons /usr/local/bin/dt-advertise /usr/local/bin/dt-advertise
+COPY --from=dt-commons /code/dt-commons /code/dt-commons
+COPY --from=dt-commons /utils /utils
+
+# recall all arguments
+ARG REPO_NAME
+ARG ARCH
+ARG MAJOR
+ARG ROS_DISTRO
+ARG BASE_TAG
+ARG BASE_IMAGE
+ARG MAINTAINER
 
 # configure environment
 ENV SOURCE_DIR /code
@@ -25,11 +39,13 @@ ENV CATKIN_WS_DIR "${SOURCE_DIR}/catkin_ws"
 ENV DUCKIEFLEET_ROOT "/data/config"
 ENV ROS_LANG_DISABLE gennodejs:geneus:genlisp
 ENV READTHEDOCS True
+ENV DISABLE_CONTRACTS 1
+ENV DT_MODULE_TYPE "${REPO_NAME}"
 WORKDIR "${CATKIN_WS_DIR}"
 
 # define repository path
-ARG REPO_NAME
 ARG REPO_PATH="${CATKIN_WS_DIR}/src/${REPO_NAME}"
+ENV DT_REPO_PATH "${REPO_PATH}"
 WORKDIR "${REPO_PATH}"
 
 # create repo directory
@@ -57,7 +73,6 @@ RUN . /opt/ros/${ROS_DISTRO}/setup.sh && \
     --workspace ${CATKIN_WS_DIR}/
 
 # configure entrypoint
-COPY assets/entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
 # define launch script
@@ -66,20 +81,10 @@ ENV LAUNCHFILE "${REPO_PATH}/launch.sh"
 # define command
 CMD ["bash", "-c", "${LAUNCHFILE}"]
 
-# store module name
-LABEL org.duckietown.label.module.type "${REPO_NAME}"
-ENV DT_REPO_PATH "${REPO_PATH}"
-ENV DT_MODULE_TYPE "${REPO_NAME}"
-
 # store module metadata
-ARG ARCH
-ARG MAJOR
-ARG BASE_TAG
-ARG BASE_IMAGE
-LABEL org.duckietown.label.architecture "${ARCH}"
-LABEL org.duckietown.label.code.location "${REPO_PATH}"
-LABEL org.duckietown.label.code.version.major "${MAJOR}"
-LABEL org.duckietown.label.base.image "${BASE_IMAGE}:${BASE_TAG}"
-
-# define maintainer
-LABEL maintainer="Andrea F. Daniele (afdaniele@ttic.edu)"
+LABEL org.duckietown.label.module.type="${REPO_NAME}" \
+    org.duckietown.label.architecture="${ARCH}" \
+    org.duckietown.label.code.location="${REPO_PATH}" \
+    org.duckietown.label.code.version.major="${MAJOR}" \
+    org.duckietown.label.base.image="${BASE_IMAGE}:${BASE_TAG}" \
+    org.duckietown.label.maintainer="${MAINTAINER}"
