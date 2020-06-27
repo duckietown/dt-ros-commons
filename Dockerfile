@@ -26,6 +26,7 @@ ENV CATKIN_WS_DIR "${SOURCE_DIR}/catkin_ws"
 ENV DUCKIEFLEET_ROOT "/data/config"
 ENV ROS_LANG_DISABLE gennodejs:geneus:genlisp
 ENV READTHEDOCS True
+ENV DISABLE_CONTRACTS 1
 WORKDIR "${CATKIN_WS_DIR}"
 
 # define repository path
