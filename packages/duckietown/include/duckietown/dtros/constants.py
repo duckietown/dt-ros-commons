@@ -109,9 +109,9 @@ class ParamType(Enum):
 
 class NodeHealth(Enum):
     UNKNOWN = 0
-    STARTING = 1
-    STARTED = 2
-    HEALTHY = 3
-    WARNING = 4
-    ERROR = 5
-    FATAL = 6
+    STARTING = 5
+    STARTED = 6
+    HEALTHY = 10
+    WARNING = 20
+    ERROR = 30
+    FATAL = 40
