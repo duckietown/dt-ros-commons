@@ -25,17 +25,22 @@ def _graph():
     topic_key = lambda x, t: '/topic/%s%s' % (x, t)
     try:
         # put in nodes and topics
+        nodes = {
+            n: KnowledgeBase.get(node_key('info', n))
+            for n in KnowledgeBase.get(node_key('list', ''), [])
+            if KnowledgeBase.has(node_key('info', n))
+        }
+        topics = {
+            t: KnowledgeBase.get(topic_key('info', t))
+            for t in KnowledgeBase.get(topic_key('list', ''))
+            if KnowledgeBase.has(topic_key('info', t))
+        }
+        # message_type is not delivered in graph
+        for topic in topics:
+            del topics[topic]['message_type']
+        # ---
         graph = {
-            'nodes': {
-                n: KnowledgeBase.get(node_key('info', n))
-                for n in KnowledgeBase.get(node_key('list', ''), [])
-                if KnowledgeBase.has(node_key('info', n))
-            },
-            'topics': {
-                t: KnowledgeBase.get(topic_key('info', t))
-                for t in KnowledgeBase.get(topic_key('list', ''))
-                if KnowledgeBase.has(topic_key('info', t))
-            },
+            'nodes': nodes.keys(),
             'edges': {
                 'node_to_topic': [],
                 'topic_to_node': [],
@@ -49,7 +54,7 @@ def _graph():
                 'from': n,
                 'to': t
             }
-            for t in graph['topics']
+            for t in topics
             for n in KnowledgeBase.get(topic_key('publishers', t), [])
         ])
         # collect edges (topic -> node)
@@ -58,12 +63,12 @@ def _graph():
                 'from': t,
                 'to': n
             }
-            for t in graph['topics']
+            for t in topics
             for n in KnowledgeBase.get(topic_key('subscribers', t), [])
         ])
         # collect edges (topic -> topic)
         edges = set()
-        for t0 in graph['topics']:
+        for t0 in topics:
             for n in KnowledgeBase.get(topic_key('subscribers', t0), []):
                 for t1, t1_info in KnowledgeBase.get(node_key('topics', n), {}).items():
                     if t1_info['direction'] == TopicDirection.OUTBOUND.name:
@@ -100,7 +105,9 @@ def _graph():
         ]
         # ---
         return response_ok({
-            'graph': graph
+            'graph': graph,
+            'nodes': nodes,
+            'topics': topics
         })
     except Exception as e:
         return response_error(str(e))

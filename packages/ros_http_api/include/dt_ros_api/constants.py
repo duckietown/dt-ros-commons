@@ -18,16 +18,14 @@ def default_node_info():
     return {
         'type': NodeType.GENERIC.name,
         'health': NodeHealth.UNKNOWN.name,
-        'health_reason': None,
+        'health_value': NodeHealth.UNKNOWN.value,
+        'health_reason': "None",
         # TODO: Turn health_stamp into elapsed time `secs_since_health`
         # 'health_stamp': None,
         'enabled': None,
         'machine': None,
         'module_type': None,
-        'module_instance': None,
-        'topics': [],
-        'services': [],
-        'parameters': []
+        'module_instance': None
     }
 
 
@@ -36,6 +34,7 @@ def default_topic_info(name, direction, node_agnostic=False):
         'message_type': None,
         'type': default_topic_type(name),
         'frequency': None,
+        'bandwidth': None,
         'effective_frequency': None
     }
     if not node_agnostic:
