@@ -23,6 +23,7 @@ COPY --from=dt-commons /environment.sh /environment.sh
 COPY --from=dt-commons /usr/local/bin/dt-advertise /usr/local/bin/dt-advertise
 COPY --from=dt-commons /code/dt-commons /code/dt-commons
 COPY --from=dt-commons /utils /utils
+COPY --from=dt-commons /status /status
 
 # recall all arguments
 ARG REPO_NAME
