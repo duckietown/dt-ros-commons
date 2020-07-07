@@ -68,7 +68,7 @@ class DTPublisher(DTTopic, rospy.__Publisher__):
 
     def switch_on(self):
         """
-        Switches the ``active`` attribute to ``False``.
+        Switches the ``active`` attribute to ``True``.
         """
         self.active = True
 
