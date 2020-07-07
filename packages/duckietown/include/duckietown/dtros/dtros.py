@@ -374,8 +374,6 @@ class DTROS(object):
 
     def _publish_phase_timing(self, event=None):
 
-        self.loginfo('timer fn called')
-
         with self.time_phase("Preparing phase timing message"):
             phase_timings = self._phase_timer.get_statistics()
 
