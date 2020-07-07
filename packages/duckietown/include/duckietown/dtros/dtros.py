@@ -372,7 +372,7 @@ class DTROS(object):
     def _register_subscriber(self, subscriber):
         self._subscribers.append(subscriber)
 
-    def publish_phase_timing(self, event=None):
+    def _publish_phase_timing(self, event=None):
 
         self.loginfo('timer fn called')
 
@@ -409,7 +409,7 @@ class DTROS(object):
             self._phase_timer.start_recording()
             if self._phasetimeTimer is None or self._phasetimeTimer._shutdown:
                 self._phasetimeTimer = rospy.Timer(period=rospy.Duration.from_sec(1),
-                                                   callback=self.publish_phase_timing,
+                                                   callback=self._publish_phase_timing,
                                                    oneshot=False)
 
     def _on_shutdown(self):
