@@ -3,22 +3,23 @@ docs_config_version: v1
 # CONFIGURE THESE TO MATCH YOUR PROJECT:
 project: "dt-ros-commons"
 copyright: "Duckietown"
-author: "Duck Quackermann"
+author: "Andrea F. Daniele (afdaniele@ttic.edu)"
 version: "daffy"
-custom_sections:  [ "Configuration",
-                    "Subscribers",
-                    "Subscriber",
-                    "Publishers",
-                    "Publisher",
-                    "Services",
-                    "Service",
-                    "Fields",
-                    "Attribute",
-                    "Attributes",
-                    "inputs",
-                    "input",
-                    "outputs",
-                    "output"
+custom_sections:  [
+  "Configuration",
+  "Subscribers",
+  "Subscriber",
+  "Publishers",
+  "Publisher",
+  "Services",
+  "Service",
+  "Fields",
+  "Attribute",
+  "Attributes",
+  "inputs",
+  "input",
+  "outputs",
+  "output"
 ]
 
 # REFRAIN FROM CHANGING THESE SPHINX-SPECIFIC CONFIGURATION SETTINGS:

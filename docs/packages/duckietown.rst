@@ -9,7 +9,7 @@ that you can use in your code.
 
 
 Python Packages
-------------------
+---------------
 
 duckietown
 ^^^^^^^^^^
