@@ -56,7 +56,7 @@ class DTPublisher(DTTopic, rospy.__Publisher__):
         # TODO: register for new subscriptions and publish new links on event
 
         # Setup callbacks for when the number of subscribers changes
-        self._subs_changed_callbacks = []
+        self._subs_changed_callbacks = set()
         self._subscribe_listener = SubscribeListenerWithCallbacks(self)
         self.impl.add_subscriber_listener(self._subscribe_listener)
 
@@ -102,7 +102,7 @@ class DTPublisher(DTTopic, rospy.__Publisher__):
         Args:
             cb_fun: the callback function
         """
-        self._subs_changed_callbacks.append(cb_fun)
+        self._subs_changed_callbacks.add(cb_fun)
 
     def _callbacks_on_subscribers_changed(self):
         for cb_fun in self._subs_changed_callbacks:
