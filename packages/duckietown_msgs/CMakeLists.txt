@@ -87,6 +87,7 @@ add_service_files(
   LFstatus.srv
   SensorsStatus.srv
   SetCustomLEDPattern.srv
+  SetCustomLEDColor.srv
   SetFSMState.srv
   SetValue.srv
   SetVariable.srv
