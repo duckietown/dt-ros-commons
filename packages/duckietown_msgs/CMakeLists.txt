@@ -39,6 +39,8 @@ add_message_files(
   KinematicsWeights.msg
   LanePose.msg
   LEDDetection.msg
+  LEDColor.msg
+  LEDColorArray.msg
   LEDDetectionArray.msg
   LEDDetectionDebugInfo.msg
   LEDInterpreter.msg
@@ -86,8 +88,8 @@ add_service_files(
   IMUstatus.srv
   LFstatus.srv
   SensorsStatus.srv
+  SetCustomLEDColors.srv
   SetCustomLEDPattern.srv
-  SetCustomLEDColor.srv
   SetFSMState.srv
   SetValue.srv
   SetVariable.srv
