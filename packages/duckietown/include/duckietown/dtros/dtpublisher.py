@@ -55,13 +55,29 @@ class DTPublisher(DTTopic, rospy.__Publisher__):
             get_instance()._register_publisher(self)
         # TODO: register for new subscriptions and publish new links on event
 
+        # Setup callbacks for when the number of subscribers changes
+        self._subs_changed_callbacks = set()
+        self._subscribe_listener = SubscribeListenerWithCallbacks(self)
+        self.impl.add_subscriber_listener(self._subscribe_listener)
+
     def switch_off(self):
+        """
+        Switches the ``active`` attribute to ``False``.
+        """
         self.active = False
 
     def switch_on(self):
+        """
+        Switches the ``active`` attribute to ``True``.
+        """
         self.active = True
 
     def anybody_listening(self):
+        """ Checks if there are any subscribers to this topic.
+
+            Returns:
+                bool: ``True`` if there is at least one connection, ``False`` if none
+        """
         return self.get_num_connections() > 0
 
     def publish(self, *args, **kwargs):
@@ -77,3 +93,29 @@ class DTPublisher(DTTopic, rospy.__Publisher__):
             self._tick_frequency()
             # call super publish
             super(DTPublisher, self).publish(*args, **kwargs)
+
+    def register_subscribers_changed_cb(self, cb_fun):
+        """
+        Registers a callback that will be called any time the number of subscribers change.
+        The callbacks should take a single argument which is the publisher object itself.
+
+        Args:
+            cb_fun: the callback function
+        """
+        self._subs_changed_callbacks.add(cb_fun)
+
+    def _callbacks_on_subscribers_changed(self):
+        for cb_fun in self._subs_changed_callbacks:
+            cb_fun(self)
+
+
+class SubscribeListenerWithCallbacks(rospy.SubscribeListener):
+    def __init__(self, publisher, *args, **kwargs):
+        super(SubscribeListenerWithCallbacks, self).__init__(*args, **kwargs)
+        self._publisher = publisher
+
+    def peer_subscribe(self, topic_name, topic_publish, peer_publish):
+        self._publisher._callbacks_on_subscribers_changed()
+
+    def peer_unsubscribe(self, topic_name, num_peers):
+        self._publisher._callbacks_on_subscribers_changed()

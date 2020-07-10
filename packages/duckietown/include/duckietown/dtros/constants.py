@@ -21,6 +21,8 @@ NODE_REQUEST_PARAM_UPDATE_SERVICE_NAME = 'request_parameters_update'
 MIN_TOPIC_FREQUENCY_SUPPORTED = 0.1
 MAX_TOPIC_FREQUENCY_SUPPORTED = 200.0
 
+PHASE_TIMER_MAX_KEEP_SEC = 3  #: Max time for keeping past phase measurements
+
 ROS_INFRA_TOPICS = [
     '/rosout',
     '/rosout_agg',
