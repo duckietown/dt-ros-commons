@@ -158,14 +158,15 @@ class DTROS(object):
             )
 
         # Add a phase timer for profiling and a publisher topic
-        self._phase_timer = PhaseTimer()
         self._pub_phase_timer = rospy.Publisher("~diagnostics/phase_times", DiagnosticsPhaseTimingArray,
                                                 queue_size=10,
                                                 dt_topic_type=TopicType.DEBUG
                                                 )
         self._pub_phase_timer.register_subscribers_changed_cb(self._cb_phase_timing_subs_update)
         self._phasetimeTimer = None
-        self.time_phase = lambda name: self._phase_timer.time_phase(name)
+        # provides both a pointer to _phase_timer (for internal use)
+        # and a public interface to the context manager `with self.timed_phase("PHASE")`
+        self.timed_phase = self._phase_timer = PhaseTimer()
 
         # mark node as healthy and STARTED
         self.set_health(NodeHealth.STARTED)
@@ -366,7 +367,7 @@ class DTROS(object):
         self._subscribers.append(subscriber)
 
     def _publish_phase_timing(self, event=None):
-        with self.time_phase("Preparing phase timing message"):
+        with self.timed_phase("Preparing phase timing message"):
             phase_timings = self._phase_timer.get_statistics()
             # create timing array
             array_msg = DiagnosticsPhaseTimingArray()

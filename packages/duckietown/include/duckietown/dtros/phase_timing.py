@@ -17,6 +17,9 @@ class PhaseTimer:
         self.time_phase = self._time_phase_notrecording
         self.is_recording = False
 
+    def __call__(self, *args, **kwargs):
+        self.time_phase(*args, **kwargs)
+
     def reset(self):
         self.__init__()
 
