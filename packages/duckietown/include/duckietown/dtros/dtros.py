@@ -79,17 +79,9 @@ class DTROS(object):
 
     Args:
        node_name (:obj:`str`): a unique, descriptive name for the node that ROS will use
-       parameters_update_period (:obj:`float`): how often to check for new parameters (in seconds). If
-          it is 0, it will not run checks at all
 
     Attributes:
        node_name (:obj:`str`): the name of the node
-       parameters (:obj:`dict`): a dictionary that holds pairs ``('~param_name`: param_value)``. Note that
-          parameters should be given in private namespace (starting with ``~``)
-       parametersChanged (:obj:`bool`): a boolean indicator if the
-       is_shutdown (:obj:`bool`): will be set to ``True`` when the :py:meth:`onShutdown` method is called
-       switch (:obj:`bool`): flag determining whether the node is active or not. Read-only, controlled through
-          the ``~switch`` service
 
     Service:
         ~switch:
@@ -171,7 +163,7 @@ class DTROS(object):
                                                 queue_size=10,
                                                 dt_topic_type=TopicType.DEBUG
                                                 )
-        self._pub_phase_timer.register_subscribers_changed_cb(self._cb_connection_change_phase_timing)
+        self._pub_phase_timer.register_subscribers_changed_cb(self._cb_phase_timing_subs_update)
         self._phasetimeTimer = None
         self.time_phase = lambda name: self._phase_timer.time_phase(name)
 
@@ -397,7 +389,7 @@ class DTROS(object):
             # publish phase timing
             self._pub_phase_timer.publish(array_msg)
 
-    def _cb_connection_change_phase_timing(self, publisher):
+    def _cb_phase_timing_subs_update(self, publisher):
         if not publisher.anybody_listening():
             self.loginfo('Phase Timing Recording switched OFF')
             self._phase_timer.stop_recording()
