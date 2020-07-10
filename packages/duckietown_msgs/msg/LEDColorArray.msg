@@ -1,2 +1,2 @@
 Header header
-LEDColor[] colors
+duckietown_msgs/LEDColor[] colors
