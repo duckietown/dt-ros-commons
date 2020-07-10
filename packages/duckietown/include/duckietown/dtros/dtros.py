@@ -158,10 +158,12 @@ class DTROS(object):
             )
 
         # Add a phase timer for profiling and a publisher topic
-        self._pub_phase_timer = rospy.Publisher("~diagnostics/phase_times", DiagnosticsPhaseTimingArray,
-                                                queue_size=10,
-                                                dt_topic_type=TopicType.DEBUG
-                                                )
+        self._pub_phase_timer = rospy.Publisher(
+            "~diagnostics/phase_times",
+            DiagnosticsPhaseTimingArray,
+            queue_size=10,
+            dt_topic_type=TopicType.DEBUG
+        )
         self._pub_phase_timer.register_subscribers_changed_cb(self._cb_phase_timing_subs_update)
         self._phasetimeTimer = None
         # provides both a pointer to _phase_timer (for internal use)
