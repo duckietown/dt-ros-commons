@@ -23,6 +23,7 @@ from .utils import get_ros_handler
 from .phase_timing import PhaseTimer
 from .constants import TopicType
 
+
 class DTROS(object):
     """
     Parent class for all Duckietown ROS nodes
@@ -373,26 +374,27 @@ class DTROS(object):
         self._subscribers.append(subscriber)
 
     def _publish_phase_timing(self, event=None):
-
         with self.time_phase("Preparing phase timing message"):
             phase_timings = self._phase_timer.get_statistics()
-
+            # create timing array
             array_msg = DiagnosticsPhaseTimingArray()
             array_msg.header.stamp = rospy.Time.now()
             for phase_name in sorted(phase_timings.keys()):
                 single_phase_stats = phase_timings[phase_name]
-
+                # create phase object
                 single_phase_msg = DiagnosticsPhaseTiming()
-                single_phase_msg.node_node = self.node_name
-                single_phase_msg.phase_name = phase_name
+                single_phase_msg.node = self.node_name
+                single_phase_msg.name = phase_name
                 single_phase_msg.num_events = single_phase_stats.num_events
                 single_phase_msg.frequency = single_phase_stats.frequency
                 single_phase_msg.avg_duration = single_phase_stats.avg_duration
                 single_phase_msg.filename = single_phase_stats.filename
-                single_phase_msg.line_nums = [single_phase_stats.line_nums[0], single_phase_stats.line_nums[1]]
-
+                single_phase_msg.line_nums = [
+                    single_phase_stats.line_nums[0], single_phase_stats.line_nums[1]
+                ]
+                # add phase to array message
                 array_msg.phases.append(single_phase_msg)
-
+            # publish phase timing
             self._pub_phase_timer.publish(array_msg)
 
     def _cb_connection_change_phase_timing(self, publisher):
@@ -401,23 +403,24 @@ class DTROS(object):
             self._phase_timer.stop_recording()
             if self._phasetimeTimer is not None and not self._phasetimeTimer._shutdown:
                 self._phasetimeTimer.shutdown()
-
         else:
             self.loginfo('Phase Timing Recording switched ON')
             self._phase_timer.start_recording()
             if self._phasetimeTimer is None or self._phasetimeTimer._shutdown:
-                self._phasetimeTimer = rospy.Timer(period=rospy.Duration.from_sec(1),
+                self._phasetimeTimer = rospy.Timer(period=rospy.Duration.from_sec(5),
                                                    callback=self._publish_phase_timing,
                                                    oneshot=False)
 
     def _on_shutdown(self):
         self.log('Received shutdown request.')
         self.is_shutdown = True
-
+        # turn off phase timer
         if self._phasetimeTimer is not None and not self._phasetimeTimer._shutdown:
             self._phasetimeTimer.shutdown()
-
+        # call node on_shutdown
         self.on_shutdown()
 
     def on_shutdown(self):
+        # this function does not do anything, it is called when the node shuts down.
+        # It can be redefined by the user in the final node class.
         pass
