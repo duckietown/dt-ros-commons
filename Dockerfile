@@ -3,7 +3,8 @@ ARG REPO_NAME="dt-ros-commons"
 ARG MAINTAINER="Andrea F. Daniele (afdaniele@ttic.edu)"
 
 ARG ARCH=arm32v7
-ARG DISTRO=daffy
+#TODO: fix this "daffy-new-deal" -> "daffy"
+ARG DISTRO=daffy-new-deal
 ARG BASE_TAG=${DISTRO}-${ARCH}
 ARG BASE_IMAGE=dt-commons
 ARG LAUNCHER=default
