@@ -18,7 +18,6 @@ add_message_files(
   FILES
   AntiInstagramHealth.msg
   AntiInstagramTransform.msg
-  AntiInstagramTransform_CB.msg
   AprilTagDetection.msg
   AprilTagDetectionArray.msg
   AprilTagsWithInfos.msg
