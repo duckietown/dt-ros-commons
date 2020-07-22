@@ -18,6 +18,7 @@ FROM duckietown/${BASE_IMAGE}:${BASE_TAG}
 
 # copy stuff from the super image
 COPY --from=dt-commons /environment.sh /environment.sh
+COPY --from=dt-commons /usr/local/bin/dt-advertise /usr/local/bin/dt-advertise
 
 # configure environment
 ENV SOURCE_DIR /code
@@ -25,6 +26,7 @@ ENV CATKIN_WS_DIR "${SOURCE_DIR}/catkin_ws"
 ENV DUCKIEFLEET_ROOT "/data/config"
 ENV ROS_LANG_DISABLE gennodejs:geneus:genlisp
 ENV READTHEDOCS True
+ENV DISABLE_CONTRACTS 1
 WORKDIR "${CATKIN_WS_DIR}"
 
 # define repository path

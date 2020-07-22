@@ -85,6 +85,12 @@ LED_protocol:
       frequency_mask: []
       frequency:  0
 
+    traffic_light_go:
+      color_mask: []
+      color_list: "green"
+      frequency_mask: []
+      frequency: *f4
+
 LED_scale: 0.8
 channel_order:
   duckiebot: "RGB"
