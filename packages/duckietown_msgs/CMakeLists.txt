@@ -22,13 +22,23 @@ add_message_files(
   AprilTagDetection.msg
   AprilTagDetectionArray.msg
   AprilTagsWithInfos.msg
-  AprilTagExtended.msg
   BoolStamped.msg
   CarControl.msg
   CoordinationClearance.msg
   CoordinationSignal.msg
+  DiagnosticsPhaseTiming.msg
+  DiagnosticsPhaseTimingArray.msg
+  DiagnosticsRosLink.msg
+  DiagnosticsRosLinkArray.msg
+  DiagnosticsRosNode.msg
+  DiagnosticsRosParameterArray.msg
+  DiagnosticsRosProfiling.msg
+  DiagnosticsRosProfilingUnit.msg
+  DiagnosticsRosTopic.msg
+  DiagnosticsRosTopicArray.msg
   DroneControl.msg
-  DroneMode.msg  
+  DroneMode.msg
+  NodeParameter.msg
   DuckiebotLED.msg
   EncoderStamped.msg
   FSMState.msg
@@ -73,6 +83,7 @@ add_message_files(
   VehicleCorners.msg
   VehiclePose.msg
   Vsample.msg
+  WheelEncoderStamped.msg
   WheelsCmd.msg
   WheelsCmdStamped.msg
   WheelsCmdDBV2Stamped.msg
@@ -85,6 +96,8 @@ add_service_files(
   GetVariable.srv
   IMUstatus.srv
   LFstatus.srv
+  NodeGetParamsList.srv
+  NodeRequestParamsUpdate.srv
   SensorsStatus.srv
   SetCustomLEDPattern.srv
   SetFSMState.srv
