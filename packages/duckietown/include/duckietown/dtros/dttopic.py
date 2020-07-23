@@ -89,8 +89,8 @@ def _arg(kwargs, key, argtype, default):
     # make sure that the value (if given) respects the expected type
     if argtype is not None and key in kwargs and not isinstance(kwargs[key], argtype):
         raise ValueError(
-            'Parameter %s in rospy.Publisher and rospy.Subscriber expects a value of type %s, '
-            'got %s instead.' % (key, str(argtype), str(type(kwargs[key])))
+            "Parameter '%s' in rospy.Publisher and rospy.Subscriber expects a value of type '%s', "
+            "got '%s' instead." % (key, str(argtype), str(type(kwargs[key])))
         )
     # return given value (if any) or default
     return kwargs[key] if key in kwargs else default
