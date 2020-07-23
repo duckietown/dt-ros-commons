@@ -20,6 +20,7 @@ uint8 TOPIC_TYPE_DEBUG = 20
 
 string node                     # Node publishing this message
 string name                     # Topic object of the diagnostics
+string help                     # Topic description
 uint8 type                      # Topic type
 uint8 direction                 # Topic direction
 float32 frequency               # Topic frequency (Hz)

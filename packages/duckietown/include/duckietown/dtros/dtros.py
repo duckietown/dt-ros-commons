@@ -100,6 +100,7 @@ class DTROS(object):
                  node_name,
                  # DT parameters from here
                  node_type,
+                 help=None,
                  dt_ghost=False):
         # configure singleton
         if rospy.__instance__ is not None:
@@ -116,6 +117,7 @@ class DTROS(object):
             log_level = rospy.DEBUG
         rospy.init_node(node_name, log_level=log_level, __dtros__=True)
         self.node_name = rospy.get_name()
+        self.node_help = help
         self.node_type = node_type
         self.log('Initializing...')
         self.is_shutdown = False
@@ -153,6 +155,7 @@ class DTROS(object):
         if DTROSDiagnostics.enabled():
             DTROSDiagnostics.getInstance().register_node(
                 self.node_name,
+                self.node_help,
                 self.node_type,
                 health=self._health
             )
@@ -314,6 +317,7 @@ class DTROS(object):
                 NodeParameter(
                     node=rospy.get_name(),
                     name=p.name,
+                    help=p.help,
                     type=p.type.value,
                     **p.options()
                 ) for p in self.parameters

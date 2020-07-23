@@ -27,6 +27,7 @@ class DTTopic(rospy.topics.Topic):
         self._dt_healthy_freq = _arg(kwargs, 'dt_healthy_hz', int, -1)
         self._dt_topic_type = _arg(kwargs, 'dt_topic_type', TopicType, TopicType.GENERIC)
         self._dt_is_ghost = _arg(kwargs, 'dt_ghost', bool, False)
+        self._dt_help = _arg(kwargs, 'dt_help', str, None)
         # sanitize dt_type
         if not isinstance(self._dt_topic_type, TopicType):
             self._node.logerror(
@@ -43,6 +44,7 @@ class DTTopic(rospy.topics.Topic):
         if DTROSDiagnostics.enabled():
             DTROSDiagnostics.getInstance().register_topic(
                 self.resolved_name,
+                self._dt_help,
                 direction,
                 self._dt_healthy_freq,
                 self._dt_topic_type,

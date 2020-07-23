@@ -36,11 +36,12 @@ def __rospy__init_node__(*args, **kwargs):
     return rospy.__init_node__(*args, **kwargs)
 
 
-def __rospy__get_param__(param_name, default=rospy.client._Unspecified):
+def __rospy__get_param__(param_name, default=rospy.client._Unspecified, dt_help=None):
     # check singleton
     if rospy.__instance__ is not None and not rospy.__instance__._has_param(param_name):
         DTParam(
             param_name,
+            help=dt_help,
             param_type=ParamType.guess_type(default),
             default=None if default in [None, rospy.client._Unspecified] else default,
             __editable__=False  # only user-created DTParam objects result into subscribed params

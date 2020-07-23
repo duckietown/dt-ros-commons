@@ -99,6 +99,7 @@ class ROS_HTTP_API_Node(DTROS):
         key = '/node/info%s' % data.name
         # store info about nodes
         info = {
+            'help': data.help,
             'type': NodeType(data.type).name,
             'health': NodeHealth(data.health).name,
             'health_value': NodeHealth(data.health).value,
@@ -130,6 +131,7 @@ class ROS_HTTP_API_Node(DTROS):
             KnowledgeBase.set(topic_key('type', topic.name), topic_type_str)
             # compile topic info
             info = {
+                'help': topic.help,
                 'message_type': None,
                 'type': topic_type_str,
                 # TODO: these should be averaged
@@ -165,6 +167,7 @@ class ROS_HTTP_API_Node(DTROS):
         params = KnowledgeBase.get(node_key(node), [])
         for param in data.params:
             info = {
+                'help': param.help,
                 'type': ParamType(param.type).name,
                 'min_value': param.min_value,
                 'max_value': param.max_value,

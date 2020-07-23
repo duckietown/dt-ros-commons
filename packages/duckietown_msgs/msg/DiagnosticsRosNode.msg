@@ -25,6 +25,7 @@ uint8 NODE_HEALTH_FATAL = 40
 
 Header header
 string name             # Node publishing this message
+string help             # Node description
 uint8 type              # Node type (see NODE_TYPE_X above)
 uint8 health            # Node health (see NODE_HEALTH_X above)
 string health_reason    # String describing the reason for this health status (if any)
