@@ -24,9 +24,9 @@ class DTTopic(rospy.topics.Topic):
 
     def _parse_dt_args(self, kwargs):
         # parse dt arguments
-        self._dt_healthy_freq = _arg(kwargs, 'dt_healthy_hz', -1)
-        self._dt_topic_type = _arg(kwargs, 'dt_topic_type', TopicType.GENERIC)
-        self._dt_is_ghost = _arg(kwargs, 'dt_ghost', False)
+        self._dt_healthy_freq = _arg(kwargs, 'dt_healthy_hz', int, -1)
+        self._dt_topic_type = _arg(kwargs, 'dt_topic_type', TopicType, TopicType.GENERIC)
+        self._dt_is_ghost = _arg(kwargs, 'dt_ghost', bool, False)
         # sanitize dt_type
         if not isinstance(self._dt_topic_type, TopicType):
             self._node.logerror(
@@ -85,5 +85,12 @@ class DTTopic(rospy.topics.Topic):
             DTROSDiagnostics.getInstance().unregister_topic(topic_name)
 
 
-def _arg(kwargs, key, default):
+def _arg(kwargs, key, argtype, default):
+    # make sure that the value (if given) respects the expected type
+    if argtype is not None and key in kwargs and not isinstance(kwargs[key], argtype):
+        raise ValueError(
+            'Parameter %s in rospy.Publisher and rospy.Subscriber expects a value of type %s, '
+            'got %s instead.' % (key, str(argtype), str(type(kwargs[key])))
+        )
+    # return given value (if any) or default
     return kwargs[key] if key in kwargs else default
