@@ -3,7 +3,7 @@ ARG REPO_NAME="dt-ros-commons"
 ARG MAINTAINER="Andrea F. Daniele (afdaniele@ttic.edu)"
 
 ARG ARCH=arm32v7
-ARG DISTRO=daffy
+ARG DISTRO=ente
 ARG BASE_TAG=${DISTRO}-${ARCH}
 ARG BASE_IMAGE=dt-commons
 ARG LAUNCHER=default
