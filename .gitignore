@@ -47,6 +47,10 @@ qtcreator-*
 # Emacs
 .#*
 
+# Documentation related
+html/*
+!html/HTML_DOCS_WILL_BE_GENERATED_HERE
+
 # Catkin custom files
 CATKIN_IGNORE
 benchmark/

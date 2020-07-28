@@ -13,8 +13,6 @@ Welcome to dt-ros-commons's documentation!
 
    packages
 
-
-
 Indices and tables
 ==================
 

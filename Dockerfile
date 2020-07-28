@@ -10,7 +10,7 @@ ARG BASE_IMAGE=dt-ros-${ROS_DISTRO}-base
 
 # extend dt-commons
 ARG SUPER_IMAGE=dt-commons
-ARG SUPER_IMAGE_MAJOR=daffy
+ARG SUPER_IMAGE_MAJOR=daffy-new-deal
 ARG SUPER_IMAGE_TAG=${SUPER_IMAGE_MAJOR}-${ARCH}
 FROM duckietown/${SUPER_IMAGE}:${SUPER_IMAGE_TAG} as dt-commons
 

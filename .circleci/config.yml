@@ -1,0 +1,34 @@
+version: 2.1
+jobs:
+  build:
+    docker:
+    - image: python:3.7
+      environment:
+        DTS_VERSION: daffy-new-deal
+
+    steps:
+    - setup_remote_docker
+    - run:
+        name: Install Docker
+        command: |
+          curl -fsSL https://get.docker.com -o get-docker.sh
+          sh get-docker.sh
+
+    - run:
+        name: Install dts
+        command:
+          pip3 install --no-cache-dir  duckietown-shell
+
+    - checkout
+    - run:
+        name: Build the docs
+        run:
+          dts devel build --docs
+
+    - store_artifacts:
+        path: html
+        destination: html
+
+    - store_artifacts:
+        path: rst
+        destination: rst
