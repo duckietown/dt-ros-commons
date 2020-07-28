@@ -26,8 +26,6 @@ setattr(rospy, '__Subscriber__', rospy.Subscriber)
 
 from .dtros import DTROS
 from .dtparam import DTParam
-from .dtreminder import DTReminder
-
 from .constants import TopicType, NodeType, ParamType, NodeHealth, TopicDirection
 
 # perform rospy decoration
