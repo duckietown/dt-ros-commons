@@ -16,15 +16,16 @@ uint8 NODE_TYPE_DEBUG = 20
 
 # Node health (this has to match duckietown.NodeHealth)
 uint8 NODE_HEALTH_UNKNOWN = 0
-uint8 NODE_HEALTH_STARTING = 1
-uint8 NODE_HEALTH_STARTED = 2
-uint8 NODE_HEALTH_HEALTHY = 3
-uint8 NODE_HEALTH_WARNING = 4
-uint8 NODE_HEALTH_ERROR = 5
-uint8 NODE_HEALTH_FATAL = 6
+uint8 NODE_HEALTH_STARTING = 5
+uint8 NODE_HEALTH_STARTED = 6
+uint8 NODE_HEALTH_HEALTHY = 10
+uint8 NODE_HEALTH_WARNING = 20
+uint8 NODE_HEALTH_ERROR = 30
+uint8 NODE_HEALTH_FATAL = 40
 
 Header header
 string name             # Node publishing this message
+string help             # Node description
 uint8 type              # Node type (see NODE_TYPE_X above)
 uint8 health            # Node health (see NODE_HEALTH_X above)
 string health_reason    # String describing the reason for this health status (if any)

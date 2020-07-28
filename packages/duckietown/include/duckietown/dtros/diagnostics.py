@@ -94,10 +94,11 @@ class _DTROSDiagnosticsManager:
             oneshot=False
         )
 
-    def register_node(self, name, type, health):
+    def register_node(self, name, help, ntype, health):
         self._node_stats = {
             'name': name,
-            'type': type.value,
+            'help': help,
+            'type': ntype.value,
             'health': health.value,
             'health_reason': '',
             'health_stamp': rospy.get_time(),
@@ -120,13 +121,14 @@ class _DTROSDiagnosticsManager:
         # publish new node information
         self._publish_node_diagnostics()
 
-    def register_topic(self, name, direction, healthy_freq, topic_type, topic_monitor):
+    def register_topic(self, name, help, direction, healthy_freq, topic_type, topic_monitor):
         if name in ROS_INFRA_TOPICS:
             return
         # ---
         self._topics_stats_lock.acquire()
         try:
             self._topics_stats[name] = {
+                'help': help,
                 'type': topic_type.value,
                 'direction': direction.value,
                 'frequency': 0.0,
@@ -164,8 +166,9 @@ class _DTROSDiagnosticsManager:
         # force topic message update
         self._publish_topics_diagnostics(force=True)
 
-    def register_param(self, name, param_type, min_value, max_value, editable):
+    def register_param(self, name, help, param_type, min_value, max_value, editable):
         self._params_stats[name] = {
+            'help': help,
             'type': param_type.value,
             'min_value': float(min_value) if isinstance(min_value, (int, float)) else -1.0,
             'max_value': float(max_value) if isinstance(max_value, (int, float)) else -1.0,

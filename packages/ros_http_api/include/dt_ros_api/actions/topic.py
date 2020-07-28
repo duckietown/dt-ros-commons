@@ -86,13 +86,15 @@ def _info(topic):
 
 @rostopic.route('/topic/hz/<path:topic>')
 def _hz(topic):
-    key = '/topic/hz/' + topic
+    key = lambda s: '/topic/{0}/{1}'.format(s, topic)
     try:
-        hz_time, hz = KnowledgeBase.get(key, None, get_time=True)
+        hz_time, hz = KnowledgeBase.get(key('hz'), None, get_time=True)
+        info = KnowledgeBase.get(key('info'), {'effective_frequency': -1})
         # return
         return response_ok({
             'topic': '/' + topic,
             'frequency': hz,
+            'effective_frequency': info['effective_frequency'],
             'secs_since_update': hz_time
         })
     except Exception as e:
@@ -144,7 +146,7 @@ def _dttype(topic):
     try:
         return response_ok({
             'topic': topic,
-            'dttype': KnowledgeBase.get('/topic/type%s' % topic, default_topic_type(topic))
+            'type': KnowledgeBase.get('/topic/type%s' % topic, default_topic_type(topic))
         })
     except Exception as e:
         return response_error(str(e))

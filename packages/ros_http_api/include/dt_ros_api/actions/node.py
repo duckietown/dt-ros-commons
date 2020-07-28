@@ -39,20 +39,18 @@ def _list():
 
 
 @rosnode.route('/node/info/<path:node>')
-def _type(node):
+def _info(node):
     node = '/' + node
     key = lambda x: '/node/%s%s' % (x, node)
     try:
         # compile node info
-        # TODO: topics, links, params, and services are lists here,
-        #  dicts are returned in graph (maybe)
-        #  but for sure topic/info, link/info, param/info, service/info will contain that info
         info = KnowledgeBase.get(key('info'), DEFAULT_NODE_INFO)
         info['node'] = node
         # get topics
-        info['topics'] = KnowledgeBase.get(key('topics'), [])
+        info['topics'] = KnowledgeBase.get(key('topics'), {}).keys()
         # get links
-        info['links'] = KnowledgeBase.get(key('links'), [])
+        # TODO: links are not reported for now
+        # info['links'] = KnowledgeBase.get(key('links'), [])
         # get params
         info['services'] = KnowledgeBase.get(key('services'), [])
         # get services
@@ -67,7 +65,11 @@ def _topics(node):
     try:
         return response_ok({
             'node': '/' + node,
-            'topics': KnowledgeBase.get('/node/topics/%s' % node, {})
+            'topics': {
+                t_name: {
+                    'direction': t_info['direction']
+                } for t_name, t_info in KnowledgeBase.get('/node/topics/%s' % node, {}).items()
+            }
         })
     except Exception as e:
         return response_error(str(e))
@@ -78,7 +80,7 @@ def _params(node):
     try:
         return response_ok({
             'node': '/' + node,
-            'params': KnowledgeBase.get('/node/params/%s' % node, {})
+            'parameters': KnowledgeBase.get('/node/params/%s' % node, {})
         })
     except Exception as e:
         return response_error(str(e))

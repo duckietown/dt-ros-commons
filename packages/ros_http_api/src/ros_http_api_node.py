@@ -33,7 +33,7 @@ class ROS_HTTP_API_Node(DTROS):
             dt_ghost=True
         )
         # ---
-        # subsriber: diagnostics/ros/node
+        # subscriber: diagnostics/ros/node
         self._diagnostics_node_sub = SubscriberProvider(
             apply_namespace(DIAGNOSTICS_ROS_NODE_TOPIC, 1),
             DiagnosticsRosNode,
@@ -43,7 +43,7 @@ class ROS_HTTP_API_Node(DTROS):
             dt_timeout=-1
         )
         KnowledgeBase.register_provider('/node/info/', self._diagnostics_node_sub)
-        # subsriber: diagnostics/ros/topics
+        # subscriber: diagnostics/ros/topics
         self._diagnostics_topics_sub = SubscriberProvider(
             apply_namespace(DIAGNOSTICS_ROS_TOPICS_TOPIC, 1),
             DiagnosticsRosTopicArray,
@@ -57,7 +57,7 @@ class ROS_HTTP_API_Node(DTROS):
         KnowledgeBase.register_provider('/topic/info/', self._diagnostics_topics_sub)
         KnowledgeBase.register_provider('/topic/hz/', self._diagnostics_topics_sub)
         KnowledgeBase.register_provider('/topic/bw/', self._diagnostics_topics_sub)
-        # subsriber: diagnostics/ros/parameters
+        # subscriber: diagnostics/ros/parameters
         self._diagnostics_params_sub = SubscriberProvider(
             apply_namespace(DIAGNOSTICS_ROS_PARAMETERS_TOPIC, 1),
             DiagnosticsRosParameterArray,
@@ -68,7 +68,7 @@ class ROS_HTTP_API_Node(DTROS):
         )
         KnowledgeBase.register_provider('/node/params/', self._diagnostics_params_sub)
         KnowledgeBase.register_provider('/param/info/', self._diagnostics_params_sub)
-        # subsriber: diagnostics/ros/links
+        # subscriber: diagnostics/ros/links
         self._diagnostics_links_sub = SubscriberProvider(
             apply_namespace(DIAGNOSTICS_ROS_LINKS_TOPIC, 1),
             DiagnosticsRosLinkArray,
@@ -99,8 +99,10 @@ class ROS_HTTP_API_Node(DTROS):
         key = '/node/info%s' % data.name
         # store info about nodes
         info = {
+            'help': data.help,
             'type': NodeType(data.type).name,
             'health': NodeHealth(data.health).name,
+            'health_value': NodeHealth(data.health).value,
             'health_reason': data.health_reason,
             'health_stamp': data.health_stamp,
             'enabled': data.enabled,
@@ -125,13 +127,15 @@ class ROS_HTTP_API_Node(DTROS):
                 continue
             # ---
             # store topic type
-            topic_type_str = TopicType(ord(topic.type)).name
+            topic_type_str = TopicType(topic.type).name
             KnowledgeBase.set(topic_key('type', topic.name), topic_type_str)
             # compile topic info
             info = {
+                'help': topic.help,
                 'message_type': None,
                 'type': topic_type_str,
                 # TODO: these should be averaged
+                'bandwidth': topic.bandwidth,
                 'frequency': topic.frequency,
                 'effective_frequency': topic.effective_frequency
             }
@@ -163,6 +167,7 @@ class ROS_HTTP_API_Node(DTROS):
         params = KnowledgeBase.get(node_key(node), [])
         for param in data.params:
             info = {
+                'help': param.help,
                 'type': ParamType(param.type).name,
                 'min_value': param.min_value,
                 'max_value': param.max_value,

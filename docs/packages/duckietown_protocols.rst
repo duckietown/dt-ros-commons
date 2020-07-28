@@ -1,5 +1,5 @@
-duckietown_protocols package
-============================
+ROS Package: duckietown_protocols
+=================================
 
 .. contents::
 

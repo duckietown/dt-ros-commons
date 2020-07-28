@@ -24,6 +24,8 @@ add_message_files(
   CarControl.msg
   CoordinationClearance.msg
   CoordinationSignal.msg
+  DiagnosticsPhaseTiming.msg
+  DiagnosticsPhaseTimingArray.msg
   DiagnosticsRosLink.msg
   DiagnosticsRosLinkArray.msg
   DiagnosticsRosNode.msg

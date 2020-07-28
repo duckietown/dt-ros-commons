@@ -8,7 +8,10 @@ from duckietown_msgs.srv import \
     NodeGetParamsListResponse, \
     NodeRequestParamsUpdate, \
     NodeRequestParamsUpdateResponse
-from duckietown_msgs.msg import NodeParameter
+from duckietown_msgs.msg import \
+    NodeParameter, \
+    DiagnosticsPhaseTiming, \
+    DiagnosticsPhaseTimingArray
 from duckietown.dtros.constants import \
     NODE_GET_PARAM_SERVICE_NAME, \
     NODE_REQUEST_PARAM_UPDATE_SERVICE_NAME, \
@@ -17,6 +20,8 @@ from .dtparam import DTParam
 from .constants import NodeHealth, NodeType
 from .diagnostics import DTROSDiagnostics
 from .utils import get_ros_handler
+from .phase_timing import PhaseTimer
+from .constants import TopicType
 
 
 class DTROS(object):
@@ -74,17 +79,9 @@ class DTROS(object):
 
     Args:
        node_name (:obj:`str`): a unique, descriptive name for the node that ROS will use
-       parameters_update_period (:obj:`float`): how often to check for new parameters (in seconds). If
-          it is 0, it will not run checks at all
 
     Attributes:
        node_name (:obj:`str`): the name of the node
-       parameters (:obj:`dict`): a dictionary that holds pairs ``('~param_name`: param_value)``. Note that
-          parameters should be given in private namespace (starting with ``~``)
-       parametersChanged (:obj:`bool`): a boolean indicator if the
-       is_shutdown (:obj:`bool`): will be set to ``True`` when the :py:meth:`onShutdown` method is called
-       switch (:obj:`bool`): flag determining whether the node is active or not. Read-only, controlled through
-          the ``~switch`` service
 
     Service:
         ~switch:
@@ -103,6 +100,7 @@ class DTROS(object):
                  node_name,
                  # DT parameters from here
                  node_type,
+                 help=None,
                  dt_ghost=False):
         # configure singleton
         if rospy.__instance__ is not None:
@@ -119,6 +117,7 @@ class DTROS(object):
             log_level = rospy.DEBUG
         rospy.init_node(node_name, log_level=log_level, __dtros__=True)
         self.node_name = rospy.get_name()
+        self.node_help = help
         self.node_type = node_type
         self.log('Initializing...')
         self.is_shutdown = False
@@ -156,9 +155,24 @@ class DTROS(object):
         if DTROSDiagnostics.enabled():
             DTROSDiagnostics.getInstance().register_node(
                 self.node_name,
+                self.node_help,
                 self.node_type,
                 health=self._health
             )
+
+        # Add a phase timer for profiling and a publisher topic
+        self._pub_phase_timer = rospy.Publisher(
+            "~diagnostics/phase_times",
+            DiagnosticsPhaseTimingArray,
+            queue_size=10,
+            dt_topic_type=TopicType.DEBUG
+        )
+        self._pub_phase_timer.register_subscribers_changed_cb(self._cb_phase_timing_subs_update)
+        self._phasetimeTimer = None
+        # provides both a pointer to _phase_timer (for internal use)
+        # and a public interface to the context manager `with self.timed_phase("PHASE")`
+        self.timed_phase = self._phase_timer = PhaseTimer()
+
         # mark node as healthy and STARTED
         self.set_health(NodeHealth.STARTED)
         # register shutdown callback
@@ -303,6 +317,7 @@ class DTROS(object):
                 NodeParameter(
                     node=rospy.get_name(),
                     name=p.name,
+                    help=p.help,
                     type=p.type.value,
                     **p.options()
                 ) for p in self.parameters
@@ -357,10 +372,54 @@ class DTROS(object):
     def _register_subscriber(self, subscriber):
         self._subscribers.append(subscriber)
 
+    def _publish_phase_timing(self, event=None):
+        with self.timed_phase("Preparing phase timing message"):
+            phase_timings = self._phase_timer.get_statistics()
+            # create timing array
+            array_msg = DiagnosticsPhaseTimingArray()
+            array_msg.header.stamp = rospy.Time.now()
+            for phase_name in sorted(phase_timings.keys()):
+                single_phase_stats = phase_timings[phase_name]
+                # create phase object
+                single_phase_msg = DiagnosticsPhaseTiming()
+                single_phase_msg.node = self.node_name
+                single_phase_msg.name = phase_name
+                single_phase_msg.num_events = single_phase_stats.num_events
+                single_phase_msg.frequency = single_phase_stats.frequency
+                single_phase_msg.avg_duration = single_phase_stats.avg_duration
+                single_phase_msg.filename = single_phase_stats.filename
+                single_phase_msg.line_nums = [
+                    single_phase_stats.line_nums[0], single_phase_stats.line_nums[1]
+                ]
+                # add phase to array message
+                array_msg.phases.append(single_phase_msg)
+            # publish phase timing
+            self._pub_phase_timer.publish(array_msg)
+
+    def _cb_phase_timing_subs_update(self, publisher):
+        if not publisher.anybody_listening():
+            self.loginfo('Phase Timing Recording switched OFF')
+            self._phase_timer.stop_recording()
+            if self._phasetimeTimer is not None and not self._phasetimeTimer._shutdown:
+                self._phasetimeTimer.shutdown()
+        else:
+            self.loginfo('Phase Timing Recording switched ON')
+            self._phase_timer.start_recording()
+            if self._phasetimeTimer is None or self._phasetimeTimer._shutdown:
+                self._phasetimeTimer = rospy.Timer(period=rospy.Duration.from_sec(5),
+                                                   callback=self._publish_phase_timing,
+                                                   oneshot=False)
+
     def _on_shutdown(self):
         self.log('Received shutdown request.')
         self.is_shutdown = True
+        # turn off phase timer
+        if self._phasetimeTimer is not None and not self._phasetimeTimer._shutdown:
+            self._phasetimeTimer.shutdown()
+        # call node on_shutdown
         self.on_shutdown()
 
     def on_shutdown(self):
+        # this function does not do anything, it is called when the node shuts down.
+        # It can be redefined by the user in the final node class.
         pass
