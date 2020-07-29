@@ -37,7 +37,8 @@ def _graph():
         }
         # message_type is not delivered in graph
         for topic in topics:
-            del topics[topic]['message_type']
+            if 'message_type' in topics[topic]:
+                del topics[topic]['message_type']
         # ---
         graph = {
             'nodes': nodes.keys(),

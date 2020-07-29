@@ -16,6 +16,7 @@ class DataProvider(object):
 
 def default_node_info():
     return {
+        'help': None,
         'type': NodeType.GENERIC.name,
         'health': NodeHealth.UNKNOWN.name,
         'health_value': NodeHealth.UNKNOWN.value,
@@ -31,6 +32,7 @@ def default_node_info():
 
 def default_topic_info(name, direction, node_agnostic=False):
     info = {
+        'help': None,
         'message_type': None,
         'type': default_topic_type(name),
         'frequency': None,
@@ -50,6 +52,7 @@ def default_topic_info(name, direction, node_agnostic=False):
 
 def default_param_info():
     return {
+        'help': None,
         'type': ParamType.UNKNOWN.name,
         'min_value': None,
         'max_value': None,

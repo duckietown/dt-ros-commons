@@ -9,8 +9,10 @@ MIN_MAX_SUPPORTED_TYPES = [ParamType.INT, ParamType.FLOAT]
 
 class DTParam:
 
-    def __init__(self, name, default=None, param_type=ParamType.UNKNOWN, min_value=None, max_value=None, __editable__=True):
+    def __init__(self, name, default=None, help=None, param_type=ParamType.UNKNOWN,
+                 min_value=None, max_value=None, __editable__=True):
         self._name = rospy.names.resolve_name(name)
+        self._help = help
         self._editable = __editable__
         if not isinstance(param_type, ParamType):
             raise ValueError(
@@ -49,6 +51,13 @@ class DTParam:
                         str(self._default_value), str(self._max_value), name
                     )
                 )
+        # - help string
+        if help is not None and not isinstance(help, str):
+            raise ValueError(
+                "Parameter 'help' in DTParam expects a value of type 'str', got '%s' instead." % (
+                    str(type(help))
+                )
+            )
         # ---
         node = get_instance()
         if node is None:
@@ -75,6 +84,7 @@ class DTParam:
         if DTROSDiagnostics.enabled():
             DTROSDiagnostics.getInstance().register_param(
                 self._name,
+                self._help,
                 self._type,
                 self._min_value,
                 self._max_value,
@@ -133,6 +143,10 @@ class DTParam:
     @property
     def name(self):
         return self._name
+
+    @property
+    def help(self):
+        return self._help
 
     @property
     def value(self):
