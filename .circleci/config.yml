@@ -34,8 +34,6 @@ jobs:
           name: Build the docs
           command: |
             export PATH="$PATH:$HOME/.local/bin"
-            export CI_DOCKER_MACHINE=$(python3 -c 'import os; print(os.environ.get("DOCKER_HOST").split("/")[-1].split(":")[0])')
-            echo "CI_DOCKER_MACHINE $CI_DOCKER_MACHINE"
             dts devel build -H $DOCKER_HOST -f --docs
 
       - store_artifacts:
