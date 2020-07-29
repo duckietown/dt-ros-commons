@@ -2,33 +2,42 @@ version: 2.1
 jobs:
   build:
     docker:
-    - image: python:3.7
-      environment:
-        DTS_VERSION: daffy-new-deal
+      - image: ubuntu:18.04
 
     steps:
-    - setup_remote_docker
-    - run:
-        name: Install Docker
-        command: |
-          curl -fsSL https://get.docker.com -o get-docker.sh
-          sh get-docker.sh
 
-    - run:
-        name: Install dts
-        command:
-          pip3 install --no-cache-dir  duckietown-shell
 
-    - checkout
-    - run:
-        name: Build the docs
-        run:
-          dts devel build --docs
+      - setup_remote_docker
 
-    - store_artifacts:
-        path: html
-        destination: html
+      - run:
+          name: Install dependencies
+          command: |
+            apt update && \
+            apt install -y python3-pip git git-lfs curl && \
+            rm -rf /var/lib/apt/lists/*
 
-    - store_artifacts:
-        path: rst
-        destination: rst
+      - run:
+          name: Install Docker
+          command: |
+            curl -fsSL https://get.docker.com -o get-docker.sh
+            sh get-docker.sh
+            rm get-docker.sh
+
+      - run:
+          name: Install dts
+          command: |
+            python3 -m pip install --no-cache-dir --user -U duckietown-shell
+            export PATH="$PATH:$HOME/.local/bin"
+            dts --set-version daffy-new-deal exit
+
+      - checkout
+
+      - run:
+          name: Build the docs
+          command: |
+            export PATH="$PATH:$HOME/.local/bin"
+            dts devel build -f --docs
+
+      - store_artifacts:
+          path: html
+          destination: html
