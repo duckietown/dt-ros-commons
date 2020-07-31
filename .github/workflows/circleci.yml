@@ -2,6 +2,7 @@ on: [status]
 jobs:
    circleci_artifacts_redirector_job:
      runs-on: ubuntu-latest
+
      name: Run CircleCI artifacts redirector
      steps:
        - name: GitHub Action step
@@ -11,3 +12,6 @@ jobs:
            repo-token: ${{ secrets.GITHUB_TOKEN }}
            artifact-path: 0/html/index.html
            circleci-jobs: build
+       - name: Check the URL
+         run: |
+           curl --fail ${{ steps.step1.outputs.url }} | grep $GITHUB_SHA:  
