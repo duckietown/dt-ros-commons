@@ -16,9 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
 add_message_files(
   FILES
-  AntiInstagramHealth.msg
-  AntiInstagramTransform.msg
-  AntiInstagramTransform_CB.msg
+  AntiInstagramThresholds.msg
   AprilTagDetection.msg
   AprilTagDetectionArray.msg
   AprilTagsWithInfos.msg
