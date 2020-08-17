@@ -44,7 +44,7 @@ def get_dropbox_urls():
             logger.debug('loading %s' % f)
             data = open(f).read()
             f_urls = yaml_load_plain(data)
-            for k, v in f_urls.items():
+            for k, v in list(f_urls.items()):
                 urls[k] = v
 
     msg = 'Found %d urls in %s files:\n' % (len(urls), len(found))
@@ -56,7 +56,7 @@ def get_dropbox_urls():
             url = url.replace('?dl=0', '?dl=1')
         return url
 
-    return dict([(k, sanitize(url)) for k, url in urls.items()])
+    return dict([(k, sanitize(url)) for k, url in list(urls.items())])
 
 
 def download_if_not_exist(url, filename):
@@ -73,7 +73,7 @@ def download_if_not_exist(url, filename):
 
 import sys
 import time
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 
 def reporthook(count, block_size, total_size):
@@ -110,7 +110,7 @@ def reporthook(count, block_size, total_size):
 def download_url_to_file(url, filename):
     logger.info('Download from %s' % url)
     tmp = filename + '.tmp_download_file'
-    urllib.urlretrieve(url, tmp, reporthook)
+    urllib.request.urlretrieve(url, tmp, reporthook)
     if not os.path.exists(filename):
         os.rename(tmp, filename)
 
@@ -175,8 +175,8 @@ def get_file_from_url(url):
 def get_sha12url():
     sha12url = {}
     urls = get_dropbox_urls()
-    for u, v in urls.items():
-        u = unicode(u)  # .encode('utf-8')
+    for u, v in list(urls.items()):
+        u = str(u)  # .encode('utf-8')
         if u.startswith('hash:'):
             parsed = parse_hash_url(u)
             sha12url[parsed.sha1] = v

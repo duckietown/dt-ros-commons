@@ -42,7 +42,7 @@ def locate_files(directory, pattern, normalize=True, followlinks=True, alsodirs=
             real2norm[real].append(norm)
         # print('%s -> %s' % (real, norm))
 
-    for k, v in real2norm.items():
+    for k, v in list(real2norm.items()):
         if len(v) > 1:
             msg = 'In directory:\n\t%s\n' % directory
             msg += 'I found %d paths that refer to the same file:\n' % len(v)

@@ -36,12 +36,12 @@ def yaml_dump_pretty(ob):
 
 def remove_unicode(x):
 
-    if isinstance(x, unicode):
+    if isinstance(x, str):
         return x.encode('utf8')
 
     if isinstance(x, dict):
         T = type(x)
-        return T([(remove_unicode(k), remove_unicode(v)) for k, v in x.items()])
+        return T([(remove_unicode(k), remove_unicode(v)) for k, v in list(x.items())])
 
     if isinstance(x, list):
         T = type(x)
