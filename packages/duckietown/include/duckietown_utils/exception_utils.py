@@ -75,7 +75,9 @@ def raise_wrapped(etype, e, msg, compact=False, exc=None, **kwargs):
 
     if exc is not None:
         _, _, trace = exc
-        raise etype, e.args, trace
+        #TODO Adapted from python2 to 3, exc might not be needed
+        #raise etype, e.args, trace
+        raise etype(e.args).with_traceback()
     else:
         raise e
 
