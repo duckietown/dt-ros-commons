@@ -5,7 +5,7 @@ ARG DESCRIPTION="Base image containing common libraries and environment setup fo
 ARG ICON="square"
 
 ARG ARCH=arm32v7
-ARG DISTRO=ente
+ARG DISTRO=daffy
 ARG BASE_TAG=${DISTRO}-${ARCH}
 ARG BASE_IMAGE=dt-commons
 ARG LAUNCHER=default
