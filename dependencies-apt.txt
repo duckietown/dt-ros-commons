@@ -1,4 +1,3 @@
 # LIST YOUR APT PACKAGES HERE
 ros-noetic-joystick-drivers
 gfortran
-python3-scipy
