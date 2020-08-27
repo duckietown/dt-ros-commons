@@ -1,2 +1,6 @@
 # LIST YOUR APT PACKAGES HERE
 ros-kinetic-joystick-drivers
+
+# these are pretty small, they can stay in the base environment image
+ros-kinetic-image-transport
+ros-kinetic-image-transport-plugins
