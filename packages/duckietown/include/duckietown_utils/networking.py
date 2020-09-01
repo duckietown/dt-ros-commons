@@ -1,6 +1,6 @@
 import socket
 import ssl
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 
 from .instantiate_utils import indent
 from .logging_logger import logger
@@ -16,8 +16,8 @@ def is_internet_connected(url=use_url, timeout=3):
     socket.setdefaulttimeout(timeout)
     try:
         try:
-            urllib2.urlopen(url, timeout=timeout)
-        except urllib2.HTTPError as e:
+            urllib.request.urlopen(url, timeout=timeout)
+        except urllib.error.HTTPError as e:
             # we expect 404
             if e.code == 404:
                 return True

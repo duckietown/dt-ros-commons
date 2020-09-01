@@ -1,1 +1,16 @@
-# LIST YOUR PYTHON3 PACKAGES HERE
+# LIST YOUR PYTHON PACKAGES HERE
+osrf-pycommon
+frozendict
+#PyGeometry==1.5.6
+PyGeometry-z6==2.0.1
+QuickApp-z6==6.0.5
+#compmake==3.5.23
+compmake-z6==6.0.8
+SystemCmd-z6==3.0.4
+picamera==1.13
+#PyContracts==1.8.12
+PyContracts3==3.0.2
+
+# Package: ros_http_api
+flask
+flask-cors

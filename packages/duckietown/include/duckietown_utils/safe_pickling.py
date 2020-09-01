@@ -10,7 +10,7 @@ from .safe_reading import safe_read, safe_write
 if sys.version_info[0] >= 3:
     import pickle  # @UnusedImport
 else:
-    import cPickle as pickle  # @Reimport
+    import pickle as pickle  # @Reimport
 
 __all__ = [
     'safe_pickle_dump',

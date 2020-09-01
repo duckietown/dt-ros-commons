@@ -40,7 +40,7 @@ def friendly_path(path, use_environment=True):
             if 'PWD' in e:
                 del envs[e]
 
-        for k, v0 in envs.items():
+        for k, v0 in list(envs.items()):
             if v0:
                 for v in [v0, os.path.realpath(v0)]:
                     if v and v[-1] == '/':

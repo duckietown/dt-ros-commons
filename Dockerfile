@@ -53,10 +53,6 @@ COPY ./dependencies-apt.txt "${REPO_PATH}/"
 RUN dt-apt-install "${REPO_PATH}/dependencies-apt.txt"
 
 # install python dependencies
-COPY ./dependencies-py.txt "${REPO_PATH}/"
-RUN pip install -r ${REPO_PATH}/dependencies-py.txt
-
-# install python dependencies
 COPY ./dependencies-py3.txt "${REPO_PATH}/"
 RUN pip3 install -r ${REPO_PATH}/dependencies-py3.txt
 

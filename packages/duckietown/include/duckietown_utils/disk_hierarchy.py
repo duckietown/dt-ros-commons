@@ -26,7 +26,7 @@ def write_to_dir(data, d):
     if isinstance(data, dict):
         if not os.path.exists(d):
             os.makedirs(d)
-        for k, v in data.items():
+        for k, v in list(data.items()):
             write_to_dir(v, os.path.join(d, k))
     elif isinstance(data, str):
         with open(d, 'w') as f:

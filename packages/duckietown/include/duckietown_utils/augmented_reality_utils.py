@@ -92,7 +92,7 @@ def load_homography(veh):
     path = '/calibrations/camera_'
     filename = get_duckiefleet_root() + path + 'extrinsic/' + veh + '.yaml'
     if not isfile(filename):
-        print('Extrinsic calibration for {} does not exist.'.format(veh))
+        print(('Extrinsic calibration for {} does not exist.'.format(veh)))
         exit(2)
     with open(filename) as f:
         contents = f.read()
@@ -105,7 +105,7 @@ def load_camera_intrinsics(veh):
     path = '/calibrations/camera_'
     filename = get_duckiefleet_root() + path + 'intrinsic/' + veh + '.yaml'
     if not isfile(filename):
-        print('Intrinsic calibration for {} does not exist.'.format(veh))
+        print(('Intrinsic calibration for {} does not exist.'.format(veh)))
         exit(3)
     with open(filename) as f:
         contents = f.read()

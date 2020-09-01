@@ -57,7 +57,7 @@ def which_robot(bag):
 
 def get_image_topic(bag):
     """ Returns the name of the topic for the main camera """
-    topics = bag.get_type_and_topic_info()[1].keys()
+    topics = list(bag.get_type_and_topic_info()[1].keys())
     for t in topics:
         if 'camera_node/image/compressed' in t:
             return t
@@ -87,7 +87,7 @@ def d8n_get_all_images_topic_bag(bag, min_messages=0):
     all_types = set()
     found = []
     topics = tat.topics
-    for t, v in topics.items():
+    for t, v in list(topics.items()):
         msg_type = v.msg_type
         all_types.add(msg_type)
         message_count = v.message_count

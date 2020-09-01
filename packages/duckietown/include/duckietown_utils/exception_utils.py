@@ -75,7 +75,7 @@ def raise_wrapped(etype, e, msg, compact=False, exc=None, **kwargs):
 
     if exc is not None:
         _, _, trace = exc
-        raise etype, e.args, trace
+        raise etype(e.args).with_traceback(trace)
     else:
         raise e
 
@@ -83,7 +83,7 @@ def raise_wrapped(etype, e, msg, compact=False, exc=None, **kwargs):
 def raise_wrapped_make(etype, e, msg, compact=False, **kwargs):
     """ Constructs the exception to be thrown by raise_wrapped() """
     assert isinstance(e, BaseException), type(e)
-    assert isinstance(msg, (str, unicode)), type(msg)
+    assert isinstance(msg, str), type(msg)
     s = msg
     if kwargs:
         s += '\n' + format_obs(kwargs)

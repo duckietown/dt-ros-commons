@@ -1,6 +1,7 @@
 # LIST YOUR APT PACKAGES HERE
-ros-kinetic-joystick-drivers
+ros-noetic-joystick-drivers
+gfortran
 
 # these are pretty small, they can stay in the ros-commons image
-ros-kinetic-image-transport
-ros-kinetic-image-transport-plugins
+ros-noetic-image-transport
+ros-noetic-image-transport-plugins
