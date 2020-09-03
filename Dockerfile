@@ -11,7 +11,7 @@ ARG BASE_IMAGE=dt-commons
 ARG LAUNCHER=default
 
 # define base image
-FROM duckietown/${BASE_IMAGE}:${BASE_TAG}
+FROM duckietown/${BASE_IMAGE}:${BASE_TAG} as BASE
 
 # recall all arguments
 ARG REPO_NAME
