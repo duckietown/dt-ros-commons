@@ -33,13 +33,14 @@ jobs:
       - run:
           name: Build the docs
           command: |
-            if [ -f PLEASE_DONT_BUILD_SPHINX_DOCS ]; then
-              echo "WE WILL NOT BUILD DOCS BECAUSE THE PLEASE_DONT_BUILD_SPHINX_DOCS IS IN THE REPO!"
-            else
-              export PATH="$PATH:$HOME/.local/bin"
-              dts devel build --docs
-            fi
+            export PATH="$PATH:$HOME/.local/bin"
+            dts devel build --docs
 
       - store_artifacts:
           path: html/out
           destination: html
+
+      - store_artifacts:
+          path: html/out/package.tgz
+          destination: out/package.tgz
+
