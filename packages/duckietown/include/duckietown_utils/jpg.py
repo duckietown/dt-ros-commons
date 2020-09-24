@@ -127,10 +127,11 @@ def bgr_from_raspistill(frame=None):
 
 # Second option: use PIL
 
+from PIL import ImageFile  # @UnresolvedImport
 
 def rgb_from_jpg_by_PIL(data):
     """ Warning: this returns RGB """
-    from PIL import ImageFile  # @UnresolvedImport
+
     parser = ImageFile.Parser()
     parser.feed(data)
     res = parser.close()

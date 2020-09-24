@@ -49,9 +49,10 @@ def d8n_image_msg_from_cv_image(cv_image, image_format, same_timestamp_as=None):
 #     msg.data = np.array(cv2.imencode('.jpg', image_np)[1]).tostring()
 #     return msg
 
+from PIL import ImageFile  # @UnresolvedImport
 
 def pil_from_CompressedImage(msg):
-    from PIL import ImageFile  # @UnresolvedImport
+
     parser = ImageFile.Parser()
     parser.feed(msg.data)
     res = parser.close()
