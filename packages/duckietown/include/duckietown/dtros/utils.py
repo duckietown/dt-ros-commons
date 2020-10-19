@@ -23,7 +23,7 @@ def get_ros_handler(force=False):
     among the objects you have access to, has a pointer to it?
     Well, I tried to follow the source code, but I had no luck tracing it down.
     The second thing I tried was to spawn a simple ROS node (which is enough to trigger the
-    creationg of the object we care about somewhere in memory), the I created a graph off of all
+    creation of the object we care about somewhere in memory), the I created a graph off of all
     the objects in memory, where objects formed nodes and their pointers edges in the graph.
     So I tried to find my way to that single instance of `rospy.impl.masterslave.ROSHandler`
     in memory by looking for paths starting from any reachable nodes and terminating there.

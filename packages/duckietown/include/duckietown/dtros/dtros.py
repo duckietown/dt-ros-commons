@@ -35,20 +35,16 @@ class DTROS(object):
 
     In particular, the DTROS class provides:
 
-    - Logging: DTROS provides the :py:meth:`log` method as a wrapper around the ROS logging
-      services. It will automatically append the ROS node name to the message.
-    - Parameters handling:  DTROS provides the :py:attr:`parameters` and :py:attr:`parametersChanged` attributes
-      and automatically updates them if it detects a change in the Parameter Server.
-    - Shutdown procedure: a common shutdown procedure for ROS nodes. Should be attached
-      via ``rospy.on_shutdown(nodeobject.onShutdown)``.
+    - Logging: By providing utility functions for logging such as `loginfo`, `logwarn`, etc.
+    - Shutdown procedure: A common shutdown procedure for ROS nodes.
     - Switchable Subscribers and Publishers: :py:meth:`publisher` and :py:meth:`subscriber` return
-      modified subscribers and publishers that can be dynamically deactivated and reactivated
-      by requesting ``False`` or ``True`` to the ``~switch`` service respectively.
+      decorated subscribers and publishers that can be dynamically deactivated and reactivated.
     - Node deactivation and reactivation: through requesting ``False`` to the ``~switch``
-      service all subscribers and publishers obtained through :py:meth:`publisher` and :py:meth:`subscriber`
-      will be deactivated and the ``switch`` attribute will be set to ``False``. This switch can be
-      used by computationally expensive parts of the node code that are not in callbacks in order to
-      to pause their execution.
+      service all subscribers and publishers obtained through :py:meth:`publisher`
+      and :py:meth:`subscriber` will be deactivated and the ``switch`` attribute will be set
+      to ``False``. This switch can be
+      used by computationally expensive parts of the node code that are not in callbacks in
+      order to pause their execution.
 
     Every children node should call the initializer of DTROS. This should be done
     by having the following line at the top of the children node ``__init__`` method::
@@ -60,28 +56,26 @@ class DTROS(object):
     - Initialize the ROS node with name ``node_name``
     - Setup the ``node_name`` attribute to the node name passed by ROS (using ``rospy.get_name()``)
     - Add a ``rospy.on_shutdown`` hook to the node's :py:meth:`onShutdown` method
-    - Initialize an empty :py:attr:`parameters` dictionary where all configurable ROS parameters should
-      be stored. A boolean attribute :py:attr:`parametersChanged` is also initialized. This will be set to
-      ``True`` when the :py:meth:`updateParameters` callback detects a change in a parameter value in the
-      `ROS Parameter Server <https://wiki.ros.org/Parameter%20Server>`_ and changes the value
-      of at least one parameter.
-      Additionally,
-      the :py:meth:`cbParametersChanged` method will be called. This can be redefined by children classes
-      in order to implement custom behavior when a change in the parameters is detected.
-
-      Note:
-          Implementing the :py:meth:`cbParametersChanged` callback will not
-          automatically set :py:attr:`parametersChanged` to ``False``! If you rely on such behavior, you need to
-          set it in your redefined callback.
-    - Start a recurrent timer that calls :py:meth:`updateParameters` regularly to
-      check if any parameter has been updated
     - Setup a ``~switch`` service that can be used to deactivate and reactivate the node
 
     Args:
-       node_name (:obj:`str`): a unique, descriptive name for the node that ROS will use
+       node_name (:obj:`str`): a unique, descriptive name for the ROS node
+       node_type (:py:class:`duckietown.dtros.NodeType`): a node type
+       help (:obj: `str`): a node description
+       dt_ghost (:obj: `bool`): (Internal use only) excludes the node from the diagnostics
 
     Attributes:
-       node_name (:obj:`str`): the name of the node
+        node_name (:obj:`str`): the name of the node
+        node_help (:obj:`str`): the description of the node
+        node_type (:py:class:`duckietown.dtros.NodeType`): the node type
+        is_shutdown (:obj:`bool`): whether the node is shutdown
+
+    Properties:
+        is_ghost:   (:obj:`bool`): (Internal use only) whether the node is a ghost
+        switch:     (:obj:`bool`): current state of the switch (`true=ON`, `false=OFF`)
+        parameters: (:obj:`list`): list of parameters defined within the node
+        subscribers: (:obj:`list`): list of subscribers defined within the node
+        publishers: (:obj:`list`): list of publishers defined within the node
 
     Service:
         ~switch:
