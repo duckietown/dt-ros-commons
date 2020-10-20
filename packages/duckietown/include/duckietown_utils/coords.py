@@ -3,9 +3,9 @@ import numpy as np
 from .contracts_ import contract
 
 __all__ = [
-    'norm_angle',
-    'norm_angle_v',
-    'm_from_in',
+    "norm_angle",
+    "norm_angle_v",
+    "m_from_in",
 ]
 
 # meters from inches
@@ -14,7 +14,7 @@ m_from_in = lambda x: x * 0.0254
 
 def norm_angle(theta):
     if np.isinf(theta) or np.isnan(theta):
-        msg = 'Invalid value for theta: %s' % theta
+        msg = "Invalid value for theta: %s" % theta
         raise ValueError(msg)
 
     while theta < -np.pi:
@@ -28,7 +28,7 @@ def norm_angle(theta):
     return theta
 
 
-@contract(theta='array[N]', returns='array[N]')
+@contract(theta="array[N]", returns="array[N]")
 def norm_angle_v(theta):
     """ Normalizes a vector of thetas such that all entries are in [-pi,pi] """
     pi = np.pi

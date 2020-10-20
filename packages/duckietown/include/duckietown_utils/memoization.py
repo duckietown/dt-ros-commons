@@ -3,7 +3,7 @@
 from decorator import decorator
 
 __all__ = [
-    'memoize_simple',
+    "memoize_simple",
 ]
 
 
@@ -11,7 +11,7 @@ def memoize_simple(obj):
     cache = obj.cache = {}
 
     def memoizer(f, *args):
-        key = (args)
+        key = args
         if key not in cache:
             cache[key] = f(*args)
         assert key in cache

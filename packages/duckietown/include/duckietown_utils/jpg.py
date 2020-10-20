@@ -20,50 +20,50 @@ from .logging_logger import logger
 # import picamera
 
 
-@contract(bgr='array[HxWx3](uint8)')
+@contract(bgr="array[HxWx3](uint8)")
 def jpg_from_bgr(bgr):
-    _retval, s = cv2.imencode('.jpg', bgr)
+    _retval, s = cv2.imencode(".jpg", bgr)
     return s.tostring()
 
 
 def png_from_bgr(bgr):
-    _retval, s = cv2.imencode('.png', bgr)
+    _retval, s = cv2.imencode(".png", bgr)
     return s.tostring()
 
 
-@deprecated('Use jpg_from_bgr()')
+@deprecated("Use jpg_from_bgr()")
 def jpg_from_image_cv(image):
     return jpg_from_bgr(image)
 
 
-@deprecated('Use bgr_from_jpg()')
+@deprecated("Use bgr_from_jpg()")
 def image_cv_from_jpg(data):
     return bgr_from_jpg(data)
 
 
-@contract(data=str, returns='array[HxWx3](uint8)')
+@contract(data=str, returns="array[HxWx3](uint8)")
 def bgr_from_png(data):
     return _bgr_from_file_data(data)
 
 
-@contract(data=str, returns='array[HxWx3](uint8)')
+@contract(data=str, returns="array[HxWx3](uint8)")
 def bgr_from_jpg(data):
     return _bgr_from_file_data(data)
 
 
-@contract(data=str, returns='array[HxWx3](uint8)')
+@contract(data=str, returns="array[HxWx3](uint8)")
 def _bgr_from_file_data(data):
     """ Returns an OpenCV BGR image from a string """
     s = np.fromstring(data, np.uint8)
     bgr = cv2.imdecode(s, cv2.IMREAD_COLOR)
     if bgr is None:
-        msg = 'Could not decode image (cv2.imdecode returned None). '
-        msg += 'This is usual a sign of data corruption.'
+        msg = "Could not decode image (cv2.imdecode returned None). "
+        msg += "This is usual a sign of data corruption."
         raise ValueError(msg)
     return bgr
 
 
-@contract(fn=str, returns='array[HxWx3](uint8)')
+@contract(fn=str, returns="array[HxWx3](uint8)")
 def bgr_from_jpg_fn(fn):
     """ Read a JPG BGR from a file """
     if not os.path.exists(fn):
@@ -73,7 +73,7 @@ def bgr_from_jpg_fn(fn):
         return bgr_from_jpg(f.read())
 
 
-@deprecated('Use bgr_from_jpg()')
+@deprecated("Use bgr_from_jpg()")
 def image_cv_from_jpg_fn(fn):
     return bgr_from_jpg_fn(fn)
 
@@ -91,6 +91,7 @@ def write_bgr_to_file_as_jpg(image_cv, fn):
 
 def bgr_from_raspistill(frame=None):
     import picamera
+
     with tmpfile(".jpg") as filename:
         if frame is not None:
             filename = frame
@@ -169,6 +170,7 @@ def image_clip_255(image_float):
     res = np.zeros((h, w, 3), dtype=np.uint8)
     np.clip(image_float, 0, 255, out=res)
     return res
+
 
 #
 # def imgmsg_from_cv2(image_cv):

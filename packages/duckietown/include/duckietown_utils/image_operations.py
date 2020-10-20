@@ -3,7 +3,7 @@ import numpy as np
 
 
 def gray2rgb(gray):
-    '''
+    """
         Converts a H x W grayscale into a H x W x 3 RGB image
         by replicating the gray channel over R,G,B.
 
@@ -12,10 +12,10 @@ def gray2rgb(gray):
 
         :return: A RGB image in shades of gray.
         :rtype: array[HxWx3](uint8)
-    '''
+    """
     #    assert_gray_image(gray, 'input to gray2rgb')
 
-    rgb = np.zeros((gray.shape[0], gray.shape[1], 3), dtype='uint8')
+    rgb = np.zeros((gray.shape[0], gray.shape[1], 3), dtype="uint8")
     for i in range(3):
         rgb[:, :, i] = gray
     return rgb

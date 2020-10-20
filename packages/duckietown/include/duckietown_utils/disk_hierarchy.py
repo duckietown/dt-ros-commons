@@ -11,6 +11,7 @@ from .yaml_pretty import yaml_load
 
 def mkdirs_thread_safe(dirname):
     from compmake.utils.filesystem_utils import mkdirs_thread_safe as md
+
     return md(dirname)
 
 
@@ -29,11 +30,11 @@ def write_to_dir(data, d):
         for k, v in list(data.items()):
             write_to_dir(v, os.path.join(d, k))
     elif isinstance(data, str):
-        with open(d, 'w') as f:
+        with open(d, "w") as f:
             f.write(data)
-        logger.info('Wrote %s' % d)
+        logger.info("Wrote %s" % d)
     else:
-        msg = 'Invalid type.'
+        msg = "Invalid type."
         raise_desc(ValueError, msg, data=data, d=d)
 
 
@@ -45,10 +46,12 @@ def get_dt_tmp_dir():
     if V in os.environ:
         return os.environ[V]
     from tempfile import gettempdir
+
     d0 = gettempdir()
     import getpass
+
     username = getpass.getuser()
-    d = os.path.join(d0, 'tmpdir-%s' % username)
+    d = os.path.join(d0, "tmpdir-%s" % username)
     if not os.path.exists(d):
         try:
             os.makedirs(d)
@@ -57,7 +60,7 @@ def get_dt_tmp_dir():
     return d
 
 
-def create_tmpdir(prefix='tmpdir'):
+def create_tmpdir(prefix="tmpdir"):
     base = get_dt_tmp_dir()
     if not os.path.exists(base):
         mkdirs_thread_safe(base)
@@ -68,7 +71,7 @@ def create_tmpdir(prefix='tmpdir'):
 
 @contextmanager
 def tmpfile(suffix):
-    ''' Yields the name of a temporary file '''
+    """ Yields the name of a temporary file """
     temp_file = NamedTemporaryFile(suffix=suffix)
     yield temp_file.name
     temp_file.close()

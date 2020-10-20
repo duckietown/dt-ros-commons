@@ -21,18 +21,19 @@ def write_rgb_as_jpg(rgb, filename):
     write_bgr_as_jpg(bgr_from_rgb(rgb), filename)
 
 
-@deprecated('use write_bgr_as_jpg')
+@deprecated("use write_bgr_as_jpg")
 def write_image_as_jpg(image, filename):
     return write_bgr_as_jpg(image, filename)
 
 
-@deprecated('use write_bgr_images_as_jpgs')
+@deprecated("use write_bgr_images_as_jpgs")
 def write_jpgs_to_dir(name2image, dirname):
     return write_bgr_images_as_jpgs(name2image, dirname)
 
 
-def write_bgr_images_as_jpgs(name2image, dirname, extra_string=None,
-                             bgcolor=ColorConstants.BGR_DUCKIETOWN_YELLOW):
+def write_bgr_images_as_jpgs(
+    name2image, dirname, extra_string=None, bgcolor=ColorConstants.BGR_DUCKIETOWN_YELLOW
+):
     """
         Write a set of images to a directory.
 
@@ -56,21 +57,21 @@ def write_bgr_images_as_jpgs(name2image, dirname, extra_string=None,
         res[filename] = add_header_to_bgr(image, s, bgcolor=bgcolor)
         images.append(res[filename])
 
-    res['all'] = make_images_grid(images, bgcolor=bgcolor, pad=20)
+    res["all"] = make_images_grid(images, bgcolor=bgcolor, pad=20)
 
     output = OrderedDict()
 
     for i, (filename, image) in enumerate(res.items()):
-        if filename == 'all':
-            basename = 'all'
+        if filename == "all":
+            basename = "all"
             if extra_string is not None:
                 max_height = 50
                 image = add_header_to_bgr(image, extra_string, max_height=max_height)
         else:
-            basename = ('step%02d-' % i) + filename
+            basename = ("step%02d-" % i) + filename
 
         if dirname is not None:
-            fn = os.path.join(dirname, basename + '.jpg')
+            fn = os.path.join(dirname, basename + ".jpg")
             write_bgr_to_file_as_jpg(image, fn)
 
         output[basename] = image

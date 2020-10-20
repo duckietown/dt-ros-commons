@@ -2,8 +2,8 @@
 import os
 
 __all__ = [
-    'd8n_make_sure_dir_exists',
-    'd8n_mkdirs_thread_safe',
+    "d8n_make_sure_dir_exists",
+    "d8n_mkdirs_thread_safe",
 ]
 
 
@@ -15,7 +15,7 @@ def d8n_make_sure_dir_exists(filename):
     dirname = os.path.dirname(filename)
 
     # dir == '' for current dir
-    if dirname != '' and not os.path.exists(dirname):
+    if dirname != "" and not os.path.exists(dirname):
         d8n_mkdirs_thread_safe(dirname)
 
 
@@ -26,11 +26,11 @@ def d8n_mkdirs_thread_safe(dst):
         This version is thread safe.
 
     """
-    if dst == '' or os.path.exists(dst):
+    if dst == "" or os.path.exists(dst):
         return
     head, _ = os.path.split(dst)
-    if os.sep == ':' and not ':' in head:
-        head += ':'
+    if os.sep == ":" and not ":" in head:
+        head += ":"
     d8n_mkdirs_thread_safe(head)
     try:
         mode = 511  # 0777 in octal

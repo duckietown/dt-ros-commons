@@ -1,5 +1,5 @@
 __all__ = [
-    'expand_environment',
+    "expand_environment",
 ]
 
 from .path_utils import expand_all

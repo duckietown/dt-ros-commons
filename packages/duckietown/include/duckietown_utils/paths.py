@@ -10,24 +10,24 @@ from .logging_logger import logger
 from .path_utils import expand_all
 
 __all__ = [
-    'get_duckietown_root',
-    'get_duckiefleet_root',
-    'get_duckietown_data_dirs',
-    'get_duckietown_local_log_downloads',
-    'get_machines_files_path',
-    'get_catkin_ws_src',
-    'get_list_of_packages_in_catkin_ws',
-    'is_ignored_by_catkin',
+    "get_duckietown_root",
+    "get_duckiefleet_root",
+    "get_duckietown_data_dirs",
+    "get_duckietown_local_log_downloads",
+    "get_machines_files_path",
+    "get_catkin_ws_src",
+    "get_list_of_packages_in_catkin_ws",
+    "is_ignored_by_catkin",
 ]
 
 
-@contract(returns='str')
+@contract(returns="str")
 def get_duckietown_root():
     """ Returns the path of DUCKIETOWN_ROOT and checks it exists """
     return _get_dir(DuckietownConstants.DUCKIETOWN_ROOT_variable)
 
 
-@contract(returns='str')
+@contract(returns="str")
 def get_duckiefleet_root():
     """
         Returns the path of DUCKIEFLEET_ROOT and checks it exists.
@@ -39,8 +39,8 @@ def get_duckiefleet_root():
     if vname in os.environ:
         return _get_dir(vname)
     else:
-        msg = 'The environment variable %s is not defined,' % vname
-        msg += ' so I will look for the default directories.'
+        msg = "The environment variable %s is not defined," % vname
+        msg += " so I will look for the default directories."
         logger.info(msg)
 
         defaults = DuckietownConstants.duckiefleet_root_defaults
@@ -50,21 +50,21 @@ def get_duckiefleet_root():
             if os.path.exists(d2):
                 found.append(d2)
         if not found:
-            msg = 'Could not find any of the default directories:'
+            msg = "Could not find any of the default directories:"
             for d in defaults:
-                msg += '\n- %s' % d
+                msg += "\n- %s" % d
             raise DTConfigException(msg)
 
         if len(found) > 1:
-            msg = 'I found more than one match for the default directories:'
+            msg = "I found more than one match for the default directories:"
             for d in found:
-                msg += '\n- %s' % d
+                msg += "\n- %s" % d
             raise DTConfigException(msg)
 
         return found[0]
 
 
-@contract(returns='list(str)')
+@contract(returns="list(str)")
 def get_duckietown_data_dirs():
     """
         Returns the paths in DUCKIETOWN_DATA and checks they exists.
@@ -74,38 +74,38 @@ def get_duckietown_data_dirs():
 
     v = DuckietownConstants.DUCKIETOWN_DATA_variable
     if not v in os.environ:
-        msg = 'No env variable %s found.' % v
+        msg = "No env variable %s found." % v
         raise DTConfigException(msg)
 
     s = expand_all(os.environ[v])
     dirs = []
-    for dirname in s.split(':'):
+    for dirname in s.split(":"):
         if not os.path.exists(dirname):
-            msg = 'Directory mentioned in %s not found: %s' % (v, dirname)
+            msg = "Directory mentioned in %s not found: %s" % (v, dirname)
             raise DTConfigException(msg)
         dirs.append(dirname)
 
     return dirs
 
 
-@contract(returns='str')
+@contract(returns="str")
 def get_duckietown_cache_dir():
     temp_dir = get_dt_tmp_dir()
-    dirname = os.path.join(temp_dir, 'caches')
+    dirname = os.path.join(temp_dir, "caches")
     return dirname
 
 
-@contract(returns='str')
+@contract(returns="str")
 def get_duckietown_local_log_downloads():
     """ Returns the directory to use for local downloads of logs"""
     temp_dir = get_dt_tmp_dir()
-    d = os.path.join(temp_dir, 'downloads')
+    d = os.path.join(temp_dir, "downloads")
     if not os.path.exists(d):
         os.makedirs(d)
     return d
 
 
-@contract(returns='str')
+@contract(returns="str")
 def get_machines_files_path():
     """ Gets the path to the machines file. It might not exist. """
     duckietown_root = get_duckietown_root()
@@ -113,15 +113,15 @@ def get_machines_files_path():
     return machines
 
 
-@contract(returns='str')
+@contract(returns="str")
 def get_catkin_ws_src():
     """ Returns the path to the src/ dir in catkin_ws """
     duckietown_root = get_duckietown_root()
-    machines = os.path.join(duckietown_root, 'catkin_ws/src')
+    machines = os.path.join(duckietown_root, "catkin_ws/src")
     return machines
 
 
-@contract(returns='dict(str:str)')
+@contract(returns="dict(str:str)")
 def get_list_of_packages_in_catkin_ws():
     """
         Returns an ordered dictionary <package name>: <package dir>
@@ -130,7 +130,7 @@ def get_list_of_packages_in_catkin_ws():
         Raises DTConfigException if $DUCKIETOWN_ROOT is not set.
     """
     src = get_catkin_ws_src()
-    package_files = locate_files(src, 'package.xml')
+    package_files = locate_files(src, "package.xml")
     results = {}
     for p in package_files:
         dn = os.path.dirname(p)
@@ -141,17 +141,17 @@ def get_list_of_packages_in_catkin_ws():
             # logger.debug('Not considering %s' % dn)
             pass
     # We expect at least these two packages
-    if not 'duckietown' in results:
-        raise ValueError('Could not find the duckietown ROS package.')
-    if not 'what_the_duck' in results:
-        raise ValueError('Could not find what_the_duck')
+    if not "duckietown" in results:
+        raise ValueError("Could not find the duckietown ROS package.")
+    if not "what_the_duck" in results:
+        raise ValueError("Could not find what_the_duck")
     return results
 
 
 @contract(returns=bool)
 def is_ignored_by_catkin(dn):
     """ Returns true if the directory is inside one with CATKIN_IGNORE """
-    while dn != '/':
+    while dn != "/":
         i = os.path.join(dn, "CATKIN_IGNORE")
         if os.path.exists(i):
             return True
@@ -168,13 +168,13 @@ def _get_dir(variable_name):
         variable is not set.
     """
     if not variable_name in os.environ:
-        msg = 'Environment variable %r not defined.' % variable_name
+        msg = "Environment variable %r not defined." % variable_name
         raise DTConfigException(msg)
 
     fn = expand_all(os.environ[variable_name])
 
     if not os.path.exists(fn):
-        msg = 'Could not get %s: dir does not exist: %s' % (variable_name, fn)
+        msg = "Could not get %s: dir does not exist: %s" % (variable_name, fn)
         raise DTConfigException(msg)
 
     return fn

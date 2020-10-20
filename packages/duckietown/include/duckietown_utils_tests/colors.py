@@ -5,9 +5,9 @@ import duckietown_utils as dtu
 
 @dtu.unit_test
 def test_color_sizes():
-    s1 = 'one'
+    s1 = "one"
 
-    s2 = colored(s1, 'magenta')
+    s2 = colored(s1, "magenta")
 
     #     print(s1.__repr__())
     #     print(s2.__repr__())
@@ -23,7 +23,7 @@ def get_test_table():
     for i in range(3):
         row = []
         for j in range(5):
-            row.append('*' * i * j)
+            row.append("*" * i * j)
         table.append(row)
     return table
 
@@ -43,5 +43,5 @@ def test_table():
     assert r1 == r2e
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     dtu.run_tests_for_this_module()

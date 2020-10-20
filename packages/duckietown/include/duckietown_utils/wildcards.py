@@ -1,6 +1,6 @@
 from .memoization import memoize_simple
 
-__all__ = ['expand_string', 'get_wildcard_matches']
+__all__ = ["expand_string", "get_wildcard_matches"]
 
 
 def flatten(seq):
@@ -16,10 +16,10 @@ def expand_string(x, options):
         return flatten(expand_string(y, options) for y in x)
     elif isinstance(x, str):
         x = x.strip()
-        if ',' in x:
-            splat = [_ for _ in x.split(',') if _]  # remove empty
+        if "," in x:
+            splat = [_ for _ in x.split(",") if _]  # remove empty
             return flatten(expand_string(y, options) for y in splat)
-        elif '*' in x:
+        elif "*" in x:
             xx = expand_wildcard(x, options)
             expanded = list(xx)
             return expanded
@@ -33,44 +33,44 @@ def expand_string(x, options):
 def wildcard_to_regexp(arg):
     """ Returns a regular expression from a shell wildcard expression. """
     import re
-    return re.compile('\A' + arg.replace('*', '.*') + '\Z')
+
+    return re.compile("\A" + arg.replace("*", ".*") + "\Z")
 
 
 def has_wildcard(s):
-    return s.find('*') > -1
+    return s.find("*") > -1
 
 
 # @contract(wildcard='str', universe='list(str)')
 def expand_wildcard(wildcard, universe):
-    '''
+    """
         Expands a wildcard expression against the given list.
         Raises ValueError if none found.
 
         :param wildcard: string with '*'
         :param universe: a list of strings
-    '''
+    """
     if not has_wildcard(wildcard):
-        msg = 'No wildcards in %r.' % wildcard
+        msg = "No wildcards in %r." % wildcard
         raise ValueError(msg)
 
     matches = list(get_wildcard_matches(wildcard, universe))
 
     if not matches:
-        msg = ('Could not find matches for pattern %r in %s.' %
-               (wildcard, universe))
+        msg = "Could not find matches for pattern %r in %s." % (wildcard, universe)
         raise ValueError(msg)
 
     return matches
 
 
 def get_wildcard_matches(wildcard, universe):
-    '''
+    """
         Expands a wildcard expression against the given list.
         Yields a sequence of strings.
 
         :param wildcard: string with '*'
         :param universe: a list of strings
-    '''
+    """
     regexp = wildcard_to_regexp(wildcard)
     for x in universe:
         if regexp.match(x):

@@ -10,6 +10,7 @@ from .text_utils import indent
 
 def _get_str(x, informal):
     from contracts.interface import describe_value_multiline
+
     if informal:
         s = str(x)
     else:
@@ -25,11 +26,11 @@ def format_list_long(l, informal=False):
     """
     res = ""
     for i, value in enumerate(l):
-        prefix = '- '
+        prefix = "- "
         if i > 0:
-            res += '\n'
+            res += "\n"
         s = _get_str(value, informal)
-        res += indent(s, ' ', first=prefix)
+        res += indent(s, " ", first=prefix)
     return res
 
 
@@ -43,20 +44,20 @@ def format_obs(d, informal=False):
         maxlen = max(len(name), maxlen)
 
     def pad(pre):
-        return ' ' * (maxlen - len(pre)) + pre
+        return " " * (maxlen - len(pre)) + pre
 
-    res = ''
+    res = ""
 
     S = sorted(d)
     for i, name in enumerate(S):
         value = d[name]
-        prefix = pad('%s: ' % name)
+        prefix = pad("%s: " % name)
         if i > 0:
-            res += '\n'
+            res += "\n"
 
         s = _get_str(value, informal)
 
-        res += indent(s, ' ', first=prefix)
+        res += indent(s, " ", first=prefix)
 
     return res
 
@@ -86,7 +87,7 @@ def raise_wrapped_make(etype, e, msg, compact=False, **kwargs):
     assert isinstance(msg, str), type(msg)
     s = msg
     if kwargs:
-        s += '\n' + format_obs(kwargs)
+        s += "\n" + format_obs(kwargs)
 
     if sys.version_info[0] >= 3:
         es = str(e)
@@ -95,9 +96,10 @@ def raise_wrapped_make(etype, e, msg, compact=False, **kwargs):
             es = str(e)
         else:
             import traceback
+
             es = traceback.format_exc(e)
 
-    s += '\n' + indent(es.strip(), '| ')
+    s += "\n" + indent(es.strip(), "| ")
 
     return etype(s)
 
@@ -139,12 +141,11 @@ def raise_x_not_found(what, x, iterable, exception=ValueError):
 
 
 def x_not_found(what, x, iterable):
-    ''' Shortcut for creating pretty error messages. '''
+    """ Shortcut for creating pretty error messages. """
     # TODO: add guess in case of typos
     options = aslist(iterable)
 
-    return ('Could not find %s %r. I know the elements: %s.' %
-            (what, x, options))
+    return "Could not find %s %r. I know the elements: %s." % (what, x, options)
 
 
 def check_is_in(what, x, iterable, exception=ValueError):
@@ -154,16 +155,16 @@ def check_is_in(what, x, iterable, exception=ValueError):
 
 def check_isinstance(ob, expected, **kwargs):
     if not isinstance(ob, expected):
-        kwargs['object'] = ob
+        kwargs["object"] = ob
         raise_type_mismatch(ob, expected, **kwargs)
 
 
 def raise_type_mismatch(ob, expected, **kwargs):
     """ Raises an exception concerning ob having the wrong type. """
-    e = 'Object not of expected type:'
-    e += '\n  expected: %s' % str(expected)
-    e += '\n  obtained: %s' % str(type(ob))
-    e += '\n' + indent(format_obs(kwargs), ' ')
+    e = "Object not of expected type:"
+    e += "\n  expected: %s" % str(expected)
+    e += "\n  obtained: %s" % str(type(ob))
+    e += "\n" + indent(format_obs(kwargs), " ")
     raise ValueError(e)
 
 
@@ -175,12 +176,12 @@ def describe_type(x):
         from types import ClassType
 
     if inPy2 and isinstance(x, ClassType):
-        class_name = '(old-style class) %s' % x
+        class_name = "(old-style class) %s" % x
     else:
-        if hasattr(x, '__class__'):
+        if hasattr(x, "__class__"):
             c = x.__class__
-            if hasattr(x, '__name__'):
-                class_name = '%s' % c.__name__
+            if hasattr(x, "__name__"):
+                class_name = "%s" % c.__name__
             else:
                 class_name = str(c)
         else:
@@ -194,14 +195,14 @@ def describe_value(x, clip=80):
     """ Describes an object, for use in the error messages.
         Short description, no multiline.
     """
-    if hasattr(x, 'shape') and hasattr(x, 'dtype'):
-        shape_desc = 'x'.join(str(i) for i in x.shape)
-        desc = 'array[%r](%s) ' % (shape_desc, x.dtype)
+    if hasattr(x, "shape") and hasattr(x, "dtype"):
+        shape_desc = "x".join(str(i) for i in x.shape)
+        desc = "array[%r](%s) " % (shape_desc, x.dtype)
         final = desc + clipped_repr(x, clip - len(desc))
         return remove_newlines(final)
     else:
         class_name = describe_type(x)
-        desc = 'Instance of %s: ' % class_name
+        desc = "Instance of %s: " % class_name
         final = desc + clipped_repr(x, clip - len(desc))
         return remove_newlines(final)
 
@@ -209,7 +210,7 @@ def describe_value(x, clip=80):
 def clipped_repr(x, clip):
     s = "{0!r}".format(x)
     if len(s) > clip:
-        clip_tag = '... [clip]'
+        clip_tag = "... [clip]"
         cut = clip - len(clip_tag)
         s = "%s%s" % (s[:cut], clip_tag)
     return s
@@ -219,4 +220,4 @@ def clipped_repr(x, clip):
 
 
 def remove_newlines(s):
-    return s.replace('\n', ' ')
+    return s.replace("\n", " ")

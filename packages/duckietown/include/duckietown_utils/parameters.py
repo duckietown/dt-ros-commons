@@ -1,7 +1,7 @@
 import copy
 
 __all__ = [
-    'Configurable',
+    "Configurable",
 ]
 
 
@@ -13,7 +13,7 @@ class Configurable(object):
         configuration0 = copy.deepcopy(configuration0)
 
         if not isinstance(configuration0, dict):
-            msg = 'Expecting a dict, obtained %r' % configuration0
+            msg = "Expecting a dict, obtained %r" % configuration0
             raise ValueError(msg)
         configuration = {}
         configuration.update(configuration0)
@@ -25,11 +25,10 @@ class Configurable(object):
         extra = set(given) - set(required)
         missing = set(required) - set(given)
         if extra or missing:
-            msg = ('Error while loading configuration for %r from %r.' %
-                   (self, configuration))
-            msg += '\n'
-            msg += 'Extra parameters: %r\n' % extra
-            msg += 'Missing parameters: %r\n' % missing
+            msg = "Error while loading configuration for %r from %r." % (self, configuration)
+            msg += "\n"
+            msg += "Extra parameters: %r\n" % extra
+            msg += "Missing parameters: %r\n" % missing
             raise ValueError(msg)
 
         assert set(given) == set(required)
@@ -38,6 +37,7 @@ class Configurable(object):
             # if the list is 3 numbers, we convert to array
             if isinstance(value, list) and len(value) == 3:
                 import numpy as np
+
                 value = np.array(value)
             configuration[p] = value
 

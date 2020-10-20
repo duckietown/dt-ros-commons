@@ -5,7 +5,6 @@ from scipy import signal
 
 
 class RandomMapGenerator(object):
-
     def __init__(self, size=(5, 6)):
         self.initialize_thresh = 0.5
         self.size = size
@@ -19,8 +18,7 @@ class RandomMapGenerator(object):
 
     def apply_rules(self):
         # pad the map with -1's around the outside (i.e. a row of non-road around the outside)
-        map_padded = np.lib.pad(self.map, ((1, 1), (1, 1)),
-                                'constant', constant_values=((-1, -1), (-1, -1)))
+        map_padded = np.lib.pad(self.map, ((1, 1), (1, 1)), "constant", constant_values=((-1, -1), (-1, -1)))
         # TODO read from yaml and put the masks into a loop
         mask = np.array([[1, 1], [1, 1]])
         if not self.check_mask(mask, map_padded):
@@ -43,7 +41,7 @@ class RandomMapGenerator(object):
         # the maximum correlation value will equal the number of non-zero vals
         check_val = np.count_nonzero(mask)
         masked = signal.correlate(map_padded, mask)
-        if (np.amax(masked) == check_val):
+        if np.amax(masked) == check_val:
             return False
         return True
 
@@ -53,7 +51,7 @@ class RandomMapGenerator(object):
             if self.apply_rules():
                 break
 
-        return self.map;
+        return self.map
 
 
 def main():

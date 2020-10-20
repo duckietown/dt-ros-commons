@@ -8,12 +8,12 @@ from .logging_logger import logger
 from .yaml_pretty import yaml_load_plain
 
 __all__ = [
-    'rosbag_info',
-    'rosbag_info_cached',
-    'd8n_get_all_images_topic_bag',
-    'd8n_get_all_images_topic',
-    'which_robot',
-    'get_image_topic',
+    "rosbag_info",
+    "rosbag_info_cached",
+    "d8n_get_all_images_topic_bag",
+    "d8n_get_all_images_topic",
+    "which_robot",
+    "get_image_topic",
 ]
 
 
@@ -22,15 +22,14 @@ def rosbag_info_cached(filename):
         return rosbag_info(filename)
 
     basename = os.path.basename(filename)
-    cache_name = 'rosbag_info/' + basename
+    cache_name = "rosbag_info/" + basename
     return get_cached(cache_name, f, quiet=True)
 
 
 def rosbag_info(bag):
-    msg = 'rosbag_info %s' % bag
+    msg = "rosbag_info %s" % bag
     logger.debug(msg)
-    stdout = subprocess.Popen(['rosbag', 'info', '--yaml', bag],
-                              stdout=subprocess.PIPE).communicate()[0]
+    stdout = subprocess.Popen(["rosbag", "info", "--yaml", bag], stdout=subprocess.PIPE).communicate()[0]
     #     try:
     info_dict = yaml_load_plain(stdout)
     #     except:
@@ -40,7 +39,7 @@ def rosbag_info(bag):
 
 
 def which_robot(bag):
-    pattern = r'/(\w+)/camera_node/image/compressed'
+    pattern = r"/(\w+)/camera_node/image/compressed"
 
     topics = list(bag.get_type_and_topic_info()[1].keys())
 
@@ -49,7 +48,7 @@ def which_robot(bag):
         if m:
             vehicle = m.group(1)
             return vehicle
-    msg = 'Could not find a topic matching %s' % pattern
+    msg = "Could not find a topic matching %s" % pattern
     raise ValueError(msg)
 
 
@@ -57,9 +56,9 @@ def get_image_topic(bag):
     """ Returns the name of the topic for the main camera """
     topics = list(bag.get_type_and_topic_info()[1].keys())
     for t in topics:
-        if 'camera_node/image/compressed' in t:
+        if "camera_node/image/compressed" in t:
             return t
-    msg = 'Cannot find the topic: %s' % topics
+    msg = "Cannot find the topic: %s" % topics
     raise ValueError(msg)
 
 
@@ -79,8 +78,8 @@ def d8n_get_all_images_topic_bag(bag, min_messages=0):
     """
     tat = bag.get_type_and_topic_info()
     consider_images = [
-        'sensor_msgs/Image',
-        'sensor_msgs/CompressedImage',
+        "sensor_msgs/Image",
+        "sensor_msgs/CompressedImage",
     ]
     all_types = set()
     found = []
@@ -92,8 +91,8 @@ def d8n_get_all_images_topic_bag(bag, min_messages=0):
         if msg_type in consider_images:
 
             # quick fix: ignore image_raw if we have image_compressed version
-            if 'raw' in t:
-                other = t.replace('raw', 'compressed')
+            if "raw" in t:
+                other = t.replace("raw", "compressed")
 
                 if other in topics:
                     continue

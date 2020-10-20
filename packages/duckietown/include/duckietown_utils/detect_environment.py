@@ -1,15 +1,16 @@
 __all__ = [
-    'on_duckiebot',
-    'on_laptop',
-    'on_circle',
+    "on_duckiebot",
+    "on_laptop",
+    "on_circle",
 ]
 
 
 def on_duckiebot():
     """ True if we are on a Duckiebot. """
     import platform
+
     proc = platform.processor()
-    on_the_duckiebot = not ('x86' in proc)
+    on_the_duckiebot = not ("x86" in proc)
     # armv7l
     return on_the_duckiebot
 
@@ -22,4 +23,5 @@ def on_laptop():
 def on_circle():
     """ True if we are running tests on the cloud. """
     import os
-    return 'CIRCLECI' in os.environ
+
+    return "CIRCLECI" in os.environ

@@ -4,29 +4,31 @@ from contextlib import contextmanager
 from .constants import DuckietownConstants
 
 __all__ = [
-    'rospy_timeit_clock',
-    'rospy_timeit_wall',
-    'timeit_clock',
-    'timeit_wall',
+    "rospy_timeit_clock",
+    "rospy_timeit_wall",
+    "timeit_clock",
+    "timeit_wall",
 ]
 
 
 @contextmanager
 def rospy_timeit_clock(s):
     import rospy
+
     t0 = time.clock()
     yield
     delta = time.clock() - t0
-    rospy.loginfo('%10d ms: %s' % (1000 * delta, s))
+    rospy.loginfo("%10d ms: %s" % (1000 * delta, s))
 
 
 @contextmanager
 def rospy_timeit_wall(s):
     import rospy
+
     t0 = time.time()
     yield
     delta = time.time() - t0
-    rospy.loginfo('%10d ms: %s' % (1000 * delta, s))
+    rospy.loginfo("%10d ms: %s" % (1000 * delta, s))
 
 
 class Stack(object):
@@ -46,8 +48,8 @@ def timeit_generic(desc, minimum, time_function):
         if delta < minimum:
             return
     if DuckietownConstants.show_timeit_benchmarks or (minimum is not None):
-        pre = '   ' * len(Stack.stack)
-        msg = 'timeit_clock: %s %6.2f ms  for %s' % (pre, delta * 1000, desc)
+        pre = "   " * len(Stack.stack)
+        msg = "timeit_clock: %s %6.2f ms  for %s" % (pre, delta * 1000, desc)
         #        t0 = time_function()
         print(msg)
 

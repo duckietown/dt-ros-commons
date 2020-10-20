@@ -70,17 +70,17 @@ from .yaml_wrap import *
 try:
     import frozendict  # @UnusedImport @UnresolvedImport
 except:
-    msg = 'frozendict not installed.'
-    msg += '\n\nTry the following:'
-    msg += '\n\n     sudo apt install python-frozendict'
+    msg = "frozendict not installed."
+    msg += "\n\nTry the following:"
+    msg += "\n\n     sudo apt install python-frozendict"
     raise Exception(msg)
 
 try:
     from ruamel import yaml  # @UnusedImport
 except:
-    msg = 'ruamel.yaml not installed.'
-    msg += '\n\nTry the following:'
-    msg += '\n\n     sudo apt install python-ruamel.yaml'
+    msg = "ruamel.yaml not installed."
+    msg += "\n\nTry the following:"
+    msg += "\n\n     sudo apt install python-ruamel.yaml"
     raise Exception(msg)
 
 # this is from the exercises
@@ -96,7 +96,7 @@ if False:
     __all__ = []
     for c in list(locals()):
         v = eval(c)
-        if hasattr(v, '__module__'):
-            if v.__module__.startswith('duckietown_utils'):
-                v.__module__ = 'duckietown_utils'
+        if hasattr(v, "__module__"):
+            if v.__module__.startswith("duckietown_utils"):
+                v.__module__ = "duckietown_utils"
                 __all__.append(c)

@@ -63,13 +63,12 @@ def d8_image_resize_fit_in_rect(img, shape, bgcolor=(128, 128, 128)):
     pad1 = (shape[1] - img.shape[1]) / 2
 
     for i in (0, 1, 2):
-        res[pad0:pad0 + img.shape[0],
-        pad1:pad1 + img.shape[1], i] = img[:, :, i]
+        res[pad0 : pad0 + img.shape[0], pad1 : pad1 + img.shape[1], i] = img[:, :, i]
 
     return res
 
 
-@contract(image_dict='dict(str:array)', returns='dict(str:array)')
+@contract(image_dict="dict(str:array)", returns="dict(str:array)")
 def resize_small_images(image_dict):
     check_isinstance(image_dict, dict)
     max_H, max_W = 0, 0
@@ -94,7 +93,7 @@ def resize_small_images(image_dict):
     return d
 
 
-@contract(image_dict='dict(str:array)', returns='dict(str:array)')
+@contract(image_dict="dict(str:array)", returns="dict(str:array)")
 def resize_images_to_fit_in_rect(image_dict, shape, bgcolor):
     check_isinstance(image_dict, dict)
 

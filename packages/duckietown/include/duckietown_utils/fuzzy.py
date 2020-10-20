@@ -24,8 +24,8 @@ class Spec(object, metaclass=ABCMeta):
     def __str__(self):
         mine = type(self).__name__
 
-        c = [indent(str(_), '', ' - ') for _ in self.children]
-        return indent("\n".join(c), '', mine + '')
+        c = [indent(str(_), "", " - ") for _ in self.children]
+        return indent("\n".join(c), "", mine + "")
 
     @abstractmethod
     def match(self, k):
@@ -53,6 +53,7 @@ class FromFilename(Spec):
 
     def match_dict(self, _):
         from easy_logs.logs_db import physical_log_from_filename, get_all_resources
+
         all_resources = get_all_resources()
 
         l = physical_log_from_filename(self.filename, all_resources.basename2filename)
@@ -62,7 +63,6 @@ class FromFilename(Spec):
 
 
 class Or(Spec):
-
     def match(self, x):
         for option in self.children:
             if option.match(x):
@@ -80,7 +80,6 @@ class Or(Spec):
 
 
 class And(Spec):
-
     def match(self, x):
         for option in self.children:
             if not option.match(x):
@@ -102,7 +101,6 @@ class And(Spec):
 
 
 class OnlyFirst(Spec):
-
     def __init__(self, spec):
         Spec.__init__(self, [spec])
 
@@ -120,7 +118,6 @@ class OnlyFirst(Spec):
 
 
 class Slice(Spec):
-
     def __init__(self, spec, indices):
         Spec.__init__(self, [spec])
         self.indices = indices
@@ -129,8 +126,8 @@ class Slice(Spec):
         return self.children[0].match(x)  # XXX
 
     def __str__(self):
-        s = 'Slice   [%s,%s,%s]' % self.indices
-        s += '\n' + indent(str(self.children[0]), '  ')
+        s = "Slice   [%s,%s,%s]" % self.indices
+        s += "\n" + indent(str(self.children[0]), "  ")
         return s
 
     def match_dict(self, seq):
@@ -155,8 +152,8 @@ class Shuffle(Spec):
         raise NotImplementedError()
 
     def __str__(self):
-        s = 'Shuffle'
-        s += '\n' + indent(str(self.children[0]), '  ')
+        s = "Shuffle"
+        s += "\n" + indent(str(self.children[0]), "  ")
         return s
 
     def match_dict(self, seq):
@@ -170,7 +167,6 @@ class Shuffle(Spec):
 
 
 class Sort(Spec):
-
     @contract(key=str)
     def __init__(self, spec, key):
         Spec.__init__(self, [spec])
@@ -180,8 +176,8 @@ class Sort(Spec):
         raise NotImplementedError()
 
     def __str__(self):
-        s = 'Sort by %s' % self.key
-        s += '\n' + indent(str(self.children[0]), '  ')
+        s = "Sort by %s" % self.key
+        s += "\n" + indent(str(self.children[0]), "  ")
         return s
 
     def match_dict(self, seq):
@@ -197,7 +193,6 @@ class Sort(Spec):
 
 
 class Reverse(Spec):
-
     def __init__(self, spec):
         Spec.__init__(self, [spec])
 
@@ -205,8 +200,8 @@ class Reverse(Spec):
         raise NotImplementedError()
 
     def __str__(self):
-        s = 'Reverse'
-        s += '\n' + indent(str(self.children[0]), '  ')
+        s = "Reverse"
+        s += "\n" + indent(str(self.children[0]), "  ")
         return s
 
     def match_dict(self, seq):
@@ -220,15 +215,14 @@ class Reverse(Spec):
 def _get_tag(x, tagname):
     if isinstance(x, dict):
         if not tagname in x:
-            msg = 'Cannot find %r in keys %r' % (tagname, list(x.keys()))
+            msg = "Cannot find %r in keys %r" % (tagname, list(x.keys()))
             raise InvalidQueryForUniverse(msg)
         return x[tagname]
     else:
         if not hasattr(x, tagname):
-            msg = ('The object of type %s does not have attribute "%s".' %
-                   (type(x).__name__, tagname))
+            msg = 'The object of type %s does not have attribute "%s".' % (type(x).__name__, tagname)
             try:
-                msg += '\nThe available attributes are:\n  %s' % sorted(x.__dict__.keys())
+                msg += "\nThe available attributes are:\n  %s" % sorted(x.__dict__.keys())
             except:
                 pass
             raise InvalidQueryForUniverse(msg)
@@ -236,7 +230,6 @@ def _get_tag(x, tagname):
 
 
 class Index(Spec):
-
     def __init__(self, spec, index):
         Spec.__init__(self, [spec])
         self.index = index
@@ -245,8 +238,8 @@ class Index(Spec):
         return self.children[0].match(x)  # XXX
 
     def __str__(self):
-        s = 'index  %s' % self.index
-        s += '\n' + indent(str(self.children[0]), '  ')
+        s = "index  %s" % self.index
+        s += "\n" + indent(str(self.children[0]), "  ")
         return s
 
     def match_dict(self, seq):
@@ -259,31 +252,28 @@ class Index(Spec):
 
 
 class ByTag(Spec):
-
     def __init__(self, tagname, spec):
-        if '*' in tagname:
-            msg = 'Invalid tag %s.' % tagname.__repr__()
+        if "*" in tagname:
+            msg = "Invalid tag %s." % tagname.__repr__()
             raise ValueError(msg)
         Spec.__init__(self, [])
         self.tagname = tagname
         self.spec = spec
 
     def __str__(self):
-        return indent(self.spec.__str__(), '',
-                      'attribute %s satisfies \n  ' % self.tagname)
+        return indent(self.spec.__str__(), "", "attribute %s satisfies \n  " % self.tagname)
 
     def match(self, x):
         if isinstance(x, dict):
             if not self.tagname in x:
-                msg = 'Cannot find %r in keys %r' % (self.tagname, list(x.keys()))
+                msg = "Cannot find %r in keys %r" % (self.tagname, list(x.keys()))
                 raise InvalidQueryForUniverse(msg)
             val = x[self.tagname]
         else:
             if not hasattr(x, self.tagname):
-                msg = ('The object of type %s does not have attribute "%s".' %
-                       (type(x).__name__, self.tagname))
+                msg = 'The object of type %s does not have attribute "%s".' % (type(x).__name__, self.tagname)
                 try:
-                    msg += '\nThe available attributes are:\n  %s' % sorted(x.__dict__.keys())
+                    msg += "\nThe available attributes are:\n  %s" % sorted(x.__dict__.keys())
                 except:
                     pass
                 raise InvalidQueryForUniverse(msg)
@@ -300,37 +290,34 @@ class ByTag(Spec):
 
 
 class Constant(Spec):
-
     def __init__(self, s):
         self.s = yaml_load(s)
 
     def __str__(self):
-        return 'is equal to %r' % self.s
+        return "is equal to %r" % self.s
 
     def match(self, x):
         return self.s == x
 
 
 class MatchAll(Spec):
-
     def __init__(self):
         pass
 
     def __str__(self):
-        return '(always matches)'
+        return "(always matches)"
 
     def match(self, _):
         return True
 
 
 class Wildcard(Spec):
-
     def __init__(self, pattern):
         self.pattern = pattern
         self.regexp = wildcard_to_regexp(pattern)
 
     def __str__(self):
-        return 'matches %s' % self.pattern
+        return "matches %s" % self.pattern
 
     def match(self, x):
         return isinstance(x, str) and self.regexp.match(x)
@@ -340,17 +327,16 @@ def value_as_float(x):
     try:
         return float(x)
     except Exception as e:
-        logger.error('Cannot convert to float %r: %s' % (x, e))
+        logger.error("Cannot convert to float %r: %s" % (x, e))
         raise
 
 
 class LT(Spec):
-
     def __init__(self, value):
         self.value = value
 
     def __str__(self):
-        return 'less than %s' % self.value
+        return "less than %s" % self.value
 
     def match(self, x):
         if x is None:
@@ -360,24 +346,22 @@ class LT(Spec):
 
 
 class Contains(Spec):
-
     def __init__(self, value):
         self.value = value
 
     def __str__(self):
-        return 'contains %s' % self.value
+        return "contains %s" % self.value
 
     def match(self, x):
         return self.value in x
 
 
 class GT(Spec):
-
     def __init__(self, value):
         self.value = value
 
     def __str__(self):
-        return 'greater than %s' % self.value
+        return "greater than %s" % self.value
 
     def match(self, x):
         if x is None:
@@ -387,22 +371,25 @@ class GT(Spec):
 
 
 def filter_index_simple(m, spec):
-    a = int(m.group('a'))
+    a = int(m.group("a"))
     return Index(spec, a)
 
 
 def filter_index(m, spec):
-    a = m.group('a')
-    b = m.group('b')
-    c = m.group('c')
-    if a is not None: a = int(a)
-    if b is not None: b = int(b)
-    if c is not None: c = int(c)
+    a = m.group("a")
+    b = m.group("b")
+    c = m.group("c")
+    if a is not None:
+        a = int(a)
+    if b is not None:
+        b = int(b)
+    if c is not None:
+        c = int(c)
     return Slice(spec, (a, b, c))
 
 
 def filter_sort(m, spec):
-    key = m.group('key')
+    key = m.group("key")
     return Sort(spec, key)
 
 
@@ -418,16 +405,18 @@ def filter_shuffle(_, spec):
     return Shuffle(spec)
 
 
-slice_regexp = r'\[(?P<a>-?\d+)?:(?P<b>-?\d+)?(:(?P<c>-?\d+)?)?\]'
+slice_regexp = r"\[(?P<a>-?\d+)?:(?P<b>-?\d+)?(:(?P<c>-?\d+)?)?\]"
 
-filters0 = OrderedDict([
-    ('\[(?P<a>\d+)\]', filter_index_simple),
-    (slice_regexp, filter_index),
-    ('first', filter_first),
-    ('shuffle', filter_shuffle),
-    ('reverse', filter_reverse),
-    ('sort\((?P<key>\w+)\)', filter_sort)
-])
+filters0 = OrderedDict(
+    [
+        ("\[(?P<a>\d+)\]", filter_index_simple),
+        (slice_regexp, filter_index),
+        ("first", filter_first),
+        ("shuffle", filter_shuffle),
+        ("reverse", filter_reverse),
+        ("sort\((?P<key>\w+)\)", filter_sort),
+    ]
+)
 
 
 @contract(s=str, returns=Spec)
@@ -440,18 +429,18 @@ def parse_match_spec(s, filters=None):
     if filters is None:
         filters = filters0
 
-    if s == 'all' or s == '*' or s == '':
+    if s == "all" or s == "*" or s == "":
         return MatchAll()
 
-    if s.endswith('.bag'):
+    if s.endswith(".bag"):
         return FromFilename(s)
 
     if not s:
-        msg = 'Cannot parse empty string.'
+        msg = "Cannot parse empty string."
         raise ValueError(msg)
 
     for k, F in list(filters.items()):
-        rs = '(.*)/' + k + '$'
+        rs = "(.*)/" + k + "$"
         reg = re.compile(rs)
 
         m = reg.search(s)
@@ -463,38 +452,38 @@ def parse_match_spec(s, filters=None):
             try:
                 return F(m, rest_p)
             except TypeError as e:
-                msg = 'Problem with %r, calling %s' % (s, F.__name__)
+                msg = "Problem with %r, calling %s" % (s, F.__name__)
                 raise_wrapped(TypeError, e, msg)
-    if '/' in s:
-        msg = 'I do not know the tag in the string %r.' % s
+    if "/" in s:
+        msg = "I do not know the tag in the string %r." % s
         raise InvalidQueryForUniverse(msg)
 
-    if '+' in s:
-        tokens = s.split('+')
+    if "+" in s:
+        tokens = s.split("+")
         return Or(list(map(rec, tokens)))
-    if ',' in s:
-        tokens = s.split(',')
+    if "," in s:
+        tokens = s.split(",")
         return And(list(map(rec, tokens)))
 
-    if s.startswith('contains:'):
-        rest = remove_prefix(s, 'contains:')
+    if s.startswith("contains:"):
+        rest = remove_prefix(s, "contains:")
         return Contains(rest)
 
-    if ':' in s:
-        i = s.index(':')
+    if ":" in s:
+        i = s.index(":")
         tagname = s[:i]
-        tagvalue = s[i + 1:]
+        tagvalue = s[i + 1 :]
         return ByTag(tagname, rec(tagvalue))
 
-    if s.startswith('<'):
+    if s.startswith("<"):
         value = float(s[1:])
         return LT(value)
 
-    if s.startswith('>'):
+    if s.startswith(">"):
         value = float(s[1:])
         return GT(value)
 
-    if '*' in s:
+    if "*" in s:
         return Wildcard(s)
 
     return Constant(s)
@@ -507,7 +496,7 @@ def fuzzy_match(query, stuff, filters=None, raise_if_no_matches=False):
         logs: an OrderedDict str -> object
     """
     if not isinstance(stuff, dict):
-        msg = 'Expectd an OrderedDict, got %s.' % describe_type(stuff)
+        msg = "Expectd an OrderedDict, got %s." % describe_type(stuff)
         raise ValueError(msg)
     check_isinstance(stuff, dict)
     check_isinstance(query, str)
@@ -516,13 +505,13 @@ def fuzzy_match(query, stuff, filters=None, raise_if_no_matches=False):
     try:
         result = spec.match_dict(stuff)
     except InvalidQueryForUniverse as e:
-        msg = 'The query does not apply to this type of objects.'
+        msg = "The query does not apply to this type of objects."
         raise_wrapped(DTUserError, e, msg, compact=True)
 
     if not result:
         if raise_if_no_matches:
-            msg = 'Could not find any match in a universe of %d elements.' % len(stuff)
-            msg += '\nThe query was interpreted as follows:'
-            msg += '\n\n' + indent(spec, '', '        %s        means       ' % query)
+            msg = "Could not find any match in a universe of %d elements." % len(stuff)
+            msg += "\nThe query was interpreted as follows:"
+            msg += "\n\n" + indent(spec, "", "        %s        means       " % query)
             raise DTNoMatches(msg)
     return result

@@ -1,7 +1,7 @@
 __all__ = [
-    'bgr_color_from_string',
-    'ColorConstants',
-    'matplotlib_01_from_rgb',
+    "bgr_color_from_string",
+    "ColorConstants",
+    "matplotlib_01_from_rgb",
 ]
 
 
@@ -11,13 +11,13 @@ def rgb_color_from_bgr_color(c):
 
 
 class ColorConstants(object):
-    STR_WHITE = 'white'
-    STR_YELLOW = 'yellow'
-    STR_RED = 'red'
-    STR_BLACK = 'black'
-    STR_GRAY = 'gray'
-    STR_GREEN = 'green'
-    STR_BLUE = 'blue'
+    STR_WHITE = "white"
+    STR_YELLOW = "yellow"
+    STR_RED = "red"
+    STR_BLACK = "black"
+    STR_GRAY = "gray"
+    STR_GREEN = "green"
+    STR_BLUE = "blue"
 
     BLACK = (0, 0, 0)  # XXX
     BGR_RED = (0, 0, 255)
@@ -55,7 +55,7 @@ def bgr_color_from_string(s):
         ColorConstants.STR_GREEN: ColorConstants.BGR_GREEN,
     }
     if not s in d:
-        msg = 'No color %r found in %s' % (s, list(d))
+        msg = "No color %r found in %s" % (s, list(d))
         raise ValueError(msg)
     return d[s]
 
