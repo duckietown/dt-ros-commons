@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import os
+from typing import Dict, List
 
 from .constants import DuckietownConstants
-from .contracts_ import contract
 from .disk_hierarchy import get_dt_tmp_dir
 from .exceptions import DTConfigException
 from .locate_files_impl import locate_files
@@ -21,14 +21,12 @@ __all__ = [
 ]
 
 
-@contract(returns="str")
-def get_duckietown_root():
+def get_duckietown_root() -> str:
     """ Returns the path of DUCKIETOWN_ROOT and checks it exists """
     return _get_dir(DuckietownConstants.DUCKIETOWN_ROOT_variable)
 
 
-@contract(returns="str")
-def get_duckiefleet_root():
+def get_duckiefleet_root() -> str:
     """
         Returns the path of DUCKIEFLEET_ROOT and checks it exists.
         Raises DTConfigException.
@@ -64,8 +62,7 @@ def get_duckiefleet_root():
         return found[0]
 
 
-@contract(returns="list(str)")
-def get_duckietown_data_dirs():
+def get_duckietown_data_dirs() -> List[str]:
     """
         Returns the paths in DUCKIETOWN_DATA and checks they exists.
 
@@ -88,15 +85,13 @@ def get_duckietown_data_dirs():
     return dirs
 
 
-@contract(returns="str")
-def get_duckietown_cache_dir():
+def get_duckietown_cache_dir() -> str:
     temp_dir = get_dt_tmp_dir()
     dirname = os.path.join(temp_dir, "caches")
     return dirname
 
 
-@contract(returns="str")
-def get_duckietown_local_log_downloads():
+def get_duckietown_local_log_downloads() -> str:
     """ Returns the directory to use for local downloads of logs"""
     temp_dir = get_dt_tmp_dir()
     d = os.path.join(temp_dir, "downloads")
@@ -105,24 +100,21 @@ def get_duckietown_local_log_downloads():
     return d
 
 
-@contract(returns="str")
-def get_machines_files_path():
+def get_machines_files_path() -> str:
     """ Gets the path to the machines file. It might not exist. """
     duckietown_root = get_duckietown_root()
     machines = os.path.join(duckietown_root, DuckietownConstants.machines_path_rel_to_root)
     return machines
 
 
-@contract(returns="str")
-def get_catkin_ws_src():
+def get_catkin_ws_src() -> str:
     """ Returns the path to the src/ dir in catkin_ws """
     duckietown_root = get_duckietown_root()
     machines = os.path.join(duckietown_root, "catkin_ws/src")
     return machines
 
 
-@contract(returns="dict(str:str)")
-def get_list_of_packages_in_catkin_ws():
+def get_list_of_packages_in_catkin_ws() -> Dict[str, str]:
     """
         Returns an ordered dictionary <package name>: <package dir>
         of packages that exist in catkin_ws/src.
@@ -148,8 +140,7 @@ def get_list_of_packages_in_catkin_ws():
     return results
 
 
-@contract(returns=bool)
-def is_ignored_by_catkin(dn):
+def is_ignored_by_catkin(dn: str) -> bool:
     """ Returns true if the directory is inside one with CATKIN_IGNORE """
     while dn != "/":
         i = os.path.join(dn, "CATKIN_IGNORE")
@@ -161,8 +152,7 @@ def is_ignored_by_catkin(dn):
     return False
 
 
-@contract(variable_name=str, returns=str)
-def _get_dir(variable_name):
+def _get_dir(variable_name: str) -> str:
     """
         Raises DTConfigException if it does not exist or the environment
         variable is not set.

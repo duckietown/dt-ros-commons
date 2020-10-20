@@ -4,6 +4,7 @@
 """
 
 import sys
+from typing import NoReturn
 
 from .text_utils import indent
 
@@ -62,7 +63,7 @@ def format_obs(d, informal=False):
     return res
 
 
-def raise_wrapped(etype, e, msg, compact=False, exc=None, **kwargs):
+def raise_wrapped(etype, e, msg, compact=False, exc=None, **kwargs) -> NoReturn:
     """ Raises an exception of type etype by wrapping
         another exception "e" with its backtrace and adding
         the objects in kwargs as formatted by format_obs.

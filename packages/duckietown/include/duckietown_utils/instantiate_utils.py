@@ -1,13 +1,14 @@
 import traceback
+from typing import Dict
 
 from .yaml_pretty import yaml_dump
 
-__all__ = ["import_name", "instantiate"]
+__all__ = ["import_name", "instantiate", "indent"]
 
 SemanticMistake = ValueError
 
 
-def instantiate(function_name, parameters):
+def instantiate(function_name: str, parameters: Dict[str, object]):
     try:
         function = import_name(function_name)
     except ValueError as e:
@@ -23,7 +24,7 @@ def instantiate(function_name, parameters):
         msg = "Could not call this function or instantiate this object:\n"
         msg += "\nConstructor: %s" % function_name
         msg += "\n" + indent(yaml_dump(parameters), "", "Parameters: ")
-        msg += "\n" + indent("%s\n%s" % (e, traceback.format_exc(e)), "> ")
+        msg += "\n" + indent(traceback.format_exc(), "> ")
 
         #         msg += '\n\n One reason this might be triggered is the presence of pyc files for files
         #         that were removed.'
@@ -33,7 +34,7 @@ def instantiate(function_name, parameters):
         raise SemanticMistake(msg)
 
 
-def import_name(name):
+def import_name(name: str):
     """
         Loads the python object with the given name.
 

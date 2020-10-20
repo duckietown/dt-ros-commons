@@ -1,6 +1,6 @@
 import cv2
 
-from duckietown_utils import load_homography, load_map
+from .augmented_reality_utils import load_homography, load_map
 
 
 class Draw:

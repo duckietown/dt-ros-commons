@@ -1,6 +1,7 @@
 import os
 import subprocess
 import tempfile
+from typing import List, Union
 
 from .contracts_ import contract
 from .logging_logger import logger
@@ -156,8 +157,8 @@ def system_cmd_result(
         os.lseek(f.fileno(), 0, 0)
         return f.read().strip()
 
-    captured_stdout = read_all(tmp_stdout).strip()
-    captured_stderr = read_all(tmp_stderr).strip()
+    captured_stdout = read_all(tmp_stdout).decode().strip()
+    captured_stderr = read_all(tmp_stderr).decode().strip()
 
     s = ""
 
@@ -181,14 +182,14 @@ def system_cmd_result(
     return res
 
 
-def remove_empty_lines(s):
+def remove_empty_lines(s: str) -> str:
     lines = s.split("\n")
     empty = lambda line: len(line.strip()) == 0
     lines = [l for l in lines if not empty(l)]
     return "\n".join(lines)
 
 
-def cmd2args(s):
+def cmd2args(s: Union[List[str], str]) -> List[str]:
     """ if s is a list, leave it like that; otherwise split()"""
     if isinstance(s, list):
         return s

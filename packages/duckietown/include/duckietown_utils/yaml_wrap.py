@@ -1,8 +1,9 @@
 import fnmatch
 import os
 from collections import OrderedDict
+from typing import Callable, Dict, List, Sequence, TypeVar
 
-from .contracts_ import contract
+from . import dt_check_isinstance
 from .exception_utils import check_isinstance, raise_wrapped
 from .exceptions import DTConfigException
 from .file_utils import write_data_to_file
@@ -30,7 +31,7 @@ def yaml_write_to_file(ob, filename):
     write_data_to_file(s, filename)
 
 
-def yaml_load_file(filename, plain_yaml=False):
+def yaml_load_file(filename: str, plain_yaml: bool = False):
     if not os.path.exists(filename):
         msg = "File does not exist: %s" % friendly_path(filename)
         raise ValueError(msg)
@@ -39,16 +40,22 @@ def yaml_load_file(filename, plain_yaml=False):
     return interpret_yaml_file(filename, contents, f=lambda _filename, data: data, plain_yaml=plain_yaml)
 
 
-def interpret_yaml_file(filename, contents, f, plain_yaml=False):
+Y = TypeVar('Y')
+
+
+def interpret_yaml_file(filename: str, contents: str, f: Callable[[str, dict], Y],
+                        plain_yaml: bool = False) -> Y:
     """
         f is a function that takes
 
             f(filename, data)
 
         f can raise KeyError, or DTConfigException """
+    dt_check_isinstance("contents", contents, str)
+    assert isinstance(contents, str), contents
     try:
         from ruamel.yaml.error import YAMLError
-
+        data = None
         try:
             if plain_yaml:
                 data = yaml_load_plain(contents)
@@ -57,10 +64,14 @@ def interpret_yaml_file(filename, contents, f, plain_yaml=False):
         except YAMLError as e:
             msg = "Invalid YAML content:"
             raise_wrapped(DTConfigException, e, msg, compact=True)
+
         except TypeError as e:
             msg = "Invalid YAML content; this usually happens "
             msg += "when you change the definition of a class."
             raise_wrapped(DTConfigException, e, msg, compact=True)
+
+        dt_check_isinstance("data", data, dict)
+
         try:
             return f(filename, data)
         except KeyError as e:
@@ -74,18 +85,22 @@ def interpret_yaml_file(filename, contents, f, plain_yaml=False):
         raise_wrapped(DTConfigException, e, msg, compact=True)
 
 
-def get_config_sources():
+def get_config_sources() -> List[str]:
     sources = []
     # We look in $DUCKIETOWN_ROOT/catkin_ws/src
     sources.append(get_catkin_ws_src())
     # then we look in $DUCKIETOWN_FLEET
-    sources.append(get_duckiefleet_root())
+    try:
+        fleet = get_duckiefleet_root()
+    except DTConfigException as e:
+        logger.warn(f'cannot run get_duckiefleet_root(): {e}')
+    else:
+        sources.append(fleet)
 
     return sources
 
 
-@contract(pattern=str, sources="seq(str)")
-def look_everywhere_for_config_files(pattern, sources):
+def look_everywhere_for_config_files(pattern: str, sources: Sequence[str]) -> Dict[str, str]:
     """
         Looks for all the configuration files by the given pattern.
         Returns a dictionary filename -> contents.
@@ -98,14 +113,14 @@ def look_everywhere_for_config_files(pattern, sources):
     for s in sources:
         filenames = locate_files(s, pattern)
         for filename in filenames:
-            contents = open(filename).read()
+            with open(filename) as _:
+                contents = _.read()
             results[filename] = contents
         logger.debug("%4d files found in %s" % (len(results), friendly_path(s)))
     return results
 
 
-@contract(pattern=str, all_yaml="dict(str:str)")
-def look_everywhere_for_config_files2(pattern, all_yaml):
+def look_everywhere_for_config_files2(pattern: str, all_yaml: Dict[str, str]) -> Dict[str, str]:
     """
         Looks for all the configuration files by the given pattern.
         Returns a dictionary filename -> contents.
@@ -122,11 +137,11 @@ def look_everywhere_for_config_files2(pattern, all_yaml):
     return results
 
 
-@contract(patterns="list(str)")
-def look_everywhere_for_files(patterns, strict=False, silent=False):
+def look_everywhere_for_files(patterns: List[str], strict: bool = False, silent: bool = False) -> Dict[
+    str, str]:
     """
         Looks for all the bag files
-        Returns a list of basename -> filename.
+        Returns a dict of basename -> filename.
     """
     sources = []
     # We look in $DUCKIETOWN_ROOT/catkin_ws/src

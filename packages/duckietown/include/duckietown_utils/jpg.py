@@ -8,12 +8,12 @@ import time
 import cv2
 import numpy as np
 
-from duckietown_utils.disk_hierarchy import tmpfile
-from duckietown_utils.mkdirs import d8n_make_sure_dir_exists
 from .contracts_ import contract
 from .deprecation import deprecated
+from .disk_hierarchy import tmpfile
 from .file_utils import write_data_to_file
 from .logging_logger import logger
+from .mkdirs import d8n_make_sure_dir_exists
 
 
 # cannot be reliably installed with pip on Linux x86
@@ -170,7 +170,6 @@ def image_clip_255(image_float):
     res = np.zeros((h, w, 3), dtype=np.uint8)
     np.clip(image_float, 0, 255, out=res)
     return res
-
 
 #
 # def imgmsg_from_cv2(image_cv):

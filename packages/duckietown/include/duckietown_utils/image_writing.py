@@ -1,7 +1,7 @@
 import os
 from collections import OrderedDict
 
-from duckietown_utils.color_constants import ColorConstants
+from .color_constants import ColorConstants
 from .deprecation import deprecated
 from .exception_utils import check_isinstance
 from .file_utils import write_data_to_file

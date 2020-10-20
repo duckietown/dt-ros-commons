@@ -6,7 +6,7 @@ import urllib.parse
 import urllib.request
 from collections import namedtuple
 
-from duckietown_utils.logging_logger import logger
+from .logging_logger import logger
 from .caching import get_cached
 from .timeit import timeit_wall
 

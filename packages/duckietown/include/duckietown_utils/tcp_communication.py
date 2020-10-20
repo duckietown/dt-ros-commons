@@ -2,13 +2,13 @@ import json
 
 import rospy
 from duckietown_msgs.srv import GetVariable, SetVariable
-from duckietown_utils import robot_name
+from .robot_name import get_current_robot_name
 from std_msgs.msg import String
 
 
 def getVariable(variable_name):
     # Get vehicle name
-    veh = robot_name.get_current_robot_name()
+    veh = get_current_robot_name()
 
     # Create rosservice proxy
     getVar = rospy.ServiceProxy("/" + str(veh) + "/tcp_communication_client_node/get_variable", GetVariable)
@@ -26,7 +26,7 @@ def getVariable(variable_name):
 
 def setVariable(variable_name, value):
     # Get vehicle name
-    veh = robot_name.get_current_robot_name()
+    veh = get_current_robot_name()
 
     # Create rosservice proxy
     setVar = rospy.ServiceProxy("/" + str(veh) + "/tcp_communication_client_node/set_variable", SetVariable)

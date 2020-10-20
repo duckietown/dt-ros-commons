@@ -3,7 +3,7 @@ from collections import OrderedDict
 import cv2
 import numpy as np
 
-from duckietown_utils.image_operations import gray2rgb
+from .image_operations import gray2rgb
 from .contracts_ import contract
 from .exception_utils import check_isinstance
 

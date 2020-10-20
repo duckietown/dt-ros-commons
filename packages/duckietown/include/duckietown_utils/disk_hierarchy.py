@@ -9,10 +9,19 @@ from .logging_logger import logger
 from .yaml_pretty import yaml_load
 
 
-def mkdirs_thread_safe(dirname):
-    from compmake.utils.filesystem_utils import mkdirs_thread_safe as md
-
-    return md(dirname)
+def mkdirs_thread_safe(dst: str) -> None:
+    """Make directories leading to 'dst' if they don't exist yet"""
+    if dst == "" or os.path.exists(dst):
+        return
+    head, _ = os.path.split(dst)
+    if os.sep == ":" and not ":" in head:
+        head += ":"
+    mkdirs_thread_safe(head)
+    try:
+        os.mkdir(dst, 0o777)
+    except OSError as err:
+        if err.errno != 17:  # file exists
+            raise
 
 
 @contract(s=str, returns=str)
