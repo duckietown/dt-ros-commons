@@ -1,12 +1,12 @@
 import os
 
 import numpy as np
-import rosbag
 
+import rosbag
 from .bag_info import get_image_topic
 from .bag_reading import BagReadProxy
 from .expand_variables import expand_environment
-from .image_conversions import rgb_from_ros, numpy_from_ros_compressed
+from .image_conversions import rgb_from_ros
 from .logging_logger import logger
 
 __all__ = [

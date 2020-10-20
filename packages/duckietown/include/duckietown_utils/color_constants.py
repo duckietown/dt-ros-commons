@@ -1,5 +1,3 @@
-
-
 __all__ = [
     'bgr_color_from_string',
     'ColorConstants',

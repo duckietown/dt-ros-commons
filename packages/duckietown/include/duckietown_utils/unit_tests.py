@@ -42,13 +42,13 @@ else:
         using_fake_tests = True
 
 if using_fake_tests:
-
     def unit_test(f):
         return f
+
 
     def run_tests_for_this_module():
         pass
 
+
     def get_output_dir_for_test():
         return 'out-comptests'
-

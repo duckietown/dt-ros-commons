@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from contextlib import contextmanager
 import gzip
 import os
 import random
+from contextlib import contextmanager
 
 from .exception_utils import check_isinstance
 

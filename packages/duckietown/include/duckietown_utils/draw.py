@@ -1,4 +1,3 @@
-
 import cv2
 
 from duckietown_utils import load_homography, load_map
@@ -17,18 +16,7 @@ class Draw():
         # Load homography
         self.H = load_homography(self.robot_name)
 
-
     def render(self, image):
-        defined_colors = {
-            'red': ['rgb', [1, 0, 0]],
-            'green': ['rgb', [0, 1, 0]],
-            'blue': ['rgb', [0, 0, 1]],
-            'yellow': ['rgb', [1, 1, 0]],
-            'magenta': ['rgb', [1, 0, 1]],
-            'cyan': ['rgb', [0, 1, 1]],
-            'white': ['rgb', [1, 1, 1]],
-            'black': ['rgb', [0, 0, 0]]
-        }
         # draw projected segments
         for segment in self.map_data["segments"]:
             self.draw_segment(image, segment)
@@ -51,6 +39,19 @@ class Draw():
             pt_y.append(pixel[1])
         color = segment["color"]
         color_type, [r, g, b] = defined_colors[color]
-        cv2.line(image, (pt_x[0], pt_y[0]), (pt_x[1], pt_y[1]), (b * 255, g * 255, r * 255), 5)
+        cv2.line(image, (pt_x[0], pt_y[0]),
+                 (pt_x[1], pt_y[1]),
+                 (b * 255, g * 255, r * 255), 5)
+        return image
 
-    return image
+
+defined_colors = {
+    'red': ['rgb', [1, 0, 0]],
+    'green': ['rgb', [0, 1, 0]],
+    'blue': ['rgb', [0, 0, 1]],
+    'yellow': ['rgb', [1, 1, 0]],
+    'magenta': ['rgb', [1, 0, 1]],
+    'cyan': ['rgb', [0, 1, 1]],
+    'white': ['rgb', [1, 1, 1]],
+    'black': ['rgb', [0, 0, 0]]
+}

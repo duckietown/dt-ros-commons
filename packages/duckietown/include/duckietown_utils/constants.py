@@ -1,4 +1,3 @@
-
 __all__ = [
     'DuckietownConstants',
 ]
@@ -37,4 +36,3 @@ class DuckietownConstants(object):
     ADD_SHORTCUT_TAG = '@create-shortcut-for-this'
 
     show_timeit_benchmarks = False
-

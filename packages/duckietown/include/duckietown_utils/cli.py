@@ -19,7 +19,7 @@ class D8App(QuickAppBase):
         options = [_ for _ in options if _ and _.strip()]
         if not options:
             msg = ('Either provide command line argument --%s or environment variable %s.' %
-                    (argname, envname))
+                   (argname, envname))
             raise DTUserError(msg)
         return options[0]
 

@@ -1,9 +1,9 @@
-from collections import namedtuple
 import time
+from collections import namedtuple
 
 import numpy as np
-import rosbag
 
+import rosbag
 from .exceptions import DTBadData
 from .logging_logger import logger
 
@@ -66,7 +66,7 @@ class BagReadProxy(object):
         """ Returns approximate message count, compensating with ratio. """
         n = self.bag.get_message_count(topic_filters)
         n1 = int(np.ceil(self.fraction * n))
-#         print('n = %s  fraction = %s  n1 = %s' % (n, self.fraction, n1) )
+        #         print('n = %s  fraction = %s  n1 = %s' % (n, self.fraction, n1) )
         return n1
 
     def read_messages_plus(self, *args, **kwargs):
@@ -75,7 +75,8 @@ class BagReadProxy(object):
             start_time = rospy.Time.from_sec(self.read_from_absolute)
             end_time = rospy.Time.from_sec(self.read_to_absolute)
 
-            for topic, msg, _t in self.bag.read_messages(*args, start_time=start_time, end_time=end_time, **kwargs):
+            for topic, msg, _t in self.bag.read_messages(*args, start_time=start_time, end_time=end_time,
+                                                         **kwargs):
                 t = _t.to_sec()
                 if t < self.read_from_absolute:
                     if debug_skip:
@@ -90,8 +91,8 @@ class BagReadProxy(object):
                 time_from_physical_log_start = t - self.bag_absolute_t0_ref
                 time_window = t - self.read_from_absolute
                 m = MessagePlus(topic=topic, msg=msg, time_absolute=time_absolute,
-                            time_from_physical_log_start=time_from_physical_log_start,
-                            time_window=time_window)
+                                time_from_physical_log_start=time_from_physical_log_start,
+                                time_window=time_window)
                 yield m
         elif isinstance(self.bag, BagReadProxy):
             for m in self.bag.read_messages_plus(*args, **kwargs):
@@ -102,7 +103,8 @@ class BagReadProxy(object):
         import rospy
         start_time = rospy.Time.from_sec(self.read_from_absolute)
         end_time = rospy.Time.from_sec(self.read_to_absolute)
-        for topic, msg, _t in self.bag.read_messages(*args, start_time=start_time, end_time=end_time, **kwargs):
+        for topic, msg, _t in self.bag.read_messages(*args, start_time=start_time, end_time=end_time,
+                                                     **kwargs):
             t = _t.to_sec()
             if t < self.read_from_absolute:
                 logger.debug('warning: skipping %s becasue %s < %s' % (topic, t, self.read_from_absolute))

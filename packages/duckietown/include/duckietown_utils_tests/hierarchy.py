@@ -1,3 +1,5 @@
+from os.path import exists, join
+
 import duckietown_utils as dtu
 
 
@@ -15,9 +17,8 @@ def testh1():
 
     d = dtu.dir_from_data(data)
 
-    #print locate_files(d, '*')
+    # print locate_files(d, '*')
 
-    from os.path import exists, join
     assert exists(join(d, 'dir1'))
     assert exists(join(d, 'dir1', 'dir2'))
     assert exists(join(d, 'dir1', 'dir2', 'filename'))
@@ -28,4 +29,3 @@ def testh1():
 
 if __name__ == '__main__':
     dtu.run_tests_for_this_module()
-

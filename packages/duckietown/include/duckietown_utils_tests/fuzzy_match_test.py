@@ -1,5 +1,5 @@
-from collections import OrderedDict, namedtuple
 import re
+from collections import namedtuple, OrderedDict
 
 from contracts.utils import check_isinstance
 
@@ -12,9 +12,9 @@ def expect(data, query, result_keys, filters=None):
 
     if True:
         spec = dtu.parse_match_spec(query, filters=filters)
-        print '-----'
-        print 'Query: %s' % query
-        print dtu.indent(spec, '', 'Spec: ')
+        print('-----')
+        print('Query: %s' % query)
+        print(dtu.indent(spec, '', 'Spec: '))
 
     res = dtu.fuzzy_match(query, data, filters=filters)
     check_isinstance(res, OrderedDict)
@@ -78,7 +78,6 @@ def specs1():
 
 @dtu.unit_test
 def my_filter():
-
     rc = re.compile(dtu.slice_regexp)
     m = rc.search('[1:2:3]')
     assert m.group('a') == '1'
@@ -130,4 +129,3 @@ def my_filter_sort():
 
 if __name__ == '__main__':
     dtu.run_tests_for_this_module()
-

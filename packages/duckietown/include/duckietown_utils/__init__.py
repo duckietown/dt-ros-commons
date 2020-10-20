@@ -7,6 +7,7 @@ many Python modules in Duckietown.
 
 # Use the PyGeometry library as dtu.geo
 import geometry as geo
+
 _ = geo
 
 from .tcp_communication import *
@@ -65,7 +66,7 @@ from .wrap_main import *
 from .yaml_pretty import *
 from .yaml_wrap import *
 
-#from .cli import *
+# from .cli import *
 try:
     import frozendict  # @UnusedImport @UnresolvedImport
 except:
@@ -84,6 +85,7 @@ except:
 
 # this is from the exercises
 from .augmented_reality_utils import *
+
 # from .draw import *
 # from .cli import *
 
@@ -98,4 +100,3 @@ if False:
             if v.__module__.startswith('duckietown_utils'):
                 v.__module__ = 'duckietown_utils'
                 __all__.append(c)
-

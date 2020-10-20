@@ -31,11 +31,11 @@ def make_images_grid(images, cols=None, pad=0, bgcolor=[128, 128, 128]):
 
         if pad > 0:
             image = image_border(image,
-                       left=pad,
-                       right=pad,
-                       top=pad,
-                       bottom=pad,
-                       color=bgcolor)
+                                 left=pad,
+                                 right=pad,
+                                 top=pad,
+                                 bottom=pad,
+                                 color=bgcolor)
         width = image.shape[1]
         height = image.shape[0]
 
@@ -50,12 +50,12 @@ def make_images_grid(images, cols=None, pad=0, bgcolor=[128, 128, 128]):
     for col in range(1, cols):
         col_x[col] = col_x[col - 1] + col_width[col - 1]
 
-    assert(canvas_width == col_x[-1] + col_width[-1])
+    assert (canvas_width == col_x[-1] + col_width[-1])
 
     row_y = np.zeros(rows, dtype='int32')
     for row in range(1, rows):
         row_y[row] = row_y[row - 1] + row_height[row - 1]
-    assert(canvas_height == row_y[-1] + row_height[-1])
+    assert (canvas_height == row_y[-1] + row_height[-1])
 
     canvas = np.zeros((canvas_height, canvas_width, 3), dtype='uint8')
     for k in range(3):
@@ -133,4 +133,3 @@ def place_at(canvas, image, xpix, ypix):
         image = image.reshape((image.shape[0], image.shape[1], 1))
     canvas[ypix:(ypix + ysize), xpix:(xpix + xsize), 0:3] = \
         image[0:ysize, 0:xsize, :]
-

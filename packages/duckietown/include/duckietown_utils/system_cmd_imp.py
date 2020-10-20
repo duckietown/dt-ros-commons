@@ -90,7 +90,7 @@ def system_cmd_result(cwd, cmd,
     rets = None
     interrupted = False
 
-#     if (display_stdout and captured_stdout) or (display_stderr and captured_stderr):
+    #     if (display_stdout and captured_stdout) or (display_stderr and captured_stderr):
 
     try:
         # stdout = None if display_stdout else
@@ -104,28 +104,28 @@ def system_cmd_result(cwd, cmd,
         if display_stdout or display_stderr:
             logger.info('$ %s' % copyable_cmd(cmd))
         p = subprocess.Popen(
-                cmd,
-                stdin=subprocess.PIPE,
-                stdout=stdout,
-                stderr=stderr,
-                bufsize=0,
-                cwd=cwd,
-                env=env)
-#         set_term_function(p)
+            cmd,
+            stdin=subprocess.PIPE,
+            stdout=stdout,
+            stderr=stderr,
+            bufsize=0,
+            cwd=cwd,
+            env=env)
+        #         set_term_function(p)
 
         if write_stdin != '':
             try:
                 p.stdin.write(write_stdin)
             except IOError as e:
-#                if e.errno == 32:  # broken pipe
-                    msg = 'Could not write input to process.'
-                    msg = 'Invalid executable (OSError)'
-                    msg += '\n      cwd   %r' % cwd
-                    msg += '\n      cmd   %s' % " ".join(cmd)
-                    msg += '\n    errno   %r' % e.errno
-                    msg += '\n strerror   %r' % e.strerror
-                    raise CouldNotCallProgram(msg)
-#                raise
+                #                if e.errno == 32:  # broken pipe
+                msg = 'Could not write input to process.'
+                msg = 'Invalid executable (OSError)'
+                msg += '\n      cwd   %r' % cwd
+                msg += '\n      cmd   %s' % " ".join(cmd)
+                msg += '\n    errno   %r' % e.errno
+                msg += '\n strerror   %r' % e.strerror
+                raise CouldNotCallProgram(msg)
+            #                raise
             p.stdin.flush()
 
         p.stdin.close()
@@ -151,10 +151,10 @@ def system_cmd_result(cwd, cmd,
         msg += '\n rest   %s' % e
         raise CouldNotCallProgram(msg)
 
-#         interrupted = False
-#         ret = 200
-#         rets = str(e)
-#         rets = 'OSError: %s' % e
+    #         interrupted = False
+    #         ret = 200
+    #         rets = str(e)
+    #         rets = 'OSError: %s' % e
 
     # remember to go back
     def read_all(f):
@@ -209,19 +209,21 @@ def wrap(header, s, N=30):
     header = '  ' + header + '  '
     l1 = '-' * N + header + '-' * N
     l2 = '-' * N + '-' * len(header) + '-' * N
-    return  l1 + '\n' + s + '\n' + l2
+    return l1 + '\n' + s + '\n' + l2
 
 
 def result_format(cwd, cmd, ret, stdout=None, stderr=None):
     msg = ('Command:\n\t{cmd}\n'
            'in directory:\n\t{cwd}\nfailed with error {ret}').format(
-            cwd=cwd, cmd=cmd, ret=ret
-           )
+        cwd=cwd, cmd=cmd, ret=ret
+    )
     if stdout is not None:
         msg += '\n' + wrap('stdout', stdout)
     if stderr is not None:
         msg += '\n' + wrap('stderr', stderr)
     return msg
+
+
 #
 # def indent(s, prefix):
 #     lines = s.split('\n')

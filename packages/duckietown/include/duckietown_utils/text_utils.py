@@ -69,11 +69,11 @@ def remove_table_field(table, f):
 
 def make_red(s):
     from termcolor import colored
-    return  colored(s, 'red')
+    return colored(s, 'red')
 
 
 def make_row_red(row):
-    return [ make_red(_) for _ in row]
+    return [make_red(_) for _ in row]
 
 
 def format_table_plus(rows, colspacing=1, paginate=25):
@@ -88,7 +88,7 @@ def format_table_plus(rows, colspacing=1, paginate=25):
             raise ValueError(msg)
 
     # now convert all to string
-    rows = [ [str(_) for _ in row] for row in rows]
+    rows = [[str(_) for _ in row] for row in rows]
 
     # for each column
     def width_cell(s):

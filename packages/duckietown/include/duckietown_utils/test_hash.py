@@ -1,11 +1,12 @@
-from collections import namedtuple
 import hashlib
 import os
-import urllib.request, urllib.parse, urllib.error
+import urllib.error
 import urllib.parse
+import urllib.parse
+import urllib.request
+from collections import namedtuple
 
 from duckietown_utils.logging_logger import logger
-
 from .caching import get_cached
 from .timeit import timeit_wall
 
@@ -38,7 +39,6 @@ def sha1_for_file(path, block_size=256 * 128):
 
 
 def sha1_for_file_cached(filename):
-
     def f():
         return sha1_for_file(filename)
 
@@ -56,7 +56,7 @@ def create_hash_url(fn):
     parameters = None
     name = os.path.basename(fn)
     size = os.path.getsize(fn)
-    qs = [ ('size', size), ('name', name) ]
+    qs = [('size', size), ('name', name)]
     query = urllib.parse.urlencode(qs)
     fragment = None
 
@@ -69,7 +69,7 @@ HashUrl = namedtuple('HashUrl', 'size name sha1')
 
 def parse_hash_url(url):
     parsed = (scheme, netloc, path, _parameters, query_string, _fragment) = urllib.parse.urlparse(url)
-#    print (scheme, netloc, path, parameters, query_string, fragment)
+    #    print (scheme, netloc, path, parameters, query_string, fragment)
     assert scheme == 'hash', parsed
     assert netloc == 'sha1', parsed
 
@@ -85,4 +85,3 @@ def parse_hash_url(url):
     if name: name = name[0]
 
     return HashUrl(name=name, size=size, sha1=sha1)
-

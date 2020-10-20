@@ -57,7 +57,7 @@ def expand_wildcard(wildcard, universe):
 
     if not matches:
         msg = ('Could not find matches for pattern %r in %s.' %
-                (wildcard, universe))
+               (wildcard, universe))
         raise ValueError(msg)
 
     return matches
@@ -75,4 +75,3 @@ def get_wildcard_matches(wildcard, universe):
     for x in universe:
         if regexp.match(x):
             yield x
-

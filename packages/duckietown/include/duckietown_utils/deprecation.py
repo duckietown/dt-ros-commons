@@ -6,6 +6,8 @@ import warnings
 __all__ = ['deprecated']
 
 string_types = (type(b''), type(''))
+
+
 #
 # def old_deprecated_name_for(replacement):
 #     """

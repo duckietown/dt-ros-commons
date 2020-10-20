@@ -3,7 +3,6 @@ from os.path import basename, isfile, splitext
 from sys import exit
 
 import cv2
-
 import numpy as np
 
 from .logging_logger import logger
@@ -19,7 +18,8 @@ class BaseAugmenter(object):
         self.veh = veh
 
         # Masking
-        #frustum = mask()
+        # frustum = mask()
+
     def callback(self, msg=None):
         pass
 
@@ -55,21 +55,23 @@ class BaseAugmenter(object):
 
     def draw_segment(self, image, pt_x, pt_y, color):
         defined_colors = {
-            'red' : ['rgb', [1, 0, 0]],
-            'green' : ['rgb', [0, 1, 0]],
-            'blue' : ['rgb', [0, 0, 1]],
-            'yellow' : ['rgb', [1, 1, 0]],
-            'magenta' : ['rgb', [1, 0 , 1]],
-            'cyan' : ['rgb', [0, 1, 1]],
-            'white' : ['rgb', [1, 1, 1]],
-            'black' : ['rgb', [0, 0, 0]]}
+            'red': ['rgb', [1, 0, 0]],
+            'green': ['rgb', [0, 1, 0]],
+            'blue': ['rgb', [0, 0, 1]],
+            'yellow': ['rgb', [1, 1, 0]],
+            'magenta': ['rgb', [1, 0, 1]],
+            'cyan': ['rgb', [0, 1, 1]],
+            'white': ['rgb', [1, 1, 1]],
+            'black': ['rgb', [0, 0, 0]]
+        }
         _color_type, [r, g, b] = defined_colors[color]
         cv2.line(image, (pt_x[0], pt_y[0]), (pt_x[1], pt_y[1]), (b * 255, g * 255, r * 255), 5)
         return image
 
-#-----------------------------------------------------------------------------#
+
+# -----------------------------------------------------------------------------#
 #                       Augmented reality utils                               #
-#-----------------------------------------------------------------------------#
+# -----------------------------------------------------------------------------#
 
 
 def get_base_name(map_filename):

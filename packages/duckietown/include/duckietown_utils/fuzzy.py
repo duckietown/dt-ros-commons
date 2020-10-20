@@ -1,11 +1,10 @@
-from abc import abstractmethod, ABCMeta
-from collections import OrderedDict
 import random
 import re
+from abc import ABCMeta, abstractmethod
+from collections import OrderedDict
 
 from .contracts_ import contract
-from .exception_utils import check_isinstance, describe_type
-from .exception_utils import raise_wrapped
+from .exception_utils import check_isinstance, describe_type, raise_wrapped
 from .exceptions import DTNoMatches, DTUserError
 from .instantiate_utils import indent
 from .logging_logger import logger
@@ -140,7 +139,7 @@ class Slice(Spec):
         keys = list(results)
         a, b, c = self.indices
         keys2 = keys[a:b:c]
-#         print('leys: %s keys2 : %s' % (keys, keys2))
+        #         print('leys: %s keys2 : %s' % (keys, keys2))
         for k in keys2:
             res[k] = results[k]
         return res
@@ -190,8 +189,8 @@ class Sort(Spec):
         res = OrderedDict()
         key = lambda _: _get_tag(seq[_], self.key)
         keys = sorted(results, key=key)
-#        print('sorted: %s' % keys)
-#        print('keys: %s' % map(key, keys))
+        #        print('sorted: %s' % keys)
+        #        print('keys: %s' % map(key, keys))
         for k in keys:
             res[k] = results[k]
         return res
@@ -227,7 +226,7 @@ def _get_tag(x, tagname):
     else:
         if not hasattr(x, tagname):
             msg = ('The object of type %s does not have attribute "%s".' %
-                 (type(x).__name__, tagname))
+                   (type(x).__name__, tagname))
             try:
                 msg += '\nThe available attributes are:\n  %s' % sorted(x.__dict__.keys())
             except:
@@ -282,7 +281,7 @@ class ByTag(Spec):
         else:
             if not hasattr(x, self.tagname):
                 msg = ('The object of type %s does not have attribute "%s".' %
-                     (type(x).__name__, self.tagname))
+                       (type(x).__name__, self.tagname))
                 try:
                     msg += '\nThe available attributes are:\n  %s' % sorted(x.__dict__.keys())
                 except:
@@ -421,7 +420,6 @@ def filter_shuffle(_, spec):
 
 slice_regexp = r'\[(?P<a>-?\d+)?:(?P<b>-?\d+)?(:(?P<c>-?\d+)?)?\]'
 
-
 filters0 = OrderedDict([
     ('\[(?P<a>\d+)\]', filter_index_simple),
     (slice_regexp, filter_index),
@@ -457,9 +455,9 @@ def parse_match_spec(s, filters=None):
         reg = re.compile(rs)
 
         m = reg.search(s)
-#         print('Trying regexp %s -> %s  aginst %s -> %s' % (k, rs, s, m))
+        #         print('Trying regexp %s -> %s  aginst %s -> %s' % (k, rs, s, m))
         if m is not None:
-#             logger.debug('Matched group(1) = %r  group(2) = %r'%(m.group(1), m.group(2)))
+            #             logger.debug('Matched group(1) = %r  group(2) = %r'%(m.group(1), m.group(2)))
             rest = m.group(1)
             rest_p = rec(rest)
             try:

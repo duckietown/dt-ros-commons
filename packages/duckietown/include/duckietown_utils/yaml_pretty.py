@@ -1,5 +1,3 @@
-
-
 # XXX: does not represent None as null, rather as '...\n'
 def yaml_load(s):
     from ruamel import yaml
@@ -35,7 +33,6 @@ def yaml_dump_pretty(ob):
 
 
 def remove_unicode(x):
-
     if isinstance(x, str):
         return x.encode('utf8')
 

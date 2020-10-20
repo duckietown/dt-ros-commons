@@ -3,21 +3,21 @@
 """
 
 import os
-import cv2
 import time
-# cannot be reliably installed with pip on Linux x86
-#import picamera
+
+import cv2
+import numpy as np
 
 from duckietown_utils.disk_hierarchy import tmpfile
 from duckietown_utils.mkdirs import d8n_make_sure_dir_exists
-from duckietown_utils.system_cmd_imp import system_cmd_result
-import numpy as np
-
 from .contracts_ import contract
 from .deprecation import deprecated
 from .file_utils import write_data_to_file
 from .logging_logger import logger
-from .timeit import timeit_clock
+
+
+# cannot be reliably installed with pip on Linux x86
+# import picamera
 
 
 @contract(bgr='array[HxWx3](uint8)')
@@ -92,24 +92,24 @@ def write_bgr_to_file_as_jpg(image_cv, fn):
 def bgr_from_raspistill(frame=None):
     import picamera
     with tmpfile(".jpg") as filename:
-
         if frame is not None:
             filename = frame
         d8n_make_sure_dir_exists(filename)
-        #cmd = ['raspistill', '-o', filename,
+        # cmd = ['raspistill', '-o', filename,
         #    '--awb', 'auto',
-#       #       '--exposure', 'off',
+        #       #       '--exposure', 'off',
         #      ]
-        #logger.debug('Capturing using command:\n   %s' % " ".join(cmd))
-        #cwd = '.'
-        #_ = system_cmd_result(cwd, cmd, raise_on_error=True)
+        # logger.debug('Capturing using command:\n   %s' % " ".join(cmd))
+        # cwd = '.'
+        # _ = system_cmd_result(cwd, cmd, raise_on_error=True)
         with picamera.PiCamera() as camera:
-            #camera.resolution = (1280, 720)   # 720p
+            # camera.resolution = (1280, 720)   # 720p
             time.sleep(2)
             camera.capture(filename)
 
         res = bgr_from_jpg_fn(filename)
         return res
+
 
 # class Storage:
 #     dst = None
@@ -129,6 +129,7 @@ def bgr_from_raspistill(frame=None):
 
 from PIL import ImageFile  # @UnresolvedImport
 
+
 def rgb_from_jpg_by_PIL(data):
     """ Warning: this returns RGB """
 
@@ -137,6 +138,7 @@ def rgb_from_jpg_by_PIL(data):
     res = parser.close()
     res = np.asarray(res)
     return res
+
 
 # third option: jpeg library
 

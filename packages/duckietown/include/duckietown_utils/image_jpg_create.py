@@ -1,6 +1,6 @@
 import cv2
-
 import numpy as np
+
 from sensor_msgs.msg import CompressedImage
 
 __all__ = [

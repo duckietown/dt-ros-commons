@@ -8,6 +8,7 @@ Author: Andrea Censi
 '''
 
 __version__ = '1.0'
+
 import os
 
 # TODO: cache the results?
@@ -75,4 +76,3 @@ def replace_variables(path, rules):
             # print("  applied %s => %s" % (v, k))
             path = path.replace(v, k)
     return path
-

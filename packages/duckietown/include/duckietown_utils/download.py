@@ -76,6 +76,9 @@ import sys
 import time
 import urllib.request, urllib.parse, urllib.error
 
+start_time = None
+last_time = None
+
 
 def reporthook(count, block_size, total_size):
     now = time.time()

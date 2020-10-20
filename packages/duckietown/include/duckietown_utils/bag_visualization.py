@@ -2,7 +2,6 @@ import os
 import shutil
 
 import rosbag
-
 from .bag_reading import BagReadProxy
 from .contracts_ import contract
 from .disk_hierarchy import create_tmpdir, mkdirs_thread_safe

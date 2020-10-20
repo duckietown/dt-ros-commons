@@ -45,4 +45,3 @@ class Configurable(object):
             setattr(self, p, configuration[p])
 
         return configuration
-

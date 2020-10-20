@@ -1,6 +1,8 @@
 import socket
 import ssl
-import urllib.request, urllib.error, urllib.parse
+import urllib.error
+import urllib.parse
+import urllib.request
 
 from .instantiate_utils import indent
 from .logging_logger import logger

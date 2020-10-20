@@ -1,4 +1,5 @@
 import traceback
+
 from .yaml_pretty import yaml_dump
 
 __all__ = ['import_name', 'instantiate']
@@ -18,16 +19,17 @@ def instantiate(function_name, parameters):
         # XXX TypeError is too broad, we should bind the params explicitly
         return function(**parameters)
     except TypeError as e:
-#         params = ', '.join(['%s=%r' % (k, v) for (k, v) in parameters.items()])
+        #         params = ', '.join(['%s=%r' % (k, v) for (k, v) in parameters.items()])
         msg = 'Could not call this function or instantiate this object:\n'
         msg += '\nConstructor: %s' % function_name
         msg += '\n' + indent(yaml_dump(parameters), '', 'Parameters: ')
         msg += '\n' + indent('%s\n%s' % (e, traceback.format_exc(e)), '> ')
 
-#         msg += '\n\n One reason this might be triggered is the presence of pyc files for files that were removed.'
-#         msg += '\n\n Use this command to remove them:'
-#         msg += '\n\n     make clean-pyc'
-#         msg += '\n\n'
+        #         msg += '\n\n One reason this might be triggered is the presence of pyc files for files
+        #         that were removed.'
+        #         msg += '\n\n Use this command to remove them:'
+        #         msg += '\n\n     make clean-pyc'
+        #         msg += '\n\n'
         raise SemanticMistake(msg)
 
 

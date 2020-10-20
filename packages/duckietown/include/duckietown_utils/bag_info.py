@@ -3,7 +3,6 @@ import re
 import subprocess
 
 import rosbag
-
 from .caching import get_cached
 from .logging_logger import logger
 from .yaml_pretty import yaml_load_plain
@@ -19,7 +18,6 @@ __all__ = [
 
 
 def rosbag_info_cached(filename):
-
     def f():
         return rosbag_info(filename)
 
@@ -33,11 +31,11 @@ def rosbag_info(bag):
     logger.debug(msg)
     stdout = subprocess.Popen(['rosbag', 'info', '--yaml', bag],
                               stdout=subprocess.PIPE).communicate()[0]
-#     try:
+    #     try:
     info_dict = yaml_load_plain(stdout)
-#     except:
-#         logger.error('Could not parse yaml:\n%s' % indent(stdout, '| '))
-#         raise
+    #     except:
+    #         logger.error('Could not parse yaml:\n%s' % indent(stdout, '| '))
+    #         raise
     return info_dict
 
 
@@ -100,10 +98,9 @@ def d8n_get_all_images_topic_bag(bag, min_messages=0):
                 if other in topics:
                     continue
 
-            if  message_count < min_messages:
+            if message_count < min_messages:
                 # print('ignoring topic %r because message_count = 0' % t)
                 continue
 
             found.append((t, msg_type))
     return found
-

@@ -1,5 +1,6 @@
-from .detect_environment import on_duckiebot
 import os
+
+from .detect_environment import on_duckiebot
 
 __all__ = [
     'ThisIsNotADuckiebot',
@@ -24,7 +25,8 @@ def get_current_robot_name():
     if robot_name is None:
 
         if not on_duckiebot():
-            msg = 'This is not a Duckiebot and VEHICLE_NAME is not set. You will have to set the name in a different way.'
+            msg = 'This is not a Duckiebot and VEHICLE_NAME is not set. You will have to set the name in a ' \
+                  'different way.'
             raise ThisIsNotADuckiebot(msg)
 
         import socket

@@ -1,4 +1,5 @@
 import numpy as np
+
 from .contracts_ import contract
 
 
@@ -40,6 +41,7 @@ def d8n_image_msg_from_cv_image(cv_image, image_format, same_timestamp_as=None):
         image_msg_out.header.stamp = same_timestamp_as.header.stamp
     return image_msg_out
 
+
 #
 # def CompressedImage_from_bgr(image_np):
 #     return d8_compressed_image_from_cv_image(image_np)
@@ -51,8 +53,8 @@ def d8n_image_msg_from_cv_image(cv_image, image_format, same_timestamp_as=None):
 
 from PIL import ImageFile  # @UnresolvedImport
 
-def pil_from_CompressedImage(msg):
 
+def pil_from_CompressedImage(msg):
     parser = ImageFile.Parser()
     parser.feed(msg.data)
     res = parser.close()

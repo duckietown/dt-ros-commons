@@ -3,7 +3,7 @@ import os
 from .friendly_path_imp import friendly_path
 from .logging_logger import logger
 from .paths import get_duckietown_cache_dir
-from .safe_pickling import safe_pickle_load, safe_pickle_dump
+from .safe_pickling import safe_pickle_dump, safe_pickle_load
 
 __all__ = [
     'get_cached',
@@ -54,8 +54,8 @@ def get_cached(cache_name, f, quiet='not-given', just_delete=False):
 
     safe_pickle_dump(ob, cache)
 
-#         with open(cache, 'w') as f:
-#             cPickle.dump(ob, f)
-#
-#
+    #         with open(cache, 'w') as f:
+    #             cPickle.dump(ob, f)
+    #
+    #
     return ob

@@ -1,4 +1,5 @@
 import numpy as np
+
 from .contracts_ import contract
 
 __all__ = [
@@ -39,4 +40,3 @@ def norm_angle_v(theta):
             assert -pi <= t <= +pi
 
     return theta
-

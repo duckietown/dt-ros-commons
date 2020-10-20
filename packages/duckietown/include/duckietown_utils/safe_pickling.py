@@ -1,9 +1,7 @@
-
 # -*- coding: utf-8 -*-
 import sys
 
 from .logging_logger import logger
-
 from .safe_reading import safe_read, safe_write
 
 # from .debug_pickler import find_pickling_error
@@ -28,8 +26,8 @@ def safe_pickle_dump(value, filename, protocol=pickle.HIGHEST_PROTOCOL,
         except Exception:
             msg = 'Cannot pickle object of class %s' % type(value).__name__
             logger.error(msg)
-#             msg = find_pickling_error(value, protocol)
-#             logger.error(msg)
+            #             msg = find_pickling_error(value, protocol)
+            #             logger.error(msg)
             raise
 
 

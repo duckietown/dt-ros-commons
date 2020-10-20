@@ -3,4 +3,5 @@ __all__ = [
 ]
 
 from .path_utils import expand_all
+
 expand_environment = expand_all

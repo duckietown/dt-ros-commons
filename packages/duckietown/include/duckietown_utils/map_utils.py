@@ -1,9 +1,7 @@
-# XXX: what is this?
-#!/usr/bin/python
-
-from scipy import signal
+#!/usr/bin/python3
 
 import numpy as np
+from scipy import signal
 
 
 class RandomMapGenerator(object):

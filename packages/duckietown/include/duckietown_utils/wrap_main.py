@@ -15,4 +15,3 @@ def wrap_main(f):
         s = traceback.format_exc(e)
         logger.error(s)
         sys.exit(2)
-

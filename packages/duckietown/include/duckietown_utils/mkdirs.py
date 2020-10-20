@@ -38,4 +38,3 @@ def d8n_mkdirs_thread_safe(dst):
     except OSError as err:
         if err.errno != 17:  # file exists
             raise
-

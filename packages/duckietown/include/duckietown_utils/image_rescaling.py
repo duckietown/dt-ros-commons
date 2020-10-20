@@ -1,16 +1,15 @@
 from collections import OrderedDict
 
 import cv2
-
-from duckietown_utils.image_operations import gray2rgb
 import numpy as np
 
+from duckietown_utils.image_operations import gray2rgb
 from .contracts_ import contract
 from .exception_utils import check_isinstance
 
 
 def d8_image_zoom_linear(cv_image, ratio=4):
-#     """ Zooms up by the given ratio """
+    #     """ Zooms up by the given ratio """
     H, W, _ = cv_image.shape
     W2 = int(W * ratio)
     H2 = int(H * ratio)
@@ -65,7 +64,7 @@ def d8_image_resize_fit_in_rect(img, shape, bgcolor=(128, 128, 128)):
 
     for i in (0, 1, 2):
         res[pad0:pad0 + img.shape[0],
-            pad1:pad1 + img.shape[1], i] = img[:, :, i]
+        pad1:pad1 + img.shape[1], i] = img[:, :, i]
 
     return res
 

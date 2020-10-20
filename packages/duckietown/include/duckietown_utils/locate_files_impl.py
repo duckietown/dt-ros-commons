@@ -1,6 +1,6 @@
-from collections import defaultdict
 import fnmatch
 import os
+from collections import defaultdict
 
 __all__ = [
     'locate_files',
@@ -53,4 +53,3 @@ def locate_files(directory, pattern, normalize=True, followlinks=True, alsodirs=
             # logger.warning(v)
 
     return list(real2norm.keys())
-

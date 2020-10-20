@@ -1,6 +1,6 @@
-from collections import OrderedDict
 import fnmatch
 import os
+from collections import OrderedDict
 
 from .contracts_ import contract
 from .exception_utils import check_isinstance, raise_wrapped
@@ -10,9 +10,9 @@ from .friendly_path_imp import friendly_path
 from .instantiate_utils import indent
 from .locate_files_impl import locate_files
 from .logging_logger import logger
-from .paths import get_catkin_ws_src, get_duckiefleet_root, \
-    get_duckietown_local_log_downloads, get_duckietown_data_dirs
-from .yaml_pretty import yaml_load, yaml_load_plain, yaml_dump_pretty
+from .paths import (get_catkin_ws_src, get_duckiefleet_root, get_duckietown_data_dirs,
+                    get_duckietown_local_log_downloads)
+from .yaml_pretty import yaml_dump_pretty, yaml_load, yaml_load_plain
 
 
 def yaml_write_to_file(ob, filename):
@@ -171,4 +171,3 @@ def same_file_content(a, b):
     s1 = os.stat(a).st_size
     s2 = os.stat(b).st_size
     return s1 == s2
-
