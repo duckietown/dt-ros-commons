@@ -41,8 +41,9 @@ def get_dropbox_urls():
         filenames = locate_files(s, pattern, case_sensitive=False)
         for f in filenames:
             found.append(f)
-            logger.debug('loading %s' % f)
-            data = open(f).read()
+            logger.debug(f'loading {f}')
+            with open(f) as _:
+                data = _.read()
             f_urls = yaml_load_plain(data)
             for k, v in list(f_urls.items()):
                 urls[k] = v
@@ -51,7 +52,7 @@ def get_dropbox_urls():
     msg += '\n'.join(found)
     logger.info(msg)
 
-    def sanitize(url):
+    def sanitize(url: str) -> str:
         if url.endswith('?dl=0'):
             url = url.replace('?dl=0', '?dl=1')
         return url

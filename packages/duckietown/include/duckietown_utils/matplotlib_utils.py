@@ -1,4 +1,3 @@
-
 import tempfile
 
 from .jpg import bgr_from_png
@@ -8,7 +7,8 @@ __all__ = ['CreateImageFromPylab']
 
 class CreateImageFromPylab(object):
 
-    def __init__(self, dpi=75, figure_args={}):
+    def __init__(self, dpi=75, figure_args: dict = None):
+        figure_args = figure_args or {}
         self.dpi = dpi
         suffix = '.png'
         self.temp_file = tempfile.NamedTemporaryFile(suffix=suffix)
@@ -30,14 +30,14 @@ class CreateImageFromPylab(object):
             return False
 
         if not self.figure.axes:
-#            raise Exception('You did not draw anything in the image.')
+            #            raise Exception('You did not draw anything in the image.')
             pass
 
         savefig_params = dict(dpi=self.dpi, bbox_inches='tight', pad_inches=0.01,
                               transparent=True, facecolor=self.figure.get_facecolor())
         self.pylab.savefig(self.temp_file.name, **savefig_params)
 
-        with open(self.temp_file.name) as f:
+        with open(self.temp_file.name, 'rb') as f:
             self.png_data = f.read()
 
         self.temp_file.close()

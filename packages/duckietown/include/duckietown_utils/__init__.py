@@ -5,7 +5,9 @@ many Python modules in Duckietown.
 
 """
 
+# Use the PyGeometry library as dtu.geo
 import geometry as geo
+_ = geo
 
 from .tcp_communication import *
 from .bag_info import *
@@ -97,4 +99,3 @@ if False:
                 v.__module__ = 'duckietown_utils'
                 __all__.append(c)
 
-# Use the PyGeometry library as dtu.geo

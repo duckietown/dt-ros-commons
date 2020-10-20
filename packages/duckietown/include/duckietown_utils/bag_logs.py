@@ -56,8 +56,7 @@ def d8n_read_all_images(filename, t0=None, t1=None):
     bag = rosbag.Bag(filename)
     topic = get_image_topic(bag)
     bag_proxy = BagReadProxy(bag, t0, t1)
-    # FIXME: this is wrong
-    res = d8n_read_all_images_from_bag(bag_proxy, topic, t0=t0, t1=t1)
+    res = d8n_read_all_images_from_bag(bag_proxy, topic)
     bag_proxy.close()
     return res
 
@@ -78,6 +77,7 @@ def d8n_read_all_images_from_bag(bag, topic0, max_images=None, use_relative_time
         logger.info('There are nfound = %d images total and I want max_images = %s' % (nfound, max_images))
         logger.info('Therefore I will use interval = %d' % (interval))
 
+    rgb = None
     for j, (topic, msg, t) in enumerate(bag.read_messages(topics=[topic0])):
 
         float_time = t.to_sec()
