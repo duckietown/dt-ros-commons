@@ -1,16 +1,15 @@
-from collections import defaultdict
 import fnmatch
 import os
+from collections import defaultdict
 
 __all__ = [
-    'locate_files',
+    "locate_files",
 ]
 
 
 # @contract(returns='list(str)', directory='str',
 #           pattern='str', followlinks='bool')
-def locate_files(directory, pattern, normalize=True, followlinks=True, alsodirs=False,
-                 case_sensitive=True):
+def locate_files(directory, pattern, normalize=True, followlinks=True, alsodirs=False, case_sensitive=True):
     # print('locate_files %r %r' % (directory, pattern))
     filenames = []
 
@@ -44,13 +43,12 @@ def locate_files(directory, pattern, normalize=True, followlinks=True, alsodirs=
 
     for k, v in list(real2norm.items()):
         if len(v) > 1:
-            msg = 'In directory:\n\t%s\n' % directory
-            msg += 'I found %d paths that refer to the same file:\n' % len(v)
+            msg = "In directory:\n\t%s\n" % directory
+            msg += "I found %d paths that refer to the same file:\n" % len(v)
             for n in v:
-                msg += '\n - %s' % n
-            msg += '\nrefer to the same file:\n\t%s\n' % k
-            msg += 'I will silently eliminate redundancies.'
+                msg += "\n - %s" % n
+            msg += "\nrefer to the same file:\n\t%s\n" % k
+            msg += "I will silently eliminate redundancies."
             # logger.warning(v)
 
     return list(real2norm.keys())
-

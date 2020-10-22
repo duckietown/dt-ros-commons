@@ -1,4 +1,4 @@
-__all__ = ['logger']
+__all__ = ["logger"]
 
 import logging
 
@@ -13,5 +13,5 @@ FORMAT = "%(name)15s|%(filename)15s:%(lineno)-4s - %(funcName)-15s| %(message)s"
 # else:
 logging.basicConfig(format=FORMAT)
 
-logger = logging.getLogger('DT')
+logger = logging.getLogger("DT")
 logger.setLevel(logging.DEBUG)

@@ -1,24 +1,24 @@
 # -*- coding: utf-8 -*-
-from contextlib import contextmanager
 import gzip
 import os
 import random
+from contextlib import contextmanager
 
 from .exception_utils import check_isinstance
 
 __all__ = [
-    'safe_write',
-    'safe_read',
+    "safe_write",
+    "safe_read",
 ]
 
 
 def is_gzip_filename(filename):
     check_isinstance(filename, str)
-    return '.gz' in filename
+    return ".gz" in filename
 
 
 @contextmanager
-def safe_write(filename, mode='wb', compresslevel=5):
+def safe_write(filename, mode="wb", compresslevel=5):
     """
         Makes atomic writes by writing to a temp filename.
         Also if the filename ends in ".gz", writes to a compressed stream.
@@ -42,11 +42,10 @@ def safe_write(filename, mode='wb', compresslevel=5):
                 #     assert not os.path.exists(filename)
                 #
     n = random.randint(0, 10000)
-    tmp_filename = '%s.tmp.%s.%s' % (filename, os.getpid(), n)
+    tmp_filename = "%s.tmp.%s.%s" % (filename, os.getpid(), n)
     try:
         if is_gzip_filename(filename):
-            fopen = lambda fname, fmode: gzip.open(filename=fname, mode=fmode,
-                                                   compresslevel=compresslevel)
+            fopen = lambda fname, fmode: gzip.open(filename=fname, mode=fmode, compresslevel=compresslevel)
         else:
             fopen = open
 
@@ -70,7 +69,7 @@ def safe_write(filename, mode='wb', compresslevel=5):
 
 
 @contextmanager
-def safe_read(filename, mode='rb'):
+def safe_read(filename, mode="rb"):
     """
         If the filename ends in ".gz", reads from a compressed stream.
         Yields a file descriptor.

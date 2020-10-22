@@ -1,8 +1,9 @@
-from duckietown_utils import robot_name
+import json
+
 import rospy
 from duckietown_msgs.srv import GetVariable, SetVariable
+from duckietown_utils import robot_name
 from std_msgs.msg import String
-import json
 
 
 def getVariable(variable_name):
@@ -22,6 +23,7 @@ def getVariable(variable_name):
     # Value of variable
     return json.loads(var.value_json.data)
 
+
 def setVariable(variable_name, value):
     # Get vehicle name
     veh = robot_name.get_current_robot_name()
@@ -37,7 +39,6 @@ def setVariable(variable_name, value):
 
     # Execute rosservice
     var = setVar(name_json, value_json)
-
 
     # Either True, False or ERROR
     return json.loads(var.success_json.data)

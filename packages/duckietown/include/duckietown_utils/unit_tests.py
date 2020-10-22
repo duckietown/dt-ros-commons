@@ -3,9 +3,9 @@ from .detect_environment import on_duckiebot
 from .logging_logger import logger
 
 __all__ = [
-    'unit_test',
-    'run_tests_for_this_module',
-    'get_output_dir_for_test',
+    "unit_test",
+    "run_tests_for_this_module",
+    "get_output_dir_for_test",
 ]
 
 show_info = DuckietownConstants.debug_show_package_import_info
@@ -20,7 +20,7 @@ def run_tests_for_this_module():
 
 
 def get_output_dir_for_test():
-    return 'out-comptests'
+    return "out-comptests"
 
 
 if on_duckiebot():
@@ -33,12 +33,12 @@ else:
         from comptests.comptests import get_comptests_output_dir as get_output_dir_for_test  # @UnusedImport
 
         if show_info:
-            logger.warning('Using the Comptests testing framework.')
+            logger.warning("Using the Comptests testing framework.")
 
         using_fake_tests = False
     except ImportError:
         if show_info:
-            logger.warning('Unit tests are disabled because Comptests not found.')
+            logger.warning("Unit tests are disabled because Comptests not found.")
         using_fake_tests = True
 
 if using_fake_tests:
@@ -50,5 +50,4 @@ if using_fake_tests:
         pass
 
     def get_output_dir_for_test():
-        return 'out-comptests'
-
+        return "out-comptests"

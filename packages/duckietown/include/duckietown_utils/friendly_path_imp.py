@@ -1,18 +1,19 @@
-'''
+"""
 
 Utilities for writing compact file paths.
 Copied from the `compmake` project.
 
 Author: Andrea Censi
 
-'''
+"""
 
-__version__ = '1.0'
+__version__ = "1.0"
+
 import os
 
 # TODO: cache the results?
 __all__ = [
-    'friendly_path',
+    "friendly_path",
 ]
 
 
@@ -29,24 +30,24 @@ def friendly_path(path, use_environment=True):
     options.append(os.path.relpath(path, os.getcwd()))
 
     rules = []
-    rules.append(('~', os.path.expanduser('~')))
-    rules.append(('.', os.getcwd()))
-    rules.append(('.', os.path.realpath(os.getcwd())))
+    rules.append(("~", os.path.expanduser("~")))
+    rules.append((".", os.getcwd()))
+    rules.append((".", os.path.realpath(os.getcwd())))
 
     if use_environment:
         envs = dict(os.environ)
         # remove unwanted
         for e in list(envs.keys()):
-            if 'PWD' in e:
+            if "PWD" in e:
                 del envs[e]
 
         for k, v0 in list(envs.items()):
             if v0:
                 for v in [v0, os.path.realpath(v0)]:
-                    if v and v[-1] == '/':
+                    if v and v[-1] == "/":
                         v = v[:-1]
-                    if v[0] == '/':
-                        rules.append(('${%s}' % k, v))
+                    if v[0] == "/":
+                        rules.append(("${%s}" % k, v))
 
     # apply longest first
     rules.sort(key=lambda x: (-len(x[1])))
@@ -58,7 +59,7 @@ def friendly_path(path, use_environment=True):
 
     def score(s):
         # penalize '..' a lot
-        s = s.replace('..', '*' * weight_doubledot)
+        s = s.replace("..", "*" * weight_doubledot)
         return len(s)
 
     options.sort(key=score)
@@ -75,4 +76,3 @@ def replace_variables(path, rules):
             # print("  applied %s => %s" % (v, k))
             path = path.replace(v, k)
     return path
-

@@ -16,7 +16,7 @@ def write_data_to_file(data, filename):
         msg = 'Expected "data" to be a string, not %s.' % type(data).__name__
         raise ValueError(msg)
     if len(filename) > 256:
-        msg = 'Invalid argument filename: too long. Did you confuse it with data?'
+        msg = "Invalid argument filename: too long. Did you confuse it with data?"
         raise ValueError(msg)
 
     filename = expand_all(filename)
@@ -25,11 +25,10 @@ def write_data_to_file(data, filename):
     if os.path.exists(filename):
         current = open(filename).read()
         if current == data:
-            if not 'assets/' in filename:
-                logger.debug('already up to date %s' % friendly_path(filename))
+            if not "assets/" in filename:
+                logger.debug("already up to date %s" % friendly_path(filename))
             return
 
-    with open(filename, 'w') as f:
+    with open(filename, "w") as f:
         f.write(data)
-    logger.debug('Written to: %s' % friendly_path(filename))
-
+    logger.debug("Written to: %s" % friendly_path(filename))

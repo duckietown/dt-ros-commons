@@ -2,17 +2,16 @@ import os
 import shutil
 
 import rosbag
-
 from .bag_reading import BagReadProxy
 from .contracts_ import contract
 from .disk_hierarchy import create_tmpdir, mkdirs_thread_safe
 from .instantiate_utils import indent
 from .logging_logger import logger
 
-__all__ = ['d8n_make_video_from_bag']
+__all__ = ["d8n_make_video_from_bag"]
 
 
-@contract(returns='tuple(int, int)')
+@contract(returns="tuple(int, int)")
 def count_messages_in_slice(bag_filename, topic, t0, t1, stop_at=None):
     """
         Counts the number of messages in a slice of time.
@@ -88,41 +87,40 @@ def d8n_make_video_from_bag(bag_filename, topic, out, t0=None, t1=None):
     stop_at = 10
     min_messages = 5
 
-    actual_count, count, stopped_early = \
-        count_messages_in_slice(bag_filename, topic, t0, t1, stop_at=stop_at)
+    actual_count, count, stopped_early = count_messages_in_slice(bag_filename, topic, t0, t1, stop_at=stop_at)
 
-    msg = ('Creating video for topic %r, which has %d messages '
-           'in the entire log.' % (topic, count))
+    msg = "Creating video for topic %r, which has %d messages " "in the entire log." % (topic, count)
     logger.info(msg)
 
     if not stopped_early and (actual_count != count):
-        msg = 'However, the actual count in [%s, %s] is %s' % (t0, t1, actual_count)
+        msg = "However, the actual count in [%s, %s] is %s" % (t0, t1, actual_count)
         logger.info(msg)
 
     if actual_count < min_messages:
-        msg = ('Topic %r has only %d messages in slice (%d total), too few'
-               ' to make a video (min: %s).\nFile: %s'
-               % (topic, actual_count, count, min_messages, bag_filename))
+        msg = (
+            "Topic %r has only %d messages in slice (%d total), too few"
+            " to make a video (min: %s).\nFile: %s" % (topic, actual_count, count, min_messages, bag_filename)
+        )
 
-        msg += '\nt0: %s' % t0
-        msg += '\nt1: %s' % t1
+        msg += "\nt0: %s" % t0
+        msg += "\nt1: %s" % t1
         bag = rosbag.Bag(bag_filename)
-        msg += '\nstart: %s' % bag.get_start_time()
-        msg += '\nend: %s' % bag.get_end_time()
+        msg += "\nstart: %s" % bag.get_start_time()
+        msg += "\nend: %s" % bag.get_end_time()
         if actual_count == count:
-            msg += '\n' + indent(get_summary_of_bag_messages(bag), '  info: ')
+            msg += "\n" + indent(get_summary_of_bag_messages(bag), "  info: ")
         bag.close()
         raise NotEnoughFramesInSlice(msg)
 
-    model = 'bag2mp4_fixfps_limit'
+    model = "bag2mp4_fixfps_limit"
 
     tmpdir = create_tmpdir()
     out_tmp = os.path.join(tmpdir, os.path.basename(out))
     try:
-        logger.debug('Writing temp file to %s' % out_tmp)
-        logger.debug('(You can use mplayer to follow along.)')
+        logger.debug("Writing temp file to %s" % out_tmp)
+        logger.debug("(You can use mplayer to follow along.)")
         pg(model, config=dict(bag=bag_filename, topic=topic, out=out_tmp, t0=t0, t1=t1))
-        md = out_tmp + '.metadata.yaml'
+        md = out_tmp + ".metadata.yaml"
         if os.path.exists(md):
             os.unlink(md)
 
@@ -131,9 +129,9 @@ def d8n_make_video_from_bag(bag_filename, topic, out, t0=None, t1=None):
             mkdirs_thread_safe(dn)
 
         shutil.copyfile(out_tmp, out)
-        logger.info('Created: %s' % out)
+        logger.info("Created: %s" % out)
 
-        info = out_tmp + '.info.yaml'
+        info = out_tmp + ".info.yaml"
         if os.path.exists(info):
             os.unlink(info)
 

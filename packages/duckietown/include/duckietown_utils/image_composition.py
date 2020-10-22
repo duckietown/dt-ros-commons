@@ -1,7 +1,7 @@
 import numpy as np
 
 __all__ = [
-    'make_images_grid',
+    "make_images_grid",
 ]
 
 
@@ -20,8 +20,8 @@ def make_images_grid(images, cols=None, pad=0, bgcolor=[128, 128, 128]):
     assert n <= cols * rows
 
     # find width and height for the grid
-    col_width = np.zeros(cols, dtype='int32')
-    row_height = np.zeros(rows, dtype='int32')
+    col_width = np.zeros(cols, dtype="int32")
+    row_height = np.zeros(rows, dtype="int32")
     for i in range(n):
         image = images[i]
         col = i % cols
@@ -30,12 +30,7 @@ def make_images_grid(images, cols=None, pad=0, bgcolor=[128, 128, 128]):
         assert 0 <= row < rows
 
         if pad > 0:
-            image = image_border(image,
-                       left=pad,
-                       right=pad,
-                       top=pad,
-                       bottom=pad,
-                       color=bgcolor)
+            image = image_border(image, left=pad, right=pad, top=pad, bottom=pad, color=bgcolor)
         width = image.shape[1]
         height = image.shape[0]
 
@@ -46,18 +41,18 @@ def make_images_grid(images, cols=None, pad=0, bgcolor=[128, 128, 128]):
     canvas_height = sum(row_height)
 
     # find position for each col and row
-    col_x = np.zeros(cols, dtype='int32')
+    col_x = np.zeros(cols, dtype="int32")
     for col in range(1, cols):
         col_x[col] = col_x[col - 1] + col_width[col - 1]
 
-    assert(canvas_width == col_x[-1] + col_width[-1])
+    assert canvas_width == col_x[-1] + col_width[-1]
 
-    row_y = np.zeros(rows, dtype='int32')
+    row_y = np.zeros(rows, dtype="int32")
     for row in range(1, rows):
         row_y[row] = row_y[row - 1] + row_height[row - 1]
-    assert(canvas_height == row_y[-1] + row_height[-1])
+    assert canvas_height == row_y[-1] + row_height[-1]
 
-    canvas = np.zeros((canvas_height, canvas_width, 3), dtype='uint8')
+    canvas = np.zeros((canvas_height, canvas_width, 3), dtype="uint8")
     for k in range(3):
         canvas[:, :, k] = bgcolor[k]
 
@@ -77,8 +72,7 @@ def make_images_grid(images, cols=None, pad=0, bgcolor=[128, 128, 128]):
         eright = extra_hor - eleft
         etop = extra_ver / 2
         ebottom = extra_ver - etop
-        image = image_border(image, left=eleft, right=eright, top=etop,
-                             bottom=ebottom, color=bgcolor)
+        image = image_border(image, left=eleft, right=eright, top=etop, bottom=ebottom, color=bgcolor)
 
         # TODO: align here
         place_at(canvas, image, x, y)
@@ -87,7 +81,7 @@ def make_images_grid(images, cols=None, pad=0, bgcolor=[128, 128, 128]):
 
 
 def rgb_pad(height, width, color):
-    pad = np.zeros((height, width, 3), dtype='uint8')
+    pad = np.zeros((height, width, 3), dtype="uint8")
     for i in range(3):
         pad[:, :, i] = color[i]
     return pad
@@ -131,6 +125,4 @@ def place_at(canvas, image, xpix, ypix):
     ysize = min(canvas.shape[0] - ypix, image.shape[0])
     if len(image.shape) == 2:
         image = image.reshape((image.shape[0], image.shape[1], 1))
-    canvas[ypix:(ypix + ysize), xpix:(xpix + xsize), 0:3] = \
-        image[0:ysize, 0:xsize, :]
-
+    canvas[ypix : (ypix + ysize), xpix : (xpix + xsize), 0:3] = image[0:ysize, 0:xsize, :]

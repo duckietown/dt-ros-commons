@@ -1,9 +1,7 @@
-
 # -*- coding: utf-8 -*-
 import sys
 
 from .logging_logger import logger
-
 from .safe_reading import safe_read, safe_write
 
 # from .debug_pickler import find_pickling_error
@@ -13,23 +11,22 @@ else:
     import pickle as pickle  # @Reimport
 
 __all__ = [
-    'safe_pickle_dump',
-    'safe_pickle_load',
+    "safe_pickle_dump",
+    "safe_pickle_load",
 ]
 
 
-def safe_pickle_dump(value, filename, protocol=pickle.HIGHEST_PROTOCOL,
-                     **safe_write_options):
+def safe_pickle_dump(value, filename, protocol=pickle.HIGHEST_PROTOCOL, **safe_write_options):
     with safe_write(filename, **safe_write_options) as f:
         try:
             pickle.dump(value, f, protocol)
         except KeyboardInterrupt:
             raise
         except Exception:
-            msg = 'Cannot pickle object of class %s' % type(value).__name__
+            msg = "Cannot pickle object of class %s" % type(value).__name__
             logger.error(msg)
-#             msg = find_pickling_error(value, protocol)
-#             logger.error(msg)
+            #             msg = find_pickling_error(value, protocol)
+            #             logger.error(msg)
             raise
 
 

@@ -14,7 +14,7 @@ from .yaml_pretty import yaml_load_plain
 
 @memoize_simple
 def get_dropbox_urls():
-    logger.info('Getting urls...')
+    logger.info("Getting urls...")
     sources = []
     # from .paths import get_duckiefleet_root, get_duckietown_root, \
     #    get_duckietown_data_dirs
@@ -23,11 +23,12 @@ def get_dropbox_urls():
     #    sources.extend(get_duckietown_data_dirs())
 
     import imp
-    dirname = imp.find_module('easy_logs')[1]
+
+    dirname = imp.find_module("easy_logs")[1]
     sources.append(dirname)
 
     try:
-        sources.append(get_ros_package_path('easy_logs'))
+        sources.append(get_ros_package_path("easy_logs"))
     except:
         pass  # XXX
 
@@ -36,24 +37,25 @@ def get_dropbox_urls():
     found = []
     urls = OrderedDict()
     for s in sources:
-        pattern = '*.urls.yaml'
+        pattern = "*.urls.yaml"
 
         filenames = locate_files(s, pattern, case_sensitive=False)
         for f in filenames:
             found.append(f)
-            logger.debug('loading %s' % f)
-            data = open(f).read()
+            logger.debug(f"loading {f}")
+            with open(f) as _:
+                data = _.read()
             f_urls = yaml_load_plain(data)
             for k, v in list(f_urls.items()):
                 urls[k] = v
 
-    msg = 'Found %d urls in %s files:\n' % (len(urls), len(found))
-    msg += '\n'.join(found)
+    msg = "Found %d urls in %s files:\n" % (len(urls), len(found))
+    msg += "\n".join(found)
     logger.info(msg)
 
-    def sanitize(url):
-        if url.endswith('?dl=0'):
-            url = url.replace('?dl=0', '?dl=1')
+    def sanitize(url: str) -> str:
+        if url.endswith(b"?dl=0"):
+            url = url.replace(b"?dl=0", b"?dl=1")
         return url
 
     return dict([(k, sanitize(url)) for k, url in list(urls.items())])
@@ -61,12 +63,12 @@ def get_dropbox_urls():
 
 def download_if_not_exist(url, filename):
     if not os.path.exists(filename):
-        logger.info('Path does not exist: %s' % filename)
+        logger.info("Path does not exist: %s" % filename)
         download_url_to_file(url, filename)
         if not os.path.exists(filename):
-            msg = 'I expected download_url_to_file() to raise an error if failed.'
-            msg += '\n url: %s' % url
-            msg += '\n filename: %s' % filename
+            msg = "I expected download_url_to_file() to raise an error if failed."
+            msg += "\n url: %s" % url
+            msg += "\n filename: %s" % filename
             raise AssertionError(msg)
     return filename
 
@@ -74,6 +76,9 @@ def download_if_not_exist(url, filename):
 import sys
 import time
 import urllib.request, urllib.parse, urllib.error
+
+start_time = None
+last_time = None
 
 
 def reporthook(count, block_size, total_size):
@@ -91,14 +96,16 @@ def reporthook(count, block_size, total_size):
 
     duration = now - start_time
     progress_size = int(count * block_size)
-    speed = (progress_size / (1024 * 1024 * duration))
-    percent = (count * block_size * 100 / total_size)
+    speed = progress_size / (1024 * 1024 * duration)
+    percent = count * block_size * 100 / total_size
 
     if percent != 100 and interval < 5:
         return
 
-    sys.stderr.write("downloaded %.2f MB of %.1fMB (%.1f%%) at %.2f MB/s in %1.f s\n" %
-                     (in_MB(progress_size), in_MB(total_size), percent, speed, duration))
+    sys.stderr.write(
+        "downloaded %.2f MB of %.1fMB (%.1f%%) at %.2f MB/s in %1.f s\n"
+        % (in_MB(progress_size), in_MB(total_size), percent, speed, duration)
+    )
 
     # sys.stdout.write("\r...%d%%, %d MB, %d KB/s, %d seconds passed" %
     #                  (percent, progress_size / (1024 * 1024), speed, duration))
@@ -108,13 +115,13 @@ def reporthook(count, block_size, total_size):
 
 
 def download_url_to_file(url, filename):
-    logger.info('Download from %s' % url)
-    tmp = filename + '.tmp_download_file'
+    logger.info("Download from %s" % url)
+    tmp = filename + ".tmp_download_file"
     urllib.request.urlretrieve(url, tmp, reporthook)
     if not os.path.exists(filename):
         os.rename(tmp, filename)
 
-    logger.info('-> %s' % friendly_path(filename))
+    logger.info("-> %s" % friendly_path(filename))
 
 
 #
@@ -162,8 +169,8 @@ def get_file_from_url(url):
         The data is cached in caches/downloads/
     """
     basename = get_md5(url)
-    if 'jpg' in url:
-        basename += '.jpg'
+    if "jpg" in url:
+        basename += ".jpg"
 
     cachedir = get_duckietown_cache_dir()
     filename = os.path.join(cachedir, basename)
@@ -177,7 +184,7 @@ def get_sha12url():
     urls = get_dropbox_urls()
     for u, v in list(urls.items()):
         u = str(u)  # .encode('utf-8')
-        if u.startswith('hash:'):
+        if u.startswith("hash:"):
             parsed = parse_hash_url(u)
             sha12url[parsed.sha1] = v
     return sha12url
@@ -190,7 +197,7 @@ def require_resource(basename, destination=None):
     """
     urls = get_dropbox_urls()
     if not basename in urls:
-        msg = 'No URL found for %r.' % basename
+        msg = "No URL found for %r." % basename
         raise Exception(msg)
     else:
         url = urls[basename]

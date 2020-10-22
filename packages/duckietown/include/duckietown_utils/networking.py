@@ -1,12 +1,14 @@
 import socket
 import ssl
-import urllib.request, urllib.error, urllib.parse
+import urllib.error
+import urllib.parse
+import urllib.request
 
 from .instantiate_utils import indent
 from .logging_logger import logger
 from .memoization import memoize_simple
 
-use_url = 'http://35.156.29.30/~duckietown/ping'
+use_url = "http://35.156.29.30/~duckietown/ping"
 
 
 @memoize_simple
@@ -22,13 +24,13 @@ def is_internet_connected(url=use_url, timeout=3):
             if e.code == 404:
                 return True
             else:
-                msg = 'Man in the middle attack?'
-                msg += '\n\n' + indent(str(e.msg), '> ')
+                msg = "Man in the middle attack?"
+                msg += "\n\n" + indent(str(e.msg), "> ")
                 return False
         return True
     except ssl.CertificateError as e:
-        msg = 'Detected proxy; no direct connection available.'
-        msg += '\n\n' + indent(e, '  > ')
+        msg = "Detected proxy; no direct connection available."
+        msg += "\n\n" + indent(e, "  > ")
         logger.warning(msg)
         return False
     except IOError as e:

@@ -5,7 +5,10 @@ many Python modules in Duckietown.
 
 """
 
+# Use the PyGeometry library as dtu.geo
 import geometry as geo
+
+_ = geo
 
 from .tcp_communication import *
 from .bag_info import *
@@ -63,25 +66,26 @@ from .wrap_main import *
 from .yaml_pretty import *
 from .yaml_wrap import *
 
-#from .cli import *
+# from .cli import *
 try:
     import frozendict  # @UnusedImport @UnresolvedImport
 except:
-    msg = 'frozendict not installed.'
-    msg += '\n\nTry the following:'
-    msg += '\n\n     sudo apt install python-frozendict'
+    msg = "frozendict not installed."
+    msg += "\n\nTry the following:"
+    msg += "\n\n     sudo apt install python-frozendict"
     raise Exception(msg)
 
 try:
     from ruamel import yaml  # @UnusedImport
 except:
-    msg = 'ruamel.yaml not installed.'
-    msg += '\n\nTry the following:'
-    msg += '\n\n     sudo apt install python-ruamel.yaml'
+    msg = "ruamel.yaml not installed."
+    msg += "\n\nTry the following:"
+    msg += "\n\n     sudo apt install python-ruamel.yaml"
     raise Exception(msg)
 
 # this is from the exercises
 from .augmented_reality_utils import *
+
 # from .draw import *
 # from .cli import *
 
@@ -92,9 +96,7 @@ if False:
     __all__ = []
     for c in list(locals()):
         v = eval(c)
-        if hasattr(v, '__module__'):
-            if v.__module__.startswith('duckietown_utils'):
-                v.__module__ = 'duckietown_utils'
+        if hasattr(v, "__module__"):
+            if v.__module__.startswith("duckietown_utils"):
+                v.__module__ = "duckietown_utils"
                 __all__.append(c)
-
-# Use the PyGeometry library as dtu.geo

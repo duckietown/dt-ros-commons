@@ -1,7 +1,7 @@
 from .exceptions import DTConfigException
 
 __all__ = [
-    'dt_check_isinstance',
+    "dt_check_isinstance",
 ]
 
 

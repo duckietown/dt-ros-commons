@@ -32,8 +32,7 @@ class DTNoMatches(DTUserError):
     """ Could not find any matches for the user selector """
 
 
-def wrap_script_entry_point(function,
-                            exceptions_no_traceback=(DTUserError,)):
+def wrap_script_entry_point(function, exceptions_no_traceback=(DTUserError,)):
     """
         Wraps the main() of a script.
         For Exception: we exit with value 2.
@@ -49,7 +48,7 @@ def wrap_script_entry_point(function,
         sys.exit(ret)
     except exceptions_no_traceback as e:
         s = "Error during execution of %s:" % function.__name__
-        s += '\n' + str(e)
+        s += "\n" + str(e)
         logger.error(s)
         sys.exit(1)
     except Exception as e:

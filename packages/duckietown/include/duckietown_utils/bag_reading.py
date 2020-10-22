@@ -1,24 +1,23 @@
-from collections import namedtuple
 import time
+from collections import namedtuple
 
 import numpy as np
-import rosbag
 
+import rosbag
 from .exceptions import DTBadData
 from .logging_logger import logger
 
 __all__ = [
-    'd8n_bag_read_with_progress',
-    'BagReadProxy',
+    "d8n_bag_read_with_progress",
+    "BagReadProxy",
 ]
 
-MessagePlus = namedtuple('MessagePlus', 'topic msg time_absolute time_from_physical_log_start time_window')
+MessagePlus = namedtuple("MessagePlus", "topic msg time_absolute time_from_physical_log_start time_window")
 
 debug_skip = False
 
 
 class BagReadProxy(object):
-
     def __init__(self, bag, t0, t1, bag_absolute_t0_ref=None):
         """
             t0, t1 are relative times to the bag start
@@ -66,32 +65,39 @@ class BagReadProxy(object):
         """ Returns approximate message count, compensating with ratio. """
         n = self.bag.get_message_count(topic_filters)
         n1 = int(np.ceil(self.fraction * n))
-#         print('n = %s  fraction = %s  n1 = %s' % (n, self.fraction, n1) )
+        #         print('n = %s  fraction = %s  n1 = %s' % (n, self.fraction, n1) )
         return n1
 
     def read_messages_plus(self, *args, **kwargs):
         if isinstance(self.bag, rosbag.Bag):
             import rospy
+
             start_time = rospy.Time.from_sec(self.read_from_absolute)
             end_time = rospy.Time.from_sec(self.read_to_absolute)
 
-            for topic, msg, _t in self.bag.read_messages(*args, start_time=start_time, end_time=end_time, **kwargs):
+            for topic, msg, _t in self.bag.read_messages(
+                *args, start_time=start_time, end_time=end_time, **kwargs
+            ):
                 t = _t.to_sec()
                 if t < self.read_from_absolute:
                     if debug_skip:
-                        logger.debug('skipping %s becasue %s < %s' % (topic, t, self.read_from_absolute))
+                        logger.debug("skipping %s becasue %s < %s" % (topic, t, self.read_from_absolute))
                     continue
                 if t > self.read_to_absolute:
                     if debug_skip:
-                        logger.debug('skipping %s becasue %s > %s' % (topic, t, self.read_to_absolute))
+                        logger.debug("skipping %s becasue %s > %s" % (topic, t, self.read_to_absolute))
                         continue
                     break
                 time_absolute = t
                 time_from_physical_log_start = t - self.bag_absolute_t0_ref
                 time_window = t - self.read_from_absolute
-                m = MessagePlus(topic=topic, msg=msg, time_absolute=time_absolute,
-                            time_from_physical_log_start=time_from_physical_log_start,
-                            time_window=time_window)
+                m = MessagePlus(
+                    topic=topic,
+                    msg=msg,
+                    time_absolute=time_absolute,
+                    time_from_physical_log_start=time_from_physical_log_start,
+                    time_window=time_window,
+                )
                 yield m
         elif isinstance(self.bag, BagReadProxy):
             for m in self.bag.read_messages_plus(*args, **kwargs):
@@ -100,15 +106,18 @@ class BagReadProxy(object):
 
     def read_messages(self, *args, **kwargs):
         import rospy
+
         start_time = rospy.Time.from_sec(self.read_from_absolute)
         end_time = rospy.Time.from_sec(self.read_to_absolute)
-        for topic, msg, _t in self.bag.read_messages(*args, start_time=start_time, end_time=end_time, **kwargs):
+        for topic, msg, _t in self.bag.read_messages(
+            *args, start_time=start_time, end_time=end_time, **kwargs
+        ):
             t = _t.to_sec()
             if t < self.read_from_absolute:
-                logger.debug('warning: skipping %s becasue %s < %s' % (topic, t, self.read_from_absolute))
+                logger.debug("warning: skipping %s becasue %s < %s" % (topic, t, self.read_from_absolute))
                 continue
             if t > self.read_to_absolute:
-                logger.debug('skipping %s becasue %s > %s' % (topic, t, self.read_to_absolute))
+                logger.debug("skipping %s becasue %s > %s" % (topic, t, self.read_to_absolute))
                 break
             yield topic, msg, _t
 
@@ -138,18 +147,19 @@ def d8n_bag_read_with_progress(bag, topic, yield_tuple=False):
         if t - last > INTERVAL:
             last = t
             fps = n / (t - first)
-            logger.debug('%6d  %4.1f%%  %5.1f fps' % (n, progress * 100, fps))
+            logger.debug("%6d  %4.1f%%  %5.1f fps" % (n, progress * 100, fps))
         if yield_tuple:
             yield topic, msg, msg_time_
         else:
             yield msg
     if n == 0:
-        s = 'Could not find any message for topic %r.' % topic
+        s = "Could not find any message for topic %r." % topic
         raise DTBadData(s)
 
     fps = n / (time.time() - first)
-    logger.debug('Read %d messages for %s. Processing time: %.1f fps.' % (n, topic, fps))
+    logger.debug("Read %d messages for %s. Processing time: %.1f fps." % (n, topic, fps))
     bag.close()
+
 
 #
 # def proxy_transparent(bag):

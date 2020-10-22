@@ -3,7 +3,7 @@ import traceback
 
 from .logging_logger import logger
 
-__all__ = ['wrap_main']
+__all__ = ["wrap_main"]
 
 
 def wrap_main(f):
@@ -15,4 +15,3 @@ def wrap_main(f):
         s = traceback.format_exc(e)
         logger.error(s)
         sys.exit(2)
-
