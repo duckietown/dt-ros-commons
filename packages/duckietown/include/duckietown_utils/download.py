@@ -54,8 +54,8 @@ def get_dropbox_urls():
     logger.info(msg)
 
     def sanitize(url: str) -> str:
-        if url.endswith("?dl=0"):
-            url = url.replace("?dl=0", "?dl=1")
+        if url.endswith(b"?dl=0"):
+            url = url.replace(b"?dl=0", b"?dl=1")
         return url
 
     return dict([(k, sanitize(url)) for k, url in list(urls.items())])
