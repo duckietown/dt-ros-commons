@@ -147,7 +147,12 @@ def look_everywhere_for_files(patterns: List[str], strict: bool = False, silent:
     # We look in $DUCKIETOWN_ROOT/catkin_ws/src
     # sources.append(get_catkin_ws_src())
     # then we look in $DUCKIETOWN_FLEET
-    sources.append(get_duckiefleet_root())
+    try:
+        r = get_duckiefleet_root()
+    except DTConfigException as e:
+        logger.warning(f'no duckiefleet found: {e}')
+    else:
+        sources.append(r)
     for d in get_duckietown_data_dirs():
         sources.append(d)
     # downloads

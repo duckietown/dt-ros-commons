@@ -17,7 +17,7 @@ class InvalidQueryForUniverse(Exception):
     pass
 
 
-class Spec(object, metaclass=ABCMeta):
+class Spec(metaclass=ABCMeta):
     def __init__(self, children):
         self.children = children
 
@@ -472,7 +472,7 @@ def parse_match_spec(s, filters=None):
     if ":" in s:
         i = s.index(":")
         tagname = s[:i]
-        tagvalue = s[i + 1 :]
+        tagvalue = s[i + 1:]
         return ByTag(tagname, rec(tagvalue))
 
     if s.startswith("<"):

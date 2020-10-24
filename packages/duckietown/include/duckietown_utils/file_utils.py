@@ -5,9 +5,21 @@ from .logging_logger import logger
 from .mkdirs import d8n_make_sure_dir_exists
 from .path_utils import expand_all
 
+
+def read_str_from_file(filename: str) -> str:
+    with open(filename, 'r') as f:
+        return f.read()
+
+
+def read_bytes_from_file(filename: str) -> bytes:
+    with open(filename, 'rb') as f:
+        return f.read()
+
+
 def write_str_to_file(data: str, filename: str):
     b: bytes = data.encode()
     return write_data_to_file(b, filename)
+
 
 def write_data_to_file(data: bytes, filename: str):
     """

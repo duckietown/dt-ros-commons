@@ -1,5 +1,10 @@
 import os
-from collections import OrderedDict
+import sys
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
+from typing import Optional
 
 from .friendly_path_imp import friendly_path
 from .locate_files_impl import locate_files
@@ -35,7 +40,7 @@ def get_dropbox_urls():
     sources = set(sources)
 
     found = []
-    urls = OrderedDict()
+    urls = {}
     for s in sources:
         pattern = "*.urls.yaml"
 
@@ -52,17 +57,20 @@ def get_dropbox_urls():
 
     msg = "Found %d urls in %s files:\n" % (len(urls), len(found))
     msg += "\n".join(found)
+    if len(urls) < 10:
+        msg += '\n\n the urls: {urls}'
     logger.info(msg)
     logger.info(repr(urls))
+
     def sanitize(url: str) -> str:
-        if url.endswith("?dl=0"): # here
+        if url.endswith("?dl=0"):  # here
             url = url.replace("?dl=0", "?dl=1")
         return url
 
-    return dict([(k, sanitize(url)) for k, url in list(urls.items())])
+    return dict([(k, sanitize(url)) for k, url in (urls.items())])
 
 
-def download_if_not_exist(url, filename):
+def download_if_not_exist(url: str, filename: str):
     if not os.path.exists(filename):
         logger.info("Path does not exist: %s" % filename)
         download_url_to_file(url, filename)
@@ -73,10 +81,6 @@ def download_if_not_exist(url, filename):
             raise AssertionError(msg)
     return filename
 
-
-import sys
-import time
-import urllib.request, urllib.parse, urllib.error
 
 start_time = None
 last_time = None
@@ -125,46 +129,7 @@ def download_url_to_file(url, filename):
     logger.info("-> %s" % friendly_path(filename))
 
 
-#
-# def download_url_to_file_old(url, filename):
-#     logger.info('Download from %s' % (url))
-#     tmp = filename + '.tmp_download_file'
-#     cmd = [
-#         'wget',
-#         '-O',
-#         tmp,
-#         url
-#     ]
-#     d8n_make_sure_dir_exists(tmp)
-#     res = system_cmd_result(cwd='.',
-#                             cmd=cmd,
-#                             display_stdout=False,
-#                             display_stderr=False,
-#                             raise_on_error=True,
-#                             write_stdin='',
-#                             capture_keyboard_interrupt=False,
-#                             env=None)
-#
-#     if not os.path.exists(tmp) and not os.path.exists(filename):
-#         msg = 'Downloaded file does not exist but wget did not give any error.'
-#         msg += '\n url: %s' % url
-#         msg += '\n downloaded to: %s' % tmp
-#         msg += '\n' + indent(str(res), ' | ')
-#         d = os.path.dirname(tmp)
-#         r = system_cmd_result(d, ['ls', '-l'], display_stdout=False,
-#                               display_stderr=False,
-#                               raise_on_error=True)
-#         msg += '\n Contents of the directory:'
-#         msg += '\n' + indent(str(r.stdout), ' | ')
-#         raise Exception(msg)
-#
-#     if not os.path.exists(filename):
-#         os.rename(tmp, filename)
-#
-#     logger.info('-> %s' % friendly_path(filename))
-
-
-def get_file_from_url(url):
+def get_file_from_url(url: str) -> str:
     """
         Returns a local filename corresponding to the contents of the URL.
         The data is cached in caches/downloads/
@@ -191,10 +156,12 @@ def get_sha12url():
     return sha12url
 
 
-def require_resource(basename, destination=None):
+def require_resource(basename: str, destination: Optional[str] = None) -> str:
     """ Basename: a file name how it is in urls.yaml
 
-        It returns the URL.
+        If destination is None, it is saved in the global cache dir.
+
+        It returns the destination file.
     """
     urls = get_dropbox_urls()
     if not basename in urls:

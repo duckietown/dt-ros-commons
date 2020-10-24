@@ -11,7 +11,7 @@ import numpy as np
 from .contracts_ import contract
 from .deprecation import deprecated
 from .disk_hierarchy import tmpfile
-from .file_utils import write_data_to_file
+from .file_utils import read_bytes_from_file, write_data_to_file
 from .logging_logger import logger
 from .mkdirs import d8n_make_sure_dir_exists
 
@@ -37,17 +37,17 @@ def jpg_from_image_cv(image):
 
 
 @deprecated("Use bgr_from_jpg()")
-def image_cv_from_jpg(data):
+def image_cv_from_jpg(data: bytes) -> np.ndarray:
     return bgr_from_jpg(data)
 
 
-@contract(data=str, returns="array[HxWx3](uint8)")
-def bgr_from_png(data):
+@contract(data=bytes, returns="array[HxWx3](uint8)")
+def bgr_from_png(data: bytes) -> np.ndarray:
     return _bgr_from_file_data(data)
 
 
-@contract(data=str, returns="array[HxWx3](uint8)")
-def bgr_from_jpg(data):
+@contract(data=bytes, returns="array[HxWx3](uint8)")
+def bgr_from_jpg(data: bytes) -> np.ndarray:
     return _bgr_from_file_data(data)
 
 
@@ -64,26 +64,26 @@ def _bgr_from_file_data(data):
 
 
 @contract(fn=str, returns="array[HxWx3](uint8)")
-def bgr_from_jpg_fn(fn):
+def bgr_from_jpg_fn(fn: str) -> np.ndarray:
     """ Read a JPG BGR from a file """
     if not os.path.exists(fn):
         msg = "File does not exist: %s" % fn
         raise ValueError(msg)
-    with open(fn) as f:
-        return bgr_from_jpg(f.read())
+    data = read_bytes_from_file(fn)
+    return bgr_from_jpg(data)
 
 
 @deprecated("Use bgr_from_jpg()")
-def image_cv_from_jpg_fn(fn):
+def image_cv_from_jpg_fn(fn: str) -> np.ndarray:
     return bgr_from_jpg_fn(fn)
 
 
 @deprecated("Use more precise write_bgr_to_file_as_jpg")
-def write_jpg_to_file(image_cv, fn):
+def write_jpg_to_file(image_cv, fn: str):
     return write_bgr_to_file_as_jpg(image_cv, fn)
 
 
-def write_bgr_to_file_as_jpg(image_cv, fn):
+def write_bgr_to_file_as_jpg(image_cv, fn: str):
     """ Assuming image_cv is a BGR image, write to the file fn. """
     data = jpg_from_bgr(image_cv)
     write_data_to_file(data, fn)

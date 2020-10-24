@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from typing import Tuple
 
 import cv2
 import numpy as np
@@ -36,7 +37,7 @@ def d8_image_resize_fit(cv_image, W, interpolation=cv2.INTER_LINEAR):
     return res
 
 
-def d8_image_resize_fit_height(cv_image, H):
+def d8_image_resize_fit_height(cv_image: np.ndarray, H: int) -> np.ndarray:
     """
         Resize the image such that it fits in exactly width = W.
     """
@@ -46,7 +47,7 @@ def d8_image_resize_fit_height(cv_image, H):
     return res
 
 
-def d8_image_resize_fit_in_rect(img, shape, bgcolor=(128, 128, 128)):
+def d8_image_resize_fit_in_rect(img: np.ndarray, shape: Tuple[int, int], bgcolor=(128, 128, 128)) -> np.ndarray:
     if img.shape[0] > shape[0]:
         img = d8_image_resize_fit_height(img, shape[0])
     if img.shape[1] > shape[1]:
@@ -59,10 +60,11 @@ def d8_image_resize_fit_in_rect(img, shape, bgcolor=(128, 128, 128)):
     for i in (0, 1, 2):
         res[:, :, i].fill(bgcolor[i])
 
-    pad0 = (shape[0] - img.shape[0]) / 2
-    pad1 = (shape[1] - img.shape[1]) / 2
+    pad0 = int((shape[0] - img.shape[0]) / 2)
+    pad1 = int((shape[1] - img.shape[1]) / 2)
 
     for i in (0, 1, 2):
+
         res[pad0 : pad0 + img.shape[0], pad1 : pad1 + img.shape[1], i] = img[:, :, i]
 
     return res

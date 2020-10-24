@@ -15,9 +15,9 @@ __all__ = [
 def rospy_timeit_clock(s):
     import rospy
 
-    t0 = time.clock()
+    t0 = time.process_time()
     yield
-    delta = time.clock() - t0
+    delta = time.process_time() - t0
     rospy.loginfo("%10d ms: %s" % (1000 * delta, s))
 
 
@@ -60,7 +60,7 @@ def timeit_generic(desc, minimum, time_function):
 
 @contextmanager
 def timeit_clock(desc, minimum=None):
-    with timeit_generic(desc=desc, minimum=minimum, time_function=time.clock):
+    with timeit_generic(desc=desc, minimum=minimum, time_function=time.process_time):
         yield
 
 

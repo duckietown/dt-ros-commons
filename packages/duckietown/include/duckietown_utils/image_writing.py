@@ -1,5 +1,5 @@
 import os
-from collections import OrderedDict
+from typing import Dict, Optional
 
 from .color_constants import ColorConstants
 from .deprecation import deprecated
@@ -10,30 +10,32 @@ from .image_operations import bgr_from_rgb
 from .image_rescaling import d8_image_resize_no_interpolation
 from .image_timestamps import add_header_to_bgr
 from .jpg import jpg_from_bgr, write_bgr_to_file_as_jpg
+from .types import NPImageBGR, NPImageRGB
 
 
-def write_bgr_as_jpg(bgr, filename):
+def write_bgr_as_jpg(bgr: NPImageBGR, filename: str) -> None:
     jpg = jpg_from_bgr(bgr)
     write_data_to_file(jpg, filename)
 
 
-def write_rgb_as_jpg(rgb, filename):
+def write_rgb_as_jpg(rgb: NPImageRGB, filename: str) -> None:
     write_bgr_as_jpg(bgr_from_rgb(rgb), filename)
 
 
 @deprecated("use write_bgr_as_jpg")
-def write_image_as_jpg(image, filename):
+def write_image_as_jpg(image: NPImageBGR, filename: str) -> None:
     return write_bgr_as_jpg(image, filename)
 
 
 @deprecated("use write_bgr_images_as_jpgs")
-def write_jpgs_to_dir(name2image, dirname):
+def write_jpgs_to_dir(name2image: Dict[str, NPImageBGR], dirname: str) -> Dict[str, NPImageBGR]:
     return write_bgr_images_as_jpgs(name2image, dirname)
 
 
 def write_bgr_images_as_jpgs(
-    name2image, dirname, extra_string=None, bgcolor=ColorConstants.BGR_DUCKIETOWN_YELLOW
-):
+    name2image: Dict[str, NPImageBGR], dirname: Optional[str], extra_string: str = None,
+    bgcolor=ColorConstants.BGR_DUCKIETOWN_YELLOW
+) -> Dict[str, NPImageBGR]:
     """
         Write a set of images to a directory.
 
@@ -42,7 +44,7 @@ def write_bgr_images_as_jpgs(
         Images are assumed to be BGR, [H,W,3] uint8.
     """
     check_isinstance(name2image, dict)
-    res = OrderedDict(name2image)
+    res: Dict[str, NPImageBGR] = dict(name2image)
     shape = None
     for i, (filename, image) in enumerate(name2image.items()):
         if shape is None:
@@ -59,7 +61,7 @@ def write_bgr_images_as_jpgs(
 
     res["all"] = make_images_grid(images, bgcolor=bgcolor, pad=20)
 
-    output = OrderedDict()
+    output = {}
 
     for i, (filename, image) in enumerate(res.items()):
         if filename == "all":

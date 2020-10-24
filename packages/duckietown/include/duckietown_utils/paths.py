@@ -135,8 +135,8 @@ def get_list_of_packages_in_catkin_ws() -> Dict[str, str]:
     # We expect at least these two packages
     if not "duckietown" in results:
         raise ValueError("Could not find the duckietown ROS package.")
-    if not "what_the_duck" in results:
-        raise ValueError("Could not find what_the_duck")
+    # if not "what_the_duck" in results:
+    #     raise ValueError("Could not find what_the_duck")
     return results
 
 

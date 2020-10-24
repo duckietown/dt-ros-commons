@@ -11,7 +11,7 @@ class DuckietownConstants(object):
     DUCKIETOWN_CONFIG_SEQUENCE_variable = "DUCKIETOWN_CONFIG_SEQUENCE"
 
     # The name of a hypothetical robot used in the unit tests.
-    ROBOT_NAME_FOR_TESTS = "robbie"
+    ROBOT_NAME_FOR_TESTS = 'tori' # "shamrock"
 
     # If the environment variable is not set, use these:
     duckiefleet_root_defaults = [

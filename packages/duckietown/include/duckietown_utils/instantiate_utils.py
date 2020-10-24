@@ -56,7 +56,7 @@ def import_name(name: str):
                     module = __import__(module_name, fromlist=["dummy"])
                 except ImportError as e:
                     msg = "Cannot load %r (tried also with %r):\n" % (name, module_name)
-                    msg += "\n" + indent("%s\n%s" % (e, traceback.format_exc(e)), "> ")
+                    msg += "\n" + indent("%s\n%s" % (e, traceback.format_exc()), "> ")
                     raise ValueError(msg)
 
                 if not field in module.__dict__:
@@ -72,7 +72,7 @@ def import_name(name: str):
                     module = import_name(module_name)
                 except ImportError as e:
                     msg = "Cannot load %r (tried also with %r):\n" % (name, module_name)
-                    msg += "\n" + indent("%s\n%s" % (e, traceback.format_exc(e)), "> ")
+                    msg += "\n" + indent("%s\n%s" % (e, traceback.format_exc()), "> ")
                     raise ValueError(msg)
 
                 if not field in module.__dict__:
@@ -90,11 +90,11 @@ def import_name(name: str):
 
         else:
             msg = "Cannot import name %r." % (name)
-            msg += "\n" + indent(traceback.format_exc(e), "> ")
+            msg += "\n" + indent(traceback.format_exc(), "> ")
             raise ValueError(msg)
 
 
-def indent(s, prefix, first=None):
+def indent(s: str, prefix: str, first: str = None) -> str:
     s = str(s)
     assert isinstance(prefix, str)
     lines = s.split("\n")

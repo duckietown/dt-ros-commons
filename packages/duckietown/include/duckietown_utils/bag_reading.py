@@ -1,5 +1,6 @@
 import time
 from collections import namedtuple
+from typing import Iterator, List, Optional, Union
 
 import numpy as np
 
@@ -10,6 +11,7 @@ from .logging_logger import logger
 __all__ = [
     "d8n_bag_read_with_progress",
     "BagReadProxy",
+    'MessagePlus'
 ]
 
 MessagePlus = namedtuple("MessagePlus", "topic msg time_absolute time_from_physical_log_start time_window")
@@ -17,8 +19,8 @@ MessagePlus = namedtuple("MessagePlus", "topic msg time_absolute time_from_physi
 debug_skip = False
 
 
-class BagReadProxy(object):
-    def __init__(self, bag, t0, t1, bag_absolute_t0_ref=None):
+class BagReadProxy:
+    def __init__(self, bag, t0: Optional[float] = None, t1: Optional[float] = None, bag_absolute_t0_ref=None):
         """
             t0, t1 are relative times to the bag start
 
@@ -68,7 +70,9 @@ class BagReadProxy(object):
         #         print('n = %s  fraction = %s  n1 = %s' % (n, self.fraction, n1) )
         return n1
 
-    def read_messages_plus(self, *args, **kwargs):
+    def read_messages_plus(self, topics: Optional[Union[str, List[str]]] = None, start_time=None,
+                           end_time=None,
+                           connection_filter=None, raw=False) -> Iterator[MessagePlus]:
         if isinstance(self.bag, rosbag.Bag):
             import rospy
 
@@ -76,7 +80,8 @@ class BagReadProxy(object):
             end_time = rospy.Time.from_sec(self.read_to_absolute)
 
             for topic, msg, _t in self.bag.read_messages(
-                *args, start_time=start_time, end_time=end_time, **kwargs
+                topics=topics, raw=raw, connection_filter=connection_filter,
+                start_time=start_time, end_time=end_time,
             ):
                 t = _t.to_sec()
                 if t < self.read_from_absolute:
@@ -159,7 +164,6 @@ def d8n_bag_read_with_progress(bag, topic, yield_tuple=False):
     fps = n / (time.time() - first)
     logger.debug("Read %d messages for %s. Processing time: %.1f fps." % (n, topic, fps))
     bag.close()
-
 
 #
 # def proxy_transparent(bag):

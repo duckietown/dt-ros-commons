@@ -25,7 +25,7 @@ def make_images_grid(images, cols=None, pad=0, bgcolor=[128, 128, 128]):
     for i in range(n):
         image = images[i]
         col = i % cols
-        row = (i - i % cols) / cols
+        row = int((i - i % cols) / cols)
         assert 0 <= col < cols
         assert 0 <= row < rows
 
@@ -58,7 +58,7 @@ def make_images_grid(images, cols=None, pad=0, bgcolor=[128, 128, 128]):
 
     for i in range(n):
         col = i % cols
-        row = (i - i % cols) / cols
+        row = int((i - i % cols) / cols)
         assert 0 <= col < cols
         assert 0 <= row < rows
         image = images[i]
@@ -68,9 +68,9 @@ def make_images_grid(images, cols=None, pad=0, bgcolor=[128, 128, 128]):
         # Pad if not right shape
         extra_hor = col_width[col] - image.shape[1]
         extra_ver = row_height[row] - image.shape[0]
-        eleft = extra_hor / 2
+        eleft = int(extra_hor / 2)
         eright = extra_hor - eleft
-        etop = extra_ver / 2
+        etop = int(extra_ver / 2)
         ebottom = extra_ver - etop
         image = image_border(image, left=eleft, right=eright, top=etop, bottom=ebottom, color=bgcolor)
 

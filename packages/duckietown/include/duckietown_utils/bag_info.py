@@ -3,6 +3,8 @@ import re
 import subprocess
 
 import rosbag
+from sensor_msgs.msg import CameraInfo
+from .bag_reading import BagReadProxy
 from .caching import get_cached
 from .logging_logger import logger
 from .yaml_pretty import yaml_load_plain
@@ -26,10 +28,11 @@ def rosbag_info_cached(filename):
     return get_cached(cache_name, f, quiet=True)
 
 
-def rosbag_info(bag):
-    msg = "rosbag_info %s" % bag
+def rosbag_info(bag: str) -> dict:
+    msg = f"rosbag_info {bag}"
     logger.debug(msg)
     stdout = subprocess.Popen(["rosbag", "info", "--yaml", bag], stdout=subprocess.PIPE).communicate()[0]
+    stdout = stdout.decode()
     #     try:
     info_dict = yaml_load_plain(stdout)
     #     except:
@@ -52,7 +55,7 @@ def which_robot(bag):
     raise ValueError(msg)
 
 
-def get_image_topic(bag):
+def get_image_topic(bag: rosbag.Bag) -> str:
     """ Returns the name of the topic for the main camera """
     topics = list(bag.get_type_and_topic_info()[1].keys())
     for t in topics:
@@ -62,7 +65,7 @@ def get_image_topic(bag):
     raise ValueError(msg)
 
 
-def d8n_get_all_images_topic(bag_filename):
+def d8n_get_all_images_topic(bag_filename: str):
     """
         Returns the (name, type) of all topics that look like images.
     """
@@ -103,3 +106,13 @@ def d8n_get_all_images_topic_bag(bag, min_messages=0):
 
             found.append((t, msg_type))
     return found
+
+
+def read_camera_info_from_bag(bag_in: BagReadProxy) -> CameraInfo:
+    from .bag_reading import MessagePlus
+    m: MessagePlus
+    for m in bag_in.read_messages_plus():
+        if 'camera_info' in m.topic:
+            return m.msg
+    msg = 'Could not find any camera_info message.'
+    raise ValueError(msg)
