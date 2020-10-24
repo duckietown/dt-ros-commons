@@ -58,7 +58,7 @@ def get_dropbox_urls():
     msg = "Found %d urls in %s files:\n" % (len(urls), len(found))
     msg += "\n".join(found)
     if len(urls) < 10:
-        msg += '\n\n the urls: {urls}'
+        msg += "\n\n the urls: {urls}"
     logger.info(msg)
     logger.info(repr(urls))
 

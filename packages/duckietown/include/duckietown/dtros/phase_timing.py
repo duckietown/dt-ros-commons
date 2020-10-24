@@ -5,13 +5,11 @@ from contextlib import contextmanager
 
 from .constants import PHASE_TIMER_MAX_KEEP_SEC
 
-TimeRange = namedtuple('TimeRange', 'start end')
-SinglePhaseStatistics = namedtuple(
-    'TimeRange', 'num_events frequency avg_duration filename lines line_nums')
+TimeRange = namedtuple("TimeRange", "start end")
+SinglePhaseStatistics = namedtuple("TimeRange", "num_events frequency avg_duration filename lines line_nums")
 
 
 class PhaseTimer:
-
     def __init__(self):
         self.phases = defaultdict(SinglePhaseTimer)
         self.time_phase = self._time_phase_notrecording
@@ -43,8 +41,7 @@ class PhaseTimer:
                 start_called_from_frame_line = inspect.getouterframes(start_frame)[2][2]
                 called_from_file = inspect.getfile(inspect.getouterframes(start_frame)[2][0])
             except Exception as e:
-                print("Error in extracting the source code of the timing context (start): %s" %
-                      str(e))
+                print("Error in extracting the source code of the timing context (start): %s" % str(e))
                 return
 
         # actual timing code (yield hands back to the code in the context)
@@ -58,29 +55,28 @@ class PhaseTimer:
             try:
                 end_frame = inspect.currentframe()
                 end_called_from_frame_line = inspect.getouterframes(end_frame)[2][2]
-                code_lines, start_idx = inspect.getsourcelines(
-                    inspect.getouterframes(end_frame)[2][0])
+                code_lines, start_idx = inspect.getsourcelines(inspect.getouterframes(end_frame)[2][0])
                 i = start_called_from_frame_line - start_idx
-                f = end_called_from_frame_line - start_idx+1
+                f = end_called_from_frame_line - start_idx + 1
                 code_lines = code_lines[i:f]
                 self.phases[phase_name].add_context(
                     filename=called_from_file,
                     lines=code_lines,
-                    line_nums=(start_called_from_frame_line, end_called_from_frame_line)
+                    line_nums=(start_called_from_frame_line, end_called_from_frame_line),
                 )
             except Exception as e:
-                print("Error in extracting the source code of the timing context (end): %s" %
-                      str(e))
+                print("Error in extracting the source code of the timing context (end): %s" % str(e))
 
     @contextmanager
     def _time_phase_notrecording(self, *_, **__):
         yield
 
     def get_statistics(self):
-        return {phase_name: phase_timer.get_statistics()
-                for phase_name, phase_timer
-                in self.phases.iteritems()
-                if phase_timer.context_set}
+        return {
+            phase_name: phase_timer.get_statistics()
+            for phase_name, phase_timer in self.phases.iteritems()
+            if phase_timer.context_set
+        }
 
 
 class SinglePhaseTimer:
@@ -117,7 +113,7 @@ class SinglePhaseTimer:
         if num_events > 1:
             first_time = self.events[0].start
             last_time = self.events[-1].start
-            frequency = float(num_events-1) / (last_time-first_time)
+            frequency = float(num_events - 1) / (last_time - first_time)
         else:
             frequency = 0
         if num_events > 0:
@@ -126,9 +122,14 @@ class SinglePhaseTimer:
         else:
             avg_duration = 0
         # ---
-        return SinglePhaseStatistics(num_events, frequency, avg_duration,
-                                     self.context_filename, self.context_lines,
-                                     self.context_line_nums)
+        return SinglePhaseStatistics(
+            num_events,
+            frequency,
+            avg_duration,
+            self.context_filename,
+            self.context_lines,
+            self.context_line_nums,
+        )
 
     def prune_old_observations(self):
         # only if the list is not empty:
@@ -137,9 +138,9 @@ class SinglePhaseTimer:
             # iterate until the first event that is within PHASE_TIMER_MAX_KEEP_SEC of now,
             # the list is ordered so the rest is within PHASE_TIMER_MAX_KEEP_SEC of now
             for event_idx, event in enumerate(self.events):
-                if event.end < time.time()-PHASE_TIMER_MAX_KEEP_SEC:
+                if event.end < time.time() - PHASE_TIMER_MAX_KEEP_SEC:
                     last_to_remove = event_idx
                 else:
                     break
             # remove the old events
-            self.events = self.events[last_to_remove+1:]
+            self.events = self.events[last_to_remove + 1 :]

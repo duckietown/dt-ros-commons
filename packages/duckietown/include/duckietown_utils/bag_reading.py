@@ -8,11 +8,7 @@ import rosbag
 from .exceptions import DTBadData
 from .logging_logger import logger
 
-__all__ = [
-    "d8n_bag_read_with_progress",
-    "BagReadProxy",
-    'MessagePlus'
-]
+__all__ = ["d8n_bag_read_with_progress", "BagReadProxy", "MessagePlus"]
 
 MessagePlus = namedtuple("MessagePlus", "topic msg time_absolute time_from_physical_log_start time_window")
 
@@ -70,9 +66,14 @@ class BagReadProxy:
         #         print('n = %s  fraction = %s  n1 = %s' % (n, self.fraction, n1) )
         return n1
 
-    def read_messages_plus(self, topics: Optional[Union[str, List[str]]] = None, start_time=None,
-                           end_time=None,
-                           connection_filter=None, raw=False) -> Iterator[MessagePlus]:
+    def read_messages_plus(
+        self,
+        topics: Optional[Union[str, List[str]]] = None,
+        start_time=None,
+        end_time=None,
+        connection_filter=None,
+        raw=False,
+    ) -> Iterator[MessagePlus]:
         if isinstance(self.bag, rosbag.Bag):
             import rospy
 
@@ -80,8 +81,11 @@ class BagReadProxy:
             end_time = rospy.Time.from_sec(self.read_to_absolute)
 
             for topic, msg, _t in self.bag.read_messages(
-                topics=topics, raw=raw, connection_filter=connection_filter,
-                start_time=start_time, end_time=end_time,
+                topics=topics,
+                raw=raw,
+                connection_filter=connection_filter,
+                start_time=start_time,
+                end_time=end_time,
             ):
                 t = _t.to_sec()
                 if t < self.read_from_absolute:
@@ -164,6 +168,7 @@ def d8n_bag_read_with_progress(bag, topic, yield_tuple=False):
     fps = n / (time.time() - first)
     logger.debug("Read %d messages for %s. Processing time: %.1f fps." % (n, topic, fps))
     bag.close()
+
 
 #
 # def proxy_transparent(bag):

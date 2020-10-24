@@ -3,19 +3,18 @@ import rospy
 from copy import copy
 
 from std_srvs.srv import SetBool, SetBoolResponse
-from duckietown_msgs.srv import \
-    NodeGetParamsList, \
-    NodeGetParamsListResponse, \
-    NodeRequestParamsUpdate, \
-    NodeRequestParamsUpdateResponse
-from duckietown_msgs.msg import \
-    NodeParameter, \
-    DiagnosticsPhaseTiming, \
-    DiagnosticsPhaseTimingArray
-from duckietown.dtros.constants import \
-    NODE_GET_PARAM_SERVICE_NAME, \
-    NODE_REQUEST_PARAM_UPDATE_SERVICE_NAME, \
-    NODE_SWITCH_SERVICE_NAME
+from duckietown_msgs.srv import (
+    NodeGetParamsList,
+    NodeGetParamsListResponse,
+    NodeRequestParamsUpdate,
+    NodeRequestParamsUpdateResponse,
+)
+from duckietown_msgs.msg import NodeParameter, DiagnosticsPhaseTiming, DiagnosticsPhaseTimingArray
+from duckietown.dtros.constants import (
+    NODE_GET_PARAM_SERVICE_NAME,
+    NODE_REQUEST_PARAM_UPDATE_SERVICE_NAME,
+    NODE_SWITCH_SERVICE_NAME,
+)
 from .dtparam import DTParam
 from .constants import NodeHealth, NodeType
 from .diagnostics import DTROSDiagnostics
@@ -96,15 +95,17 @@ class DTROS(object):
 
     """
 
-    def __init__(self,
-                 node_name,
-                 # DT parameters from here
-                 node_type,
-                 help=None,
-                 dt_ghost=False):
+    def __init__(
+        self,
+        node_name,
+        # DT parameters from here
+        node_type,
+        help=None,
+        dt_ghost=False,
+    ):
         # configure singleton
         if rospy.__instance__ is not None:
-            raise RuntimeError('You cannot instantiate two objects of type DTROS')
+            raise RuntimeError("You cannot instantiate two objects of type DTROS")
         rospy.__instance__ = self
         if not isinstance(node_type, NodeType):
             raise ValueError(
@@ -113,13 +114,13 @@ class DTROS(object):
             )
         # Initialize the node
         log_level = rospy.INFO
-        if os.environ.get('DEBUG', 0) in ['1', 'true', 'True', 'enabled', 'Enabled', 'on', 'On']:
+        if os.environ.get("DEBUG", 0) in ["1", "true", "True", "enabled", "Enabled", "on", "On"]:
             log_level = rospy.DEBUG
         rospy.init_node(node_name, log_level=log_level, __dtros__=True)
         self.node_name = rospy.get_name()
         self.node_help = help
         self.node_type = node_type
-        self.log('Initializing...')
+        self.log("Initializing...")
         self.is_shutdown = False
         self._is_ghost = dt_ghost
         self._health = NodeHealth.STARTING
@@ -132,32 +133,26 @@ class DTROS(object):
         if self._ros_handler is not None:
             # decorate the XMLRPC paramUpdate function
             self._rh_paramUpdate = self._ros_handler.paramUpdate
-            setattr(self._ros_handler, 'paramUpdate', self._param_update)
+            setattr(self._ros_handler, "paramUpdate", self._param_update)
         # Handle publishers, subscribers, and the state switch
         self._switch = True
         self._subscribers = list()
         self._publishers = list()
         # create switch service for node
-        self.srv_switch = rospy.Service(
-            "~%s" % NODE_SWITCH_SERVICE_NAME,
-            SetBool, self._srv_switch
-        )
+        self.srv_switch = rospy.Service("~%s" % NODE_SWITCH_SERVICE_NAME, SetBool, self._srv_switch)
         # create services to manage parameters
         self._srv_get_params = rospy.Service(
-            "~%s" % NODE_GET_PARAM_SERVICE_NAME,
-            NodeGetParamsList, self._srv_get_params_list
+            "~%s" % NODE_GET_PARAM_SERVICE_NAME, NodeGetParamsList, self._srv_get_params_list
         )
         self._srv_request_params_update = rospy.Service(
             "~%s" % NODE_REQUEST_PARAM_UPDATE_SERVICE_NAME,
-            NodeRequestParamsUpdate, self._srv_request_param_update
+            NodeRequestParamsUpdate,
+            self._srv_request_param_update,
         )
         # register node against the diagnostics manager
         if DTROSDiagnostics.enabled():
             DTROSDiagnostics.getInstance().register_node(
-                self.node_name,
-                self.node_help,
-                self.node_type,
-                health=self._health
+                self.node_name, self.node_help, self.node_type, health=self._health
             )
 
         # Add a phase timer for profiling and a publisher topic
@@ -165,7 +160,7 @@ class DTROS(object):
             "~diagnostics/phase_times",
             DiagnosticsPhaseTimingArray,
             queue_size=10,
-            dt_topic_type=TopicType.DEBUG
+            dt_topic_type=TopicType.DEBUG,
         )
         self._pub_phase_timer.register_subscribers_changed_cb(self._cb_phase_timing_subs_update)
         self._phasetimeTimer = None
@@ -207,19 +202,18 @@ class DTROS(object):
 
     def set_health(self, health, reason=None):
         if not isinstance(health, NodeHealth):
-            raise ValueError('Argument \'health\' must be of type duckietown.NodeHealth. '
-                             'Got %s instead' % str(type(health)))
-        self.log('Health status changed [%s] -> [%s]' % (self._health.name, health.name))
+            raise ValueError(
+                "Argument 'health' must be of type duckietown.NodeHealth. "
+                "Got %s instead" % str(type(health))
+            )
+        self.log("Health status changed [%s] -> [%s]" % (self._health.name, health.name))
         self._health = health
         self._health_reason = None if reason is None else str(reason)
         # update node health in the diagnostics manager
         if DTROSDiagnostics.enabled():
-            DTROSDiagnostics.getInstance().update_node(
-                health=self._health,
-                health_reason=self._health_reason
-            )
+            DTROSDiagnostics.getInstance().update_node(health=self._health, health_reason=self._health_reason)
 
-    def log(self, msg, type='info'):
+    def log(self, msg, type="info"):
         """ Passes a logging message to the ROS logging methods.
 
         Attaches the ros name to the beginning of the message and passes it to
@@ -236,38 +230,38 @@ class DTROS(object):
             ValueError: if the ``type`` argument is not one of the supported types
 
         """
-        full_msg = '[%s] %s' % (self.node_name, msg)
+        full_msg = "[%s] %s" % (self.node_name, msg)
         # pipe to the right logger
-        if type == 'debug':
+        if type == "debug":
             rospy.logdebug(full_msg)
-        elif type == 'info':
+        elif type == "info":
             rospy.loginfo(full_msg)
-        elif type == 'warn' or type == 'warning':
+        elif type == "warn" or type == "warning":
             self.set_health(NodeHealth.WARNING, full_msg)
             rospy.logwarn(full_msg)
-        elif type == 'err' or type == 'error':
+        elif type == "err" or type == "error":
             self.set_health(NodeHealth.ERROR, full_msg)
             rospy.logerr(full_msg)
-        elif type == 'fatal':
+        elif type == "fatal":
             self.set_health(NodeHealth.FATAL, full_msg)
             rospy.logfatal(full_msg)
         else:
-            raise ValueError('Type argument value %s is not supported!' % type)
+            raise ValueError("Type argument value %s is not supported!" % type)
 
     def loginfo(self, msg):
-        self.log(msg, type='info')
+        self.log(msg, type="info")
 
     def logerr(self, msg):
-        self.log(msg, type='err')
+        self.log(msg, type="err")
 
     def logfatal(self, msg):
-        self.log(msg, type='fatal')
+        self.log(msg, type="fatal")
 
     def logwarn(self, msg):
-        self.log(msg, type='warn')
+        self.log(msg, type="warn")
 
     def logdebug(self, msg):
-        self.log(msg, type='debug')
+        self.log(msg, type="debug")
 
     def _srv_switch(self, request):
         """
@@ -287,14 +281,9 @@ class DTROS(object):
             sub.active = self._switch
         # update node switch in the diagnostics manager
         if DTROSDiagnostics.enabled():
-            DTROSDiagnostics.getInstance().update_node(
-                enabled=self._switch
-            )
+            DTROSDiagnostics.getInstance().update_node(enabled=self._switch)
         # create a response to the service call
-        msg = 'Node switched from [%s] to [%s]' % (
-            'on' if old_state else 'off',
-            'on' if new_state else 'off'
-        )
+        msg = "Node switched from [%s] to [%s]" % ("on" if old_state else "off", "on" if new_state else "off")
         # print out the change in state
         self.log(msg)
         # reply to the service call
@@ -315,12 +304,9 @@ class DTROS(object):
         return NodeGetParamsListResponse(
             parameters=[
                 NodeParameter(
-                    node=rospy.get_name(),
-                    name=p.name,
-                    help=p.help,
-                    type=p.type.value,
-                    **p.options()
-                ) for p in self.parameters
+                    node=rospy.get_name(), name=p.name, help=p.help, type=p.type.value, **p.options()
+                )
+                for p in self.parameters
             ]
         )
 
@@ -345,22 +331,23 @@ class DTROS(object):
             self._rh_paramUpdate(*args, **kwargs)
         # check data
         if len(args) < 3:
-            self.logdebug('Received invalid paramUpdate call from Master')
+            self.logdebug("Received invalid paramUpdate call from Master")
             return
         # get what changed
         _, param_name, param_value = args[:3]
-        param_name = param_name.rstrip('/')
+        param_name = param_name.rstrip("/")
         self.logdebug('Received paramUpdate("%s", %s)' % (param_name, str(param_value)))
         # update parameter value
         if param_name in self._parameters:
             self._parameters[param_name].set_value(param_value)
-            self.loginfo('Parameter "%s" has now the value [%s]' % (
-                param_name, str(self._parameters[param_name].value)
-            ))
+            self.loginfo(
+                'Parameter "%s" has now the value [%s]'
+                % (param_name, str(self._parameters[param_name].value))
+            )
 
     def _add_param(self, param):
         if not isinstance(param, DTParam):
-            raise ValueError('Expected type duckietown.DTParam, got %s instead' % str(type(param)))
+            raise ValueError("Expected type duckietown.DTParam, got %s instead" % str(type(param)))
         self._parameters[param.name] = param
 
     def _has_param(self, param):
@@ -389,7 +376,8 @@ class DTROS(object):
                 single_phase_msg.avg_duration = single_phase_stats.avg_duration
                 single_phase_msg.filename = single_phase_stats.filename
                 single_phase_msg.line_nums = [
-                    single_phase_stats.line_nums[0], single_phase_stats.line_nums[1]
+                    single_phase_stats.line_nums[0],
+                    single_phase_stats.line_nums[1],
                 ]
                 # add phase to array message
                 array_msg.phases.append(single_phase_msg)
@@ -398,20 +386,20 @@ class DTROS(object):
 
     def _cb_phase_timing_subs_update(self, publisher):
         if not publisher.anybody_listening():
-            self.loginfo('Phase Timing Recording switched OFF')
+            self.loginfo("Phase Timing Recording switched OFF")
             self._phase_timer.stop_recording()
             if self._phasetimeTimer is not None and not self._phasetimeTimer._shutdown:
                 self._phasetimeTimer.shutdown()
         else:
-            self.loginfo('Phase Timing Recording switched ON')
+            self.loginfo("Phase Timing Recording switched ON")
             self._phase_timer.start_recording()
             if self._phasetimeTimer is None or self._phasetimeTimer._shutdown:
-                self._phasetimeTimer = rospy.Timer(period=rospy.Duration.from_sec(5),
-                                                   callback=self._publish_phase_timing,
-                                                   oneshot=False)
+                self._phasetimeTimer = rospy.Timer(
+                    period=rospy.Duration.from_sec(5), callback=self._publish_phase_timing, oneshot=False
+                )
 
     def _on_shutdown(self):
-        self.log('Received shutdown request.')
+        self.log("Received shutdown request.")
         self.is_shutdown = True
         # turn off phase timer
         if self._phasetimeTimer is not None and not self._phasetimeTimer._shutdown:

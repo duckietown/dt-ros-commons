@@ -40,11 +40,12 @@ def yaml_load_file(filename: str, plain_yaml: bool = False):
     return interpret_yaml_file(filename, contents, f=lambda _filename, data: data, plain_yaml=plain_yaml)
 
 
-Y = TypeVar('Y')
+Y = TypeVar("Y")
 
 
-def interpret_yaml_file(filename: str, contents: str, f: Callable[[str, dict], Y],
-                        plain_yaml: bool = False) -> Y:
+def interpret_yaml_file(
+    filename: str, contents: str, f: Callable[[str, dict], Y], plain_yaml: bool = False
+) -> Y:
     """
         f is a function that takes
 
@@ -55,6 +56,7 @@ def interpret_yaml_file(filename: str, contents: str, f: Callable[[str, dict], Y
     assert isinstance(contents, str), contents
     try:
         from ruamel.yaml.error import YAMLError
+
         data = None
         try:
             if plain_yaml:
@@ -93,7 +95,7 @@ def get_config_sources() -> List[str]:
     try:
         fleet = get_duckiefleet_root()
     except DTConfigException as e:
-        logger.warn(f'cannot run get_duckiefleet_root(): {e}')
+        logger.warn(f"cannot run get_duckiefleet_root(): {e}")
     else:
         sources.append(fleet)
 
@@ -137,8 +139,9 @@ def look_everywhere_for_config_files2(pattern: str, all_yaml: Dict[str, str]) ->
     return results
 
 
-def look_everywhere_for_files(patterns: List[str], strict: bool = False, silent: bool = False) -> Dict[
-    str, str]:
+def look_everywhere_for_files(
+    patterns: List[str], strict: bool = False, silent: bool = False
+) -> Dict[str, str]:
     """
         Looks for all the bag files
         Returns a dict of basename -> filename.
@@ -150,7 +153,7 @@ def look_everywhere_for_files(patterns: List[str], strict: bool = False, silent:
     try:
         r = get_duckiefleet_root()
     except DTConfigException as e:
-        logger.warning(f'no duckiefleet found: {e}')
+        logger.warning(f"no duckiefleet found: {e}")
     else:
         sources.append(r)
     for d in get_duckietown_data_dirs():

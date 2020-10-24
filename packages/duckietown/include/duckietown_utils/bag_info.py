@@ -110,9 +110,10 @@ def d8n_get_all_images_topic_bag(bag, min_messages=0):
 
 def read_camera_info_from_bag(bag_in: BagReadProxy) -> CameraInfo:
     from .bag_reading import MessagePlus
+
     m: MessagePlus
     for m in bag_in.read_messages_plus():
-        if 'camera_info' in m.topic:
+        if "camera_info" in m.topic:
             return m.msg
-    msg = 'Could not find any camera_info message.'
+    msg = "Could not find any camera_info message."
     raise ValueError(msg)

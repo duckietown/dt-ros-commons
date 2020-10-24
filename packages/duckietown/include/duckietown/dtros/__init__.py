@@ -19,10 +19,10 @@ import rospy
 from .singleton import get_instance
 
 # keep a copy to the original rospy objects
-setattr(rospy, '__init_node__', rospy.init_node)
-setattr(rospy, '__get_param__', rospy.get_param)
-setattr(rospy, '__Publisher__', rospy.Publisher)
-setattr(rospy, '__Subscriber__', rospy.Subscriber)
+setattr(rospy, "__init_node__", rospy.init_node)
+setattr(rospy, "__get_param__", rospy.get_param)
+setattr(rospy, "__Publisher__", rospy.Publisher)
+setattr(rospy, "__Subscriber__", rospy.Subscriber)
 
 from .dtros import DTROS
 from .dtparam import DTParam
@@ -30,5 +30,6 @@ from .constants import TopicType, NodeType, ParamType, NodeHealth, TopicDirectio
 
 # perform rospy decoration
 from .decoration import rospy_decorate
+
 rospy_decorate()
 del rospy_decorate

@@ -42,41 +42,37 @@ def get_ros_handler(force=False):
     global __rh
     if __rh is not None and not force:
         return __rh
-    rhs = [
-        e for e in gc.get_objects()
-        if isinstance(e, rospy.impl.masterslave.ROSHandler)
-    ]
+    rhs = [e for e in gc.get_objects() if isinstance(e, rospy.impl.masterslave.ROSHandler)]
     if len(rhs) == 0:
         return None
     if len(rhs) == 1:
         __rh = rhs[0]
     if len(rhs) > 1:
-        print('WARNING: Two or more ROS Handlers were found in memory. If you happen to see this, '
-              'please, post a message on (please, reopen the issue if closed): '
-              'https://github.com/duckietown/dt-ros-commons/issues/24.')
+        print(
+            "WARNING: Two or more ROS Handlers were found in memory. If you happen to see this, "
+            "please, post a message on (please, reopen the issue if closed): "
+            "https://github.com/duckietown/dt-ros-commons/issues/24."
+        )
     return __rh
 
 
 def get_namespace(level):
     node_name = rospy.get_name()
-    namespace_comps = node_name.lstrip('/').split('/')
+    namespace_comps = node_name.lstrip("/").split("/")
     if level > len(namespace_comps):
         level = len(namespace_comps)
-    return '/{:s}'.format('/'.join(namespace_comps[:level]))
+    return "/{:s}".format("/".join(namespace_comps[:level]))
 
 
 def apply_namespace(name, ns_level):
-    return '{:s}/{:s}'.format(
-        get_namespace(ns_level).rstrip('/'),
-        name.strip('/')
-    )
+    return "{:s}/{:s}".format(get_namespace(ns_level).rstrip("/"), name.strip("/"))
 
 
 def get_module_type():
     # NOTE: This is defined in the Dockerfiles
-    return os.environ.get('DT_MODULE_TYPE', '')
+    return os.environ.get("DT_MODULE_TYPE", "")
 
 
 def get_module_instance():
     # NOTE: This is defined in the entrypoint.sh and contains the container ID
-    return os.environ.get('DT_MODULE_INSTANCE', '')
+    return os.environ.get("DT_MODULE_INSTANCE", "")

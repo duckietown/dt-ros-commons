@@ -33,8 +33,10 @@ def write_jpgs_to_dir(name2image: Dict[str, NPImageBGR], dirname: str) -> Dict[s
 
 
 def write_bgr_images_as_jpgs(
-    name2image: Dict[str, NPImageBGR], dirname: Optional[str], extra_string: str = None,
-    bgcolor=ColorConstants.BGR_DUCKIETOWN_YELLOW
+    name2image: Dict[str, NPImageBGR],
+    dirname: Optional[str],
+    extra_string: str = None,
+    bgcolor=ColorConstants.BGR_DUCKIETOWN_YELLOW,
 ) -> Dict[str, NPImageBGR]:
     """
         Write a set of images to a directory.

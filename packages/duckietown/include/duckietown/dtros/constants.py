@@ -3,36 +3,29 @@ from enum import Enum
 DIAGNOSTICS_ENABLED = True
 
 DIAGNOSTICS_ROS_NODE_PUB_EVERY_SEC = 30.0
-DIAGNOSTICS_ROS_NODE_TOPIC = '/diagnostics/ros/node'
+DIAGNOSTICS_ROS_NODE_TOPIC = "/diagnostics/ros/node"
 
 DIAGNOSTICS_ROS_TOPICS_PUB_EVERY_SEC = 10.0
-DIAGNOSTICS_ROS_TOPICS_TOPIC = '/diagnostics/ros/topics'
+DIAGNOSTICS_ROS_TOPICS_TOPIC = "/diagnostics/ros/topics"
 
 DIAGNOSTICS_ROS_PARAMETERS_PUB_EVERY_SEC = 30.0
-DIAGNOSTICS_ROS_PARAMETERS_TOPIC = '/diagnostics/ros/parameters'
+DIAGNOSTICS_ROS_PARAMETERS_TOPIC = "/diagnostics/ros/parameters"
 
 DIAGNOSTICS_ROS_LINKS_PUB_EVERY_SEC = 10.0
-DIAGNOSTICS_ROS_LINKS_TOPIC = '/diagnostics/ros/links'
+DIAGNOSTICS_ROS_LINKS_TOPIC = "/diagnostics/ros/links"
 
-NODE_SWITCH_SERVICE_NAME = 'switch'
-NODE_GET_PARAM_SERVICE_NAME = 'get_parameters_list'
-NODE_REQUEST_PARAM_UPDATE_SERVICE_NAME = 'request_parameters_update'
+NODE_SWITCH_SERVICE_NAME = "switch"
+NODE_GET_PARAM_SERVICE_NAME = "get_parameters_list"
+NODE_REQUEST_PARAM_UPDATE_SERVICE_NAME = "request_parameters_update"
 
 MIN_TOPIC_FREQUENCY_SUPPORTED = 0.1
 MAX_TOPIC_FREQUENCY_SUPPORTED = 200.0
 
 PHASE_TIMER_MAX_KEEP_SEC = 3  #: Max time for keeping past phase measurements
 
-ROS_INFRA_TOPICS = [
-    '/rosout',
-    '/rosout_agg',
-    '/tf'
-]
+ROS_INFRA_TOPICS = ["/rosout", "/rosout_agg", "/tf"]
 
-ROS_INFRA_NODES = [
-    '/rosout',
-    '/rosapi'
-]
+ROS_INFRA_NODES = ["/rosout", "/rosapi"]
 
 
 class TopicDirection(Enum):
@@ -79,26 +72,19 @@ class ParamType(Enum):
         FLOAT: float,
         BOOL: bool,
         LIST: lambda x: x,
-        DICT: lambda x: x
+        DICT: lambda x: x,
     }
 
-    _ptype_to_type = {
-        str: STRING,
-        int: INT,
-        float: FLOAT,
-        bool: BOOL,
-        list: LIST,
-        tuple: LIST,
-        dict: DICT
-    }
+    _ptype_to_type = {str: STRING, int: INT, float: FLOAT, bool: BOOL, list: LIST, tuple: LIST, dict: DICT}
 
     @classmethod
     def parse(cls, param_type, value):
         if value is None:
             return None
         if not isinstance(param_type, ParamType):
-            raise ValueError("Argument 'param_type' must be of type ParamType. "
-                             "Got %s instead." % str(type(param_type)))
+            raise ValueError(
+                "Argument 'param_type' must be of type ParamType. " "Got %s instead." % str(type(param_type))
+            )
         # ---
         return cls._type_to_ptype.value[param_type.value](value)
 

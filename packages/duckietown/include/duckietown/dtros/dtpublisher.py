@@ -39,7 +39,7 @@ class DTPublisher(DTTopic, rospy.__Publisher__):
     """
 
     def __init__(self, *args, **kwargs):
-        ros_args = {k: v for k, v in kwargs.items() if not k.startswith('dt_')}
+        ros_args = {k: v for k, v in kwargs.items() if not k.startswith("dt_")}
         # call super constructor
         DTTopic.__init__(self)
         rospy.__Publisher__.__init__(self, *args, **ros_args)

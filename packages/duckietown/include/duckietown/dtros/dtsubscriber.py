@@ -42,12 +42,19 @@ class DTSubscriber(DTTopic, rospy.__Subscriber__):
 
     """
 
-    def __init__(self,
-                 # ROS arguments
-                 name, data_class, callback=None, callback_args=None, queue_size=None,
-                 buff_size=DEFAULT_BUFF_SIZE, tcp_nodelay=False,
-                 # Duckietown specific arguments
-                 **kwargs):
+    def __init__(
+        self,
+        # ROS arguments
+        name,
+        data_class,
+        callback=None,
+        callback_args=None,
+        queue_size=None,
+        buff_size=DEFAULT_BUFF_SIZE,
+        tcp_nodelay=False,
+        # Duckietown specific arguments
+        **kwargs,
+    ):
 
         # store the user callback, a decorated one will be used instead
         self._user_callback = callback
@@ -61,7 +68,7 @@ class DTSubscriber(DTTopic, rospy.__Subscriber__):
             callback_args=callback_args,
             queue_size=queue_size,
             buff_size=buff_size,
-            tcp_nodelay=tcp_nodelay
+            tcp_nodelay=tcp_nodelay,
         )
         # dt parameters
         self._active = True
@@ -76,14 +83,14 @@ class DTSubscriber(DTTopic, rospy.__Subscriber__):
             get_instance()._register_subscriber(self)
         # store attributes
         self._attributes_keeper = {
-            'name': name,
-            'data_class': data_class,
-            'callback': self._monitored_callback,
-            'callback_args': callback_args,
-            'queue_size': queue_size,
-            'buff_size': buff_size,
-            'tcp_nodelay': tcp_nodelay,
-            'resolved_name': self.resolved_name
+            "name": name,
+            "data_class": data_class,
+            "callback": self._monitored_callback,
+            "callback_args": callback_args,
+            "queue_size": queue_size,
+            "buff_size": buff_size,
+            "tcp_nodelay": tcp_nodelay,
+            "resolved_name": self.resolved_name,
         }
 
     @property  #: Read-only property for the private attributes
@@ -143,28 +150,25 @@ class DTSubscriber(DTTopic, rospy.__Subscriber__):
         """
         # Restore what was removed by the Topic.unregister() method
         self.impl = get_topic_manager().acquire_impl(
-            self.reg_type,
-            self._attributes_keeper['resolved_name'],
-            self._attributes_keeper['data_class']
+            self.reg_type, self._attributes_keeper["resolved_name"], self._attributes_keeper["data_class"]
         )
-        self.resolved_name = self._attributes_keeper['resolved_name']
-        self.data_class = self._attributes_keeper['data_class']
+        self.resolved_name = self._attributes_keeper["resolved_name"]
+        self.data_class = self._attributes_keeper["data_class"]
         self.type = self.data_class._type
         self.md5sum = self.data_class._md5sum
 
         # Restore what was removed by the Subscriber.unregister() method
-        if self._attributes_keeper['queue_size'] is not None:
-            self.impl.set_queue_size(self._attributes_keeper['queue_size'])
-        if self._attributes_keeper['buff_size'] != DEFAULT_BUFF_SIZE:
-            self.impl.set_buff_size(self._attributes_keeper['buff_size'])
-        if self._attributes_keeper['callback'] is not None:
+        if self._attributes_keeper["queue_size"] is not None:
+            self.impl.set_queue_size(self._attributes_keeper["queue_size"])
+        if self._attributes_keeper["buff_size"] != DEFAULT_BUFF_SIZE:
+            self.impl.set_buff_size(self._attributes_keeper["buff_size"])
+        if self._attributes_keeper["callback"] is not None:
             self.impl.add_callback(
-                self._attributes_keeper['callback'],
-                self._attributes_keeper['callback_args']
+                self._attributes_keeper["callback"], self._attributes_keeper["callback_args"]
             )
-            self.callback = self._attributes_keeper['callback']
-            self.callback_args = self._attributes_keeper['callback_args']
+            self.callback = self._attributes_keeper["callback"]
+            self.callback_args = self._attributes_keeper["callback_args"]
         else:
             self.callback = self.callback_args = None
-        if self._attributes_keeper['tcp_nodelay']:
-            self.impl.set_tcp_nodelay(self._attributes_keeper['tcp_nodelay'])
+        if self._attributes_keeper["tcp_nodelay"]:
+            self.impl.set_tcp_nodelay(self._attributes_keeper["tcp_nodelay"])

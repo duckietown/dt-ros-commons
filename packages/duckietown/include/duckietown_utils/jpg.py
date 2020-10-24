@@ -171,6 +171,7 @@ def image_clip_255(image_float):
     np.clip(image_float, 0, 255, out=res)
     return res
 
+
 #
 # def imgmsg_from_cv2(image_cv):
 #     return

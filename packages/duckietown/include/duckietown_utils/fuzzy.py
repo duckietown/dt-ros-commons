@@ -472,7 +472,7 @@ def parse_match_spec(s, filters=None):
     if ":" in s:
         i = s.index(":")
         tagname = s[:i]
-        tagvalue = s[i + 1:]
+        tagvalue = s[i + 1 :]
         return ByTag(tagname, rec(tagvalue))
 
     if s.startswith("<"):

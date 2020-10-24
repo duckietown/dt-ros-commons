@@ -38,4 +38,3 @@ def yaml_dump_pretty(ob) -> str:
     from ruamel import yaml
 
     return yaml.dump(ob, Dumper=yaml.RoundTripDumper)
-

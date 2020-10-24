@@ -47,7 +47,9 @@ def d8_image_resize_fit_height(cv_image: np.ndarray, H: int) -> np.ndarray:
     return res
 
 
-def d8_image_resize_fit_in_rect(img: np.ndarray, shape: Tuple[int, int], bgcolor=(128, 128, 128)) -> np.ndarray:
+def d8_image_resize_fit_in_rect(
+    img: np.ndarray, shape: Tuple[int, int], bgcolor=(128, 128, 128)
+) -> np.ndarray:
     if img.shape[0] > shape[0]:
         img = d8_image_resize_fit_height(img, shape[0])
     if img.shape[1] > shape[1]:

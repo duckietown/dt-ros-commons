@@ -11,6 +11,7 @@ class DTTopic(rospy.topics.Topic):
     This is a generic DT Publisher/Subscriber.
     We called it Topic to follow the convention used by rospy.
     """
+
     def __init__(self, *args, **kwargs):
         self._dt_healthy_freq = -1
         self._dt_topic_type = TopicType.GENERIC
@@ -18,21 +19,19 @@ class DTTopic(rospy.topics.Topic):
         # get the singleton (DT) ROS node
         self._node = get_instance()
         if self._node is None:
-            raise ValueError(
-                'Cannot create an object of type DTTopic before a DTROS node is initialized.'
-            )
+            raise ValueError("Cannot create an object of type DTTopic before a DTROS node is initialized.")
 
     def _parse_dt_args(self, kwargs):
         # parse dt arguments
-        self._dt_healthy_freq = _arg(kwargs, 'dt_healthy_hz', int, -1)
-        self._dt_topic_type = _arg(kwargs, 'dt_topic_type', TopicType, TopicType.GENERIC)
-        self._dt_is_ghost = _arg(kwargs, 'dt_ghost', bool, False)
-        self._dt_help = _arg(kwargs, 'dt_help', str, None)
+        self._dt_healthy_freq = _arg(kwargs, "dt_healthy_hz", int, -1)
+        self._dt_topic_type = _arg(kwargs, "dt_topic_type", TopicType, TopicType.GENERIC)
+        self._dt_is_ghost = _arg(kwargs, "dt_ghost", bool, False)
+        self._dt_help = _arg(kwargs, "dt_help", str, None)
         # sanitize dt_type
         if not isinstance(self._dt_topic_type, TopicType):
             self._node.logerror(
-                'The type "{:s}" is not supported. '.format(str(self._dt_topic_type)) +
-                'An instance of duckietown.TopicType is expected'
+                'The type "{:s}" is not supported. '.format(str(self._dt_topic_type))
+                + "An instance of duckietown.TopicType is expected"
             )
             self._dt_topic_type = TopicType.GENERIC
         # topic statistics
@@ -43,20 +42,14 @@ class DTTopic(rospy.topics.Topic):
         # register topic to diagnostics manager
         if DTROSDiagnostics.enabled():
             DTROSDiagnostics.getInstance().register_topic(
-                self.resolved_name,
-                self._dt_help,
-                direction,
-                self._dt_healthy_freq,
-                self._dt_topic_type,
-                self
+                self.resolved_name, self._dt_help, direction, self._dt_healthy_freq, self._dt_topic_type, self
             )
 
     def set_healthy_freq(self, healthy_hz):
         self._dt_healthy_freq = healthy_hz
         if DTROSDiagnostics.enabled():
             DTROSDiagnostics.getInstance().update_topic(
-                self.resolved_name,
-                healthy_freq=self._dt_healthy_freq
+                self.resolved_name, healthy_freq=self._dt_healthy_freq
             )
 
     def get_frequency(self):

@@ -7,12 +7,12 @@ from .path_utils import expand_all
 
 
 def read_str_from_file(filename: str) -> str:
-    with open(filename, 'r') as f:
+    with open(filename, "r") as f:
         return f.read()
 
 
 def read_bytes_from_file(filename: str) -> bytes:
-    with open(filename, 'rb') as f:
+    with open(filename, "rb") as f:
         return f.read()
 
 
@@ -38,7 +38,7 @@ def write_data_to_file(data: bytes, filename: str):
     d8n_make_sure_dir_exists(filename)
 
     if os.path.exists(filename):
-        with open(filename, 'rb') as _:
+        with open(filename, "rb") as _:
             current = _.read()
         if current == data:
             if not "assets/" in filename:
