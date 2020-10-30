@@ -11,3 +11,6 @@ PyContracts3==3.0.2
 # Package: ros_http_api
 flask
 flask-cors
+
+# these are pinned to the latest compatible version
+pybase64==1.0.1
