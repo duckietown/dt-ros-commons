@@ -5,6 +5,3 @@ gfortran
 # these are pretty small, they can stay in the ros-commons image
 ros-noetic-image-transport
 ros-noetic-image-transport-plugins
-
-# these are pinned to the latest compatible version
-pybase64==1.0.1
