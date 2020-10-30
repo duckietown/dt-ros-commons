@@ -24,14 +24,12 @@ add_message_files(
   CarControl.msg
   CoordinationClearance.msg
   CoordinationSignal.msg
-  DiagnosticsPhaseTiming.msg
-  DiagnosticsPhaseTimingArray.msg
+  DiagnosticsCodeProfiling.msg
+  DiagnosticsCodeProfilingArray.msg
   DiagnosticsRosLink.msg
   DiagnosticsRosLinkArray.msg
   DiagnosticsRosNode.msg
   DiagnosticsRosParameterArray.msg
-  DiagnosticsRosProfiling.msg
-  DiagnosticsRosProfilingUnit.msg
   DiagnosticsRosTopic.msg
   DiagnosticsRosTopicArray.msg
   DroneControl.msg

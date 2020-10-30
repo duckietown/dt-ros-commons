@@ -9,9 +9,7 @@ from duckietown_msgs.srv import \
     NodeRequestParamsUpdate, \
     NodeRequestParamsUpdateResponse
 from duckietown_msgs.msg import \
-    NodeParameter, \
-    DiagnosticsPhaseTiming, \
-    DiagnosticsPhaseTimingArray
+    NodeParameter
 from duckietown.dtros.constants import \
     NODE_GET_PARAM_SERVICE_NAME, \
     NODE_REQUEST_PARAM_UPDATE_SERVICE_NAME, \
@@ -20,8 +18,7 @@ from .dtparam import DTParam
 from .constants import NodeHealth, NodeType
 from .diagnostics import DTROSDiagnostics
 from .utils import get_ros_handler
-from .phase_timing import PhaseTimer
-from .constants import TopicType
+from .profiler import CodeProfiler
 
 
 class DTROS(object):
@@ -154,18 +151,8 @@ class DTROS(object):
                 health=self._health
             )
 
-        # Add a phase timer for profiling and a publisher topic
-        self._pub_phase_timer = rospy.Publisher(
-            "~diagnostics/phase_times",
-            DiagnosticsPhaseTimingArray,
-            queue_size=10,
-            dt_topic_type=TopicType.DEBUG
-        )
-        self._pub_phase_timer.register_subscribers_changed_cb(self._cb_phase_timing_subs_update)
-        self._phasetimeTimer = None
-        # provides both a pointer to _phase_timer (for internal use)
-        # and a public interface to the context manager `with self.timed_phase("PHASE")`
-        self.timed_phase = self._phase_timer = PhaseTimer()
+        # provide a public interface to the context manager to use as `with self.profiler("PHASE")`
+        self.profiler = CodeProfiler()
 
         # mark node as healthy and STARTED
         self.set_health(NodeHealth.STARTED)
@@ -266,7 +253,7 @@ class DTROS(object):
     def _srv_switch(self, request):
         """
         Args:
-            request (:obj:`std_srvs.srv.SetBool`): The switch request from the ``~switch`` callback.
+            request (:obj:`std_srvs.srv.SetBool`): The switch request from the ``~switch`` callback
 
         Returns:
             :obj:`std_srvs.srv.SetBoolResponse`: Response for successful feedback
@@ -366,50 +353,9 @@ class DTROS(object):
     def _register_subscriber(self, subscriber):
         self._subscribers.append(subscriber)
 
-    def _publish_phase_timing(self, event=None):
-        with self.timed_phase("Preparing phase timing message"):
-            phase_timings = self._phase_timer.get_statistics()
-            # create timing array
-            array_msg = DiagnosticsPhaseTimingArray()
-            array_msg.header.stamp = rospy.Time.now()
-            for phase_name in sorted(phase_timings.keys()):
-                single_phase_stats = phase_timings[phase_name]
-                # create phase object
-                single_phase_msg = DiagnosticsPhaseTiming()
-                single_phase_msg.node = self.node_name
-                single_phase_msg.name = phase_name
-                single_phase_msg.num_events = single_phase_stats.num_events
-                single_phase_msg.frequency = single_phase_stats.frequency
-                single_phase_msg.avg_duration = single_phase_stats.avg_duration
-                single_phase_msg.filename = single_phase_stats.filename
-                single_phase_msg.line_nums = [
-                    single_phase_stats.line_nums[0], single_phase_stats.line_nums[1]
-                ]
-                # add phase to array message
-                array_msg.phases.append(single_phase_msg)
-            # publish phase timing
-            self._pub_phase_timer.publish(array_msg)
-
-    def _cb_phase_timing_subs_update(self, publisher):
-        if not publisher.anybody_listening():
-            self.loginfo('Phase Timing Recording switched OFF')
-            self._phase_timer.stop_recording()
-            if self._phasetimeTimer is not None and not self._phasetimeTimer._shutdown:
-                self._phasetimeTimer.shutdown()
-        else:
-            self.loginfo('Phase Timing Recording switched ON')
-            self._phase_timer.start_recording()
-            if self._phasetimeTimer is None or self._phasetimeTimer._shutdown:
-                self._phasetimeTimer = rospy.Timer(period=rospy.Duration.from_sec(5),
-                                                   callback=self._publish_phase_timing,
-                                                   oneshot=False)
-
     def _on_shutdown(self):
         self.log('Received shutdown request.')
         self.is_shutdown = True
-        # turn off phase timer
-        if self._phasetimeTimer is not None and not self._phasetimeTimer._shutdown:
-            self._phasetimeTimer.shutdown()
         # call node on_shutdown
         self.on_shutdown()
 

@@ -97,11 +97,12 @@ class DTSubscriber(DTTopic, rospy.__Subscriber__):
             pass
         elif not self._active and new_status:
             # Reactive the subscription
-            self.reregister()
+            self._reregister()
         else:
             # Unsubscribe
             self.unregister()
         self._active = new_status
+        # update diagnostics
         if DTROSDiagnostics.enabled():
             DTROSDiagnostics.getInstance().set_topic_switch(self.resolved_name, new_status)
 
@@ -115,24 +116,20 @@ class DTSubscriber(DTTopic, rospy.__Subscriber__):
         return self.get_num_connections() > 0
 
     def _monitored_callback(self, *args, **kwargs):
-        # tick the diagnostics manager (used to compute the topic frequency)
-        # DTROSDiagnostics.getInstance().tick_topic(self.resolved_name)
+        # if the topic was deactivated, do nothing
+        if not self.active:
+            return None
         # run the user's callback
         out = None
-        ptime = 0
         if self._user_callback:
-            stime = time.time()
-            out = self._user_callback(*args, **kwargs)
-            ptime = time.time() - stime
+            with get_instance().profiler(f'/auto/topic/callback{self.resolved_name}'):
+                out = self._user_callback(*args, **kwargs)
         # tick for frequency update
         self._tick_frequency()
-        # update the estimate of the callback processing time
-        if DTROSDiagnostics.enabled():
-            DTROSDiagnostics.getInstance().update_topic_processing_time(self.resolved_name, ptime)
         # return callback output (usually None)
         return out
 
-    def reregister(self):
+    def _reregister(self):
         """
         Resets some of the attributes in order to restore the state of the object before
         the ``unregister`` method was called

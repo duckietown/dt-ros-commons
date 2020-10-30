@@ -1,4 +1,7 @@
 import time
+from collections import OrderedDict
+from typing import Tuple
+
 import rospy
 import socket
 from threading import Lock
@@ -14,7 +17,9 @@ from duckietown_msgs.msg import \
     DiagnosticsRosTopicArray,\
     DiagnosticsRosLink, \
     DiagnosticsRosLinkArray, \
-    DiagnosticsRosParameterArray
+    DiagnosticsRosParameterArray, \
+    DiagnosticsCodeProfilingArray, \
+    DiagnosticsCodeProfiling
 
 
 class DTROSDiagnostics:
@@ -48,6 +53,8 @@ class _DTROSDiagnosticsManager:
         self._links_stats = {}
         self._links_stats_lock = Lock()
         self._params_stats = {}
+        self._profiling_stats_lock = Lock()
+        self._profiling_stats = OrderedDict()
         # initialize publishers
         self._node_diagnostics_pub = rospy.Publisher(
             apply_namespace(DIAGNOSTICS_ROS_NODE_TOPIC, 1),
@@ -81,6 +88,14 @@ class _DTROSDiagnosticsManager:
             dt_ghost=True,
             dt_topic_type=TopicType.DEBUG
         )
+        self._profiling_diagnostics_pub = rospy.Publisher(
+            apply_namespace(DIAGNOSTICS_CODE_PROFILING_TOPIC, 1),
+            DiagnosticsCodeProfilingArray,
+            queue_size=20,
+            latch=True,
+            dt_ghost=True,
+            dt_topic_type=TopicType.DEBUG
+        )
         # topics diagnostics timer
         self._topics_diagnostics_timer = rospy.Timer(
             period=rospy.Duration.from_sec(DIAGNOSTICS_ROS_TOPICS_PUB_EVERY_SEC),
@@ -91,6 +106,12 @@ class _DTROSDiagnosticsManager:
         self._links_diagnostics_timer = rospy.Timer(
             period=rospy.Duration.from_sec(DIAGNOSTICS_ROS_LINKS_PUB_EVERY_SEC),
             callback=self._publish_links_diagnostics,
+            oneshot=False
+        )
+        # profiling diagnostics timer
+        self._profiling_diagnostics_timer = rospy.Timer(
+            period=rospy.Duration.from_sec(DIAGNOSTICS_CODE_PROFILING_PUB_EVERY_SEC),
+            callback=self._publish_profiling_diagnostics,
             oneshot=False
         )
 
@@ -135,7 +156,6 @@ class _DTROSDiagnosticsManager:
                 'effective_frequency': 0.0,
                 'healthy_frequency': healthy_freq,
                 'bandwidth': -1.0,
-                'processing_time': -1.0,
                 'enabled': True
             }
             self._topics_monitor[name] = topic_monitor
@@ -157,8 +177,8 @@ class _DTROSDiagnosticsManager:
             self._topics_stats_lock.release()
 
     def unregister_topic(self, name):
+        self._topics_stats_lock.acquire()
         try:
-            self._topics_stats_lock.acquire()
             if name in self._topics_stats:
                 del self._topics_stats[name]
         finally:
@@ -213,6 +233,27 @@ class _DTROSDiagnosticsManager:
             # ---
         finally:
             self._links_stats_lock.release()
+
+    def register_profiler_reading(self, block: str, duration: float, filename: str,
+                                  line_nums: Tuple[int, int]):
+        # update profiling stats
+        self._profiling_stats_lock.acquire()
+        try:
+            frequency = -1.0
+            now = time.time()
+            # opportunistically compute the frequency
+            if block in self._profiling_stats:
+                frequency = 1 / (now - self._profiling_stats[block]['last_recorded_time'])
+            # store profiling stats
+            self._profiling_stats[block] = {
+                'duration': duration,
+                'filename': filename,
+                'line_nums': line_nums,
+                'frequency': frequency,
+                'last_recorded_time': now
+            }
+        finally:
+            self._profiling_stats_lock.release()
 
     def _compute_stats(self):
         # get bus stats and bus info for every active connection
@@ -290,23 +331,13 @@ class _DTROSDiagnosticsManager:
                 links[_id] = link_info
         # ---
         # update link stats
+        self._links_stats_lock.acquire()
         try:
-            self._links_stats_lock.acquire()
             self._links_stats = links
         finally:
             self._links_stats_lock.release()
         # update topic stats
         self.compute_topics_frequency()
-
-    # TODO: implement this using profiling context from AP once merged
-    def update_topic_processing_time(self, name, proc_time):
-        if name in self._topics_stats:
-            lpt = self._topics_stats[name]['processing_time']
-            if lpt > 0:
-                # average the previous value (weight = 40%) with the new one (weight = 60%)
-                self._topics_stats[name]['processing_time'] = 0.4 * lpt + 0.6 * proc_time
-            else:
-                self._topics_stats[name]['processing_time'] = proc_time
 
     def _publish_node_diagnostics(self):
         msg = DiagnosticsRosNode(
@@ -361,8 +392,8 @@ class _DTROSDiagnosticsManager:
         # ---
         msg = DiagnosticsRosLinkArray()
         msg.header.stamp = rospy.Time.now()
+        self._links_stats_lock.acquire()
         try:
-            self._links_stats_lock.acquire()
             for _, link_stats in self._links_stats.items():
                 msg.links.append(DiagnosticsRosLink(
                     node=rospy.get_name(),
@@ -371,6 +402,32 @@ class _DTROSDiagnosticsManager:
         finally:
             self._links_stats_lock.release()
         self._links_diagnostics_pub.publish(msg)
+
+    def _publish_profiling_diagnostics(self, *args, **kwargs):
+        if not self._profiling_diagnostics_pub.anybody_listening():
+            return
+        # ---
+        # create timing array
+        now = time.time()
+        msg = DiagnosticsCodeProfilingArray()
+        msg.header.stamp = rospy.Time.now()
+        # populate message with blocks
+        self._profiling_stats_lock.acquire()
+        try:
+            for name, block in self._profiling_stats.items():
+                msg.blocks.append(DiagnosticsCodeProfiling(
+                    node=rospy.get_name(),
+                    block=name,
+                    frequency=block['frequency'],
+                    duration=block['duration'],
+                    filename=block['filename'],
+                    line_nums=block['line_nums'],
+                    time_since_last_execution=now - block['last_recorded_time']
+                ))
+        finally:
+            self._profiling_stats_lock.release()
+        # publish
+        self._profiling_diagnostics_pub.publish(msg)
 
 
 def _compute_f_b(new_read, old_read):

@@ -42,7 +42,6 @@ def default_topic_info(name, direction, node_agnostic=False):
     if not node_agnostic:
         info.update({
             'healthy_frequency': None,
-            'processing_time': None,
             'enabled': True
         })
     if direction:
