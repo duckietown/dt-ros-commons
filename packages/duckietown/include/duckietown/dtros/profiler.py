@@ -62,24 +62,12 @@ class CodeProfilerContext:
             # we don't support start and end on different files
             if self._start_filename != end_filename:
                 return
-            # get code
-            code_lines, start_idx = inspect.getsourcelines(end_frame.frame)
         except BaseException:
             return
         # ---
-        i = self._start_line - start_idx + 1
-        f = end_line - start_idx + 1
+        i = self._start_line + 1
+        f = end_line
         # add findings to diagnostics
         self._diagnostics_manager.register_profiler_reading(
             self._name, block_time, end_filename, (i, f)
         )
-
-    @staticmethod
-    def sanitize_code(code_lines):
-        code_lines = list(map(lambda statement: statement.rstrip('\n'), code_lines))
-        smallest_tab_size = min(list(map(
-            lambda statement: len(statement) - len(statement.lstrip(' ').lstrip('\t')),
-            code_lines
-        )))
-        code_lines = list(map(lambda statement: statement[smallest_tab_size:], code_lines))
-        return code_lines
