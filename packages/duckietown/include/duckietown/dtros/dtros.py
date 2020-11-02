@@ -23,7 +23,7 @@ from .phase_timing import PhaseTimer
 from .constants import TopicType
 
 
-class DTROS(object):
+class DTROS:
     """
     Parent class for all Duckietown ROS nodes
 

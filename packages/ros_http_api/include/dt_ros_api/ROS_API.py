@@ -9,7 +9,6 @@ from .actions.graph import rosgraph
 
 
 class ROS_HTTP_API(Flask):
-
     def __init__(self):
         super(ROS_HTTP_API, self).__init__(__name__)
         self.register_blueprint(rostopic)

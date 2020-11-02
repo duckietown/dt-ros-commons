@@ -5,19 +5,25 @@ from duckietown.dtros import TopicDirection
 from duckietown.dtros.dtsubscriber import DTSubscriber
 
 from .knowledge_base import KnowledgeBase
-from .constants import DataProvider, default_node_info, default_topic_info, default_service_info, is_infra_topic, is_infra_node
+from .constants import (
+    DataProvider,
+    default_node_info,
+    default_topic_info,
+    default_service_info,
+    is_infra_topic,
+    is_infra_node,
+)
 from socket import error
 
 
 class TimedDataProvider(DataProvider):
-
     def __init__(self, *args, **kwargs):
         # call super constructor
         super(TimedDataProvider, self).__init__()
         # read the timeout parameter
-        if 'dt_timeout' not in kwargs:
+        if "dt_timeout" not in kwargs:
             raise ValueError("TimedDataProvider.__init__ expected the parameter 'dt_timeout'")
-        self._timeout = int(kwargs['dt_timeout'])
+        self._timeout = int(kwargs["dt_timeout"])
         # keep track of the last interest
         self._last_interest_time = rospy.get_time()
 
@@ -30,16 +36,13 @@ class TimedDataProvider(DataProvider):
 
 
 class SubscriberProvider(TimedDataProvider, DTSubscriber):
-
     def __init__(self, *args, **kwargs):
         # call super constructors
         TimedDataProvider.__init__(self, *args, **kwargs)
         DTSubscriber.__init__(self, *args, **kwargs)
         # subscriber monitor timer
         self._subscriber_monitor_timer = rospy.Timer(
-            period=rospy.Duration.from_sec(5),
-            callback=self._timer_monitor_cb,
-            oneshot=False
+            period=rospy.Duration.from_sec(5), callback=self._timer_monitor_cb, oneshot=False
         )
 
     def _timer_monitor_cb(self, _):
@@ -54,7 +57,6 @@ class SubscriberProvider(TimedDataProvider, DTSubscriber):
 
 
 class RosGraphProvider(DataProvider):
-
     def __init__(self):
         # call super constructor
         super(RosGraphProvider, self).__init__()
@@ -62,17 +64,15 @@ class RosGraphProvider(DataProvider):
         self._master = rosgraph.Master(rospy.get_name())
         # subscriber monitor timer
         self._heart_beat = rospy.Timer(
-            period=rospy.Duration.from_sec(30),
-            callback=self._fetch_system_status,
-            oneshot=False
+            period=rospy.Duration.from_sec(30), callback=self._fetch_system_status, oneshot=False
         )
         # fetch graph right away
         self._fetch_system_status(None)
 
     def _fetch_system_status(self, _):
-        topic_key = lambda x, t: '/topic/%s%s' % (x, t)
-        service_key = lambda x, s: '/service/%s%s' % (x, s)
-        node_key = lambda x, n: '/node/%s%s' % (x, n)
+        topic_key = lambda x, t: "/topic/%s%s" % (x, t)
+        service_key = lambda x, s: "/service/%s%s" % (x, s)
+        node_key = lambda x, n: "/node/%s%s" % (x, n)
         try:
             pubs, subs, srvs = self._master.getSystemState()
         except (rosgraph.masterapi.Error, rosgraph.masterapi.Failure, Exception, error):
@@ -91,7 +91,7 @@ class RosGraphProvider(DataProvider):
             if is_infra_topic(topic):
                 continue
             # ---
-            KnowledgeBase.set(topic_key('publishers', topic), publishers)
+            KnowledgeBase.set(topic_key("publishers", topic), publishers)
             # populate node -> topics map
             for pub in publishers:
                 if is_infra_node(pub):
@@ -103,7 +103,7 @@ class RosGraphProvider(DataProvider):
                 # populate node/list
                 all_nodes.add(pub)
             # add topic to list of topics (if not present)
-            if not KnowledgeBase.has(topic_key('info', topic)):
+            if not KnowledgeBase.has(topic_key("info", topic)):
                 topics[topic] = default_topic_info(topic, None, node_agnostic=True)
             # populate topic/list
             all_topics.add(topic)
@@ -113,7 +113,7 @@ class RosGraphProvider(DataProvider):
             if is_infra_topic(topic):
                 continue
             # ---
-            KnowledgeBase.set(topic_key('subscribers', topic), subscribers)
+            KnowledgeBase.set(topic_key("subscribers", topic), subscribers)
             # populate node -> topics map
             for sub in subscribers:
                 if is_infra_node(sub):
@@ -125,14 +125,14 @@ class RosGraphProvider(DataProvider):
                 # populate node/list
                 all_nodes.add(sub)
             # add topic to list of topics (if not present)
-            if not KnowledgeBase.has(topic_key('info', topic)):
+            if not KnowledgeBase.has(topic_key("info", topic)):
                 topics[topic] = default_topic_info(topic, None, node_agnostic=True)
             # populate topic/list
             all_topics.add(topic)
 
         # process services
         for service, providers in srvs:
-            KnowledgeBase.set(service_key('providers', service), providers)
+            KnowledgeBase.set(service_key("providers", service), providers)
             # populate node -> service map
             for prov in providers:
                 if is_infra_node(prov):
@@ -144,38 +144,34 @@ class RosGraphProvider(DataProvider):
                 # populate node/list
                 all_nodes.add(prov)
             # add service to list of services (if not present)
-            if not KnowledgeBase.has(service_key('info', service)):
+            if not KnowledgeBase.has(service_key("info", service)):
                 services[service] = default_service_info()
             # create topic/list
             all_services.add(service)
 
         # store /node/list
-        KnowledgeBase.set(node_key('list', ''), all_nodes)
+        KnowledgeBase.set(node_key("list", ""), all_nodes)
         # store /topic/list
-        KnowledgeBase.set(topic_key('list', ''), all_topics)
+        KnowledgeBase.set(topic_key("list", ""), all_topics)
         # store /topic/list
-        KnowledgeBase.set(service_key('list', ''), all_services)
+        KnowledgeBase.set(service_key("list", ""), all_services)
 
         # store /node/info
         for node in all_nodes:
-            if not KnowledgeBase.has(node_key('info', node)):
-                KnowledgeBase.set(node_key('info', node), default_node_info())
+            if not KnowledgeBase.has(node_key("info", node)):
+                KnowledgeBase.set(node_key("info", node), default_node_info())
 
         # store /topic/info
         for topic, topic_info in topics.items():
-            KnowledgeBase.set(topic_key('info', topic), topic_info)
+            KnowledgeBase.set(topic_key("info", topic), topic_info)
 
         # store /service/info
         for service, service_info in services.items():
-            KnowledgeBase.set(service_key('info', service), service_info)
+            KnowledgeBase.set(service_key("info", service), service_info)
 
         # # update node/topics info
-        node_topics = {
-            node: KnowledgeBase.get(node_key('topics', node), {}) for node in node_to_topic
-        }
-        node_services = {
-            node: KnowledgeBase.get(node_key('services', node), []) for node in node_to_service
-        }
+        node_topics = {node: KnowledgeBase.get(node_key("topics", node), {}) for node in node_to_topic}
+        node_services = {node: KnowledgeBase.get(node_key("services", node), []) for node in node_to_service}
         # merge rosgraph data with what is already in the KB
         # - /node/topics
         for node, topics in node_to_topic.items():
@@ -184,9 +180,8 @@ class RosGraphProvider(DataProvider):
                 if topic in node_topics[node]:
                     continue
                 node_topics[node][topic] = topic_info
-            KnowledgeBase.set(node_key('topics', node), node_topics[node])
+            KnowledgeBase.set(node_key("topics", node), node_topics[node])
         # - /node/services
         for node, services in node_to_service.items():
             srvs = list(set(services + node_services[node]))
-            KnowledgeBase.set(node_key('services', node), srvs)
-
+            KnowledgeBase.set(node_key("services", node), srvs)

@@ -57,9 +57,7 @@ class KnowledgeBase:
     def register_provider(cls, key, provider):
         if not isinstance(provider, DataProvider):
             raise ValueError(
-                "Parameter 'provider' must be of type DataProvider. Got '%s' instead" % (
-                    str(type(provider))
-                )
+                "Parameter 'provider' must be of type DataProvider. Got '%s' instead" % (str(type(provider)))
             )
         # ---
         cls._providers_lock.acquire()
@@ -67,4 +65,3 @@ class KnowledgeBase:
             cls._providers[key].append(provider)
         finally:
             cls._providers_lock.release()
-
