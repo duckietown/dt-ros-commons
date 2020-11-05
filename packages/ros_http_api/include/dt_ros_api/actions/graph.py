@@ -41,7 +41,7 @@ def _graph():
                 del topics[topic]['message_type']
         # ---
         graph = {
-            'nodes': nodes.keys(),
+            'nodes': list(nodes.keys()),
             'edges': {
                 'node_to_topic': [],
                 'topic_to_node': [],
