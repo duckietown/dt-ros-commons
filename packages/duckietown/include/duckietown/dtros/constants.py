@@ -1,6 +1,8 @@
+import os
 from enum import Enum
 
-DIAGNOSTICS_ENABLED = True
+DIAGNOSTICS_ENABLED = os.environ.get('DT_DIAGNOSTICS', '1').lower() in \
+                      ['1', 'true', 'yes', 'enabled']
 
 DIAGNOSTICS_ROS_NODE_PUB_EVERY_SEC = 30.0
 DIAGNOSTICS_ROS_NODE_TOPIC = '/diagnostics/ros/node'
