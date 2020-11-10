@@ -1,10 +1,9 @@
 Header header
 float32 d   #lateral offset
 float32 d_ref #lateral offset reference
-float32 sigma_d
 float32 phi #heading error
 float32 phi_ref #heading error reference
-float32 sigma_phi
+float32[4] d_phi_covariance
 float32 curvature
 float32 curvature_ref # Refernece Curvature
 float32 v_ref # Referenece Velocity
