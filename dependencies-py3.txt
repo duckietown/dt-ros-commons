@@ -14,3 +14,6 @@ flask-cors
 
 # these are pinned to the latest compatible version
 pybase64==1.0.1
+
+# this is for DTROS and buff_size input
+humanfriendly

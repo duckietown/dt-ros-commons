@@ -3,6 +3,8 @@ import rospy
 from rospy.impl.tcpros import DEFAULT_BUFF_SIZE
 from rospy.impl.registration import get_topic_manager
 
+import humanfriendly
+
 from .constants import TopicDirection
 from .diagnostics import DTROSDiagnostics
 from .dttopic import DTTopic
@@ -51,6 +53,9 @@ class DTSubscriber(DTTopic, rospy.__Subscriber__):
 
         # store the user callback, a decorated one will be used instead
         self._user_callback = callback
+        # parse buff_size if necessary
+        if isinstance(buff_size, str):
+            buff_size = humanfriendly.parse_size(buff_size)
         # call super constructor
         DTTopic.__init__(self)
         rospy.__Subscriber__.__init__(
