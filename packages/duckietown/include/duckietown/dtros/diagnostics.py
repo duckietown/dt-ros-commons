@@ -407,6 +407,9 @@ class _DTROSDiagnosticsManager:
         if not self._profiling_diagnostics_pub.anybody_listening():
             return
         # ---
+        # make sure there is something to publish
+        if len(self._profiling_stats) <= 0:
+            return
         # create timing array
         now = time.time()
         msg = DiagnosticsCodeProfilingArray()
