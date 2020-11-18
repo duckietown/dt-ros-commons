@@ -65,7 +65,7 @@ class TFBridgeNode(DTROS):
             self._tf_static_broadcaster = StaticTransformBroadcaster()
 
     def on_shutdown(self):
-        if self._group is not None:
+        if hasattr(self, '_group') and self._group is not None:
             self._group.shutdown()
 
     def _cb_local_tf(self, msg):
@@ -82,6 +82,10 @@ class TFBridgeNode(DTROS):
                 if not self._can_publish(transform):
                     continue
                 key = (transform.header.frame_id, transform.child_frame_id)
+                # set time to 0, that is how we distinguish between /tf and /tf_static
+                transform.header.stamp.secs = 0
+                transform.header.stamp.nsecs = 0
+                # list TF for the publisher
                 self._static_tfs[key] = transform
         finally:
             self._static_tfs_sem.release()
@@ -104,7 +108,8 @@ class TFBridgeNode(DTROS):
             self.logwarn('Received boomerang messages. This should not have happened.')
             return
         # forward TF locally
-        tf_bcaster = self._tf_broadcaster if msg.header.seq > 0 else self._tf_static_broadcaster
+        is_static = msg.header.stamp.secs == 0 and msg.header.stamp.nsecs == 0
+        tf_bcaster = self._tf_static_broadcaster if is_static else self._tf_broadcaster
         if tf_bcaster:
             tf_bcaster.sendTransform(msg)
 
