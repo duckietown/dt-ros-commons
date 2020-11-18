@@ -9,7 +9,7 @@ dt-launchfile-init
 # ----------------------------------------------------------------------------
 
 # launching app
-dt-exec roslaunch ros_http_api ros_http_api_node.launch veh:="$VEHICLE_NAME"
+dt-exec roslaunch ros_commons default.launch veh:="$VEHICLE_NAME"
 
 # ----------------------------------------------------------------------------
 # YOUR CODE ABOVE THIS LINE
