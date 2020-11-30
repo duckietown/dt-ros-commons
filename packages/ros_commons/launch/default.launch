@@ -13,10 +13,4 @@
         <arg name="param_file_name" value="$(arg param_file_name)"/>
     </include>
 
-    <!-- MultiRobot TF Bridge: Bridges TFs across robots within the local network -->
-    <include file="$(find multirobot)/launch/tf_bridge_node.launch">
-        <arg name="veh" value="$(arg veh)"/>
-        <arg name="robot_type" value="$(arg robot_type)"/>
-    </include>
-
 </launch>
