@@ -1,4 +1,9 @@
 # LIST YOUR PYTHON PACKAGES HERE
+
+# pinned dependencies due to PEP517
+setproctitle==1.1.10
+pybase64==1.0.1
+
 osrf-pycommon
 frozendict
 PyGeometry-z6==2.0.1
@@ -11,9 +16,6 @@ PyContracts3==3.0.2
 # Package: ros_http_api
 flask
 flask-cors
-
-# these are pinned to the latest compatible version
-pybase64==1.0.1
 
 # this is for DTROS and buff_size input
 humanfriendly
