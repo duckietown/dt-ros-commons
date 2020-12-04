@@ -69,11 +69,7 @@ def _rosbag_start():
     shelf[bag_name] = bag
     # return current API rosbag
     return response_ok({
-        'name': bag_name,
-        'recorder': {
-            'PID': bag.recorder.pid,
-            'PGID': bag.recorder.pgid
-        }
+        'name': bag_name
     })
 
 
