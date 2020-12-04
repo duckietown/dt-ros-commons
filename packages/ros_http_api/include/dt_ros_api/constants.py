@@ -5,6 +5,10 @@ from duckietown.dtros import TopicType, TopicDirection, ParamType, NodeType, Nod
 from duckietown.dtros.constants import ROS_INFRA_NODES, ROS_INFRA_TOPICS
 
 
+BAG_RECORDER_DIR = "/data/logs/bag"
+BAG_RECORDER_MAX_DURATION_SECS = 120
+
+
 class DataProvider(object):
 
     def __init__(self):

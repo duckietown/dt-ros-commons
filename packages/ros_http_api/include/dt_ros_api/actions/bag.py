@@ -1,0 +1,125 @@
+import os
+import time
+import signal
+import datetime
+import subprocess
+import dataclasses
+from enum import IntEnum
+
+from flask import Blueprint
+
+from dt_device_utils import get_device_hostname
+from dt_ros_api.utils import response_ok, response_error
+from dt_ros_api.constants import (
+    BAG_RECORDER_DIR,
+    BAG_RECORDER_MAX_DURATION_SECS
+)
+
+
+rosbag = Blueprint('rosbag', __name__)
+shelf = dict()
+
+
+@dataclasses.dataclass
+class ROSBag:
+
+    class Status(IntEnum):
+        RECORDING = 0
+        POSTPROCESSING = 1
+        READY = 2
+
+    @dataclasses.dataclass
+    class Recorder:
+        process: subprocess.Popen
+        pid: int
+        pgid: int
+
+    recorder: Recorder
+    path: str
+    status: Status
+
+
+@rosbag.route('/bag/record/start')
+def _rosbag_start():
+    # make sure target directory exists
+    subprocess.run(["mkdir", "-p", BAG_RECORDER_DIR])
+    bag_name = datetime.datetime.now().isoformat().replace(':','_').split('.')[0]
+    bag_path = os.path.abspath(os.path.join(BAG_RECORDER_DIR, f"{bag_name}.bag"))
+    # if all topics, put "--all" in the list
+    topics = ["--all"]
+    if len(topics) == 0:
+        return response_error("no topic is specified so no bag is recorded")
+    # compile command
+    cmd = [
+        "rosbag",
+        "record",
+        f"--output-name={bag_path}",
+        f"--duration={BAG_RECORDER_MAX_DURATION_SECS}",
+    ] + topics
+    # launch recorder
+    proc = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=os.setpgrp)
+    # store Bag recorder info
+    bag = ROSBag(
+        ROSBag.Recorder(proc, proc.pid, os.getpgid(proc.pid)),
+        bag_path,
+        ROSBag.Status.RECORDING
+    )
+    # store bag handler
+    shelf[bag_name] = bag
+    # return current API rosbag
+    return response_ok({
+        'name': bag_name,
+        'recorder': {
+            'PID': bag.recorder.pid,
+            'PGID': bag.recorder.pgid
+        }
+    })
+
+
+def _is_running(bag):
+    return bag.recorder.process.poll() is None
+
+
+def _is_postprocessing(bag):
+    return os.path.isfile(f"{bag.path}.active")
+
+
+@rosbag.route('/bag/record/status/<string:bag_name>')
+def _rosbag_status(bag_name: str):
+    bag = shelf.get(bag_name, None)
+    if bag is None:
+        return response_error(f"No bag with name `{bag_name}` is being recorded")
+    # check if it is still recording
+    bag.status = ROSBag.Status.RECORDING if _is_running(bag) else \
+        (ROSBag.Status.POSTPROCESSING if _is_postprocessing(bag) else ROSBag.Status.READY)
+    # extra data
+    extra = {}
+    if bag.status == ROSBag.Status.READY:
+        extra['url'] = f'http://{get_device_hostname()}.local/files/logs/bag/{bag_name}.bag'
+    # return current API rosbag
+    return response_ok({
+        'name': bag_name,
+        'status': bag.status.name,
+        'local': bag.path,
+        **extra
+    })
+
+
+@rosbag.route('/bag/record/stop/<string:bag_name>')
+def _rosbag_stop(bag_name: str):
+    bag = shelf.get(bag_name, None)
+    if bag is None:
+        return response_error(f"No bag with name `{bag_name}` is being recorded")
+    # stop recording
+    try:
+        os.killpg(bag.recorder.pgid, signal.SIGINT)
+    except ProcessLookupError:
+        pass
+    # wait for the bag to be completed
+    while _is_running(bag):
+        time.sleep(1)
+    # return current API rosbag
+    return response_ok({
+        'name': bag_name
+    })
