@@ -6,7 +6,7 @@ import subprocess
 import dataclasses
 from enum import IntEnum
 
-from flask import Blueprint
+from flask import Blueprint, request
 
 from dt_device_utils import get_device_hostname
 from dt_ros_api.utils import response_ok, response_error
@@ -39,16 +39,19 @@ class ROSBag:
     status: Status
 
 
-@rosbag.route('/bag/record/start')
+@rosbag.route('/bag/record/start', methods=['POST', 'GET'])
 def _rosbag_start():
+    # record specified topics, or all if not specified
+    if request.method == "POST":
+        topics = request.form.get("topics", "--all").split(":")
+    else:
+        topics = request.args.get("topics", "--all").split(":")
+
     # make sure target directory exists
     subprocess.run(["mkdir", "-p", BAG_RECORDER_DIR])
     bag_name = datetime.datetime.now().isoformat().replace(':','_').split('.')[0]
     bag_path = os.path.abspath(os.path.join(BAG_RECORDER_DIR, f"{bag_name}.bag"))
-    # if all topics, put "--all" in the list
-    topics = ["--all"]
-    if len(topics) == 0:
-        return response_error("no topic is specified so no bag is recorded")
+
     # compile command
     cmd = [
         "rosbag",
