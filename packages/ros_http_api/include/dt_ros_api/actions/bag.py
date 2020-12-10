@@ -51,7 +51,7 @@ def _rosbag_start():
 
     # make sure target directory exists
     subprocess.run(["mkdir", "-p", BAG_RECORDER_DIR])
-    bag_name = datetime.datetime.now().isoformat().replace(':','_').split('.')[0]
+    bag_name = datetime.datetime.now().isoformat().replace(':', '_').split('.')[0]
     bag_path = os.path.abspath(os.path.join(BAG_RECORDER_DIR, f"{bag_name}.bag"))
 
     # compile command
@@ -139,6 +139,26 @@ def _rosbag_stop(bag_name: str):
     # wait for the bag to be completed
     while _is_running(bag):
         time.sleep(1)
+    # return current API rosbag
+    return response_ok({
+        'name': bag_name
+    })
+
+
+@rosbag.route('/bag/delete/<string:bag_name>')
+def _rosbag_delete(bag_name: str):
+    bag = shelf.get(bag_name, None)
+    if bag is None:
+        return response_error(f"No bag with name `{bag_name}` is being recorded")
+    # make sure the recording is over
+    if not _is_ready(bag):
+        return response_error(f"Bag is still recording")
+    # delete recording
+    bag_path = os.path.abspath(os.path.join(BAG_RECORDER_DIR, f"{bag_name}.bag"))
+    try:
+        os.remove(bag_path)
+    except BaseException as e:
+        return response_error(f"Error: {str(e)}")
     # return current API rosbag
     return response_ok({
         'name': bag_name
