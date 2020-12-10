@@ -24,9 +24,11 @@ shelf = dict()
 class ROSBag:
 
     class Status(IntEnum):
+        INIT = -1
         RECORDING = 0
         POSTPROCESSING = 1
         READY = 2
+        ERROR = 10
 
     @dataclasses.dataclass
     class Recorder:
@@ -76,6 +78,10 @@ def _rosbag_start():
     })
 
 
+def _is_only_initialized(bag):
+    return not os.path.isfile(f"{bag.path}") and not os.path.isfile(f"{bag.path}.active")
+
+
 def _is_running(bag):
     return bag.recorder.process.poll() is None
 
@@ -84,14 +90,29 @@ def _is_postprocessing(bag):
     return os.path.isfile(f"{bag.path}.active")
 
 
+def _is_ready(bag):
+    return os.path.isfile(f"{bag.path}") and not os.path.isfile(f"{bag.path}.active")
+
+
 @rosbag.route('/bag/record/status/<string:bag_name>')
 def _rosbag_status(bag_name: str):
     bag = shelf.get(bag_name, None)
     if bag is None:
         return response_error(f"No bag with name `{bag_name}` is being recorded")
-    # check if it is still recording
-    bag.status = ROSBag.Status.RECORDING if _is_running(bag) else \
-        (ROSBag.Status.POSTPROCESSING if _is_postprocessing(bag) else ROSBag.Status.READY)
+    # check if the files are there
+    if _is_only_initialized(bag):
+        bag.status = ROSBag.Status.INIT
+    # check if the bag is being recorded
+    elif _is_running(bag):
+        bag.status = ROSBag.Status.RECORDING
+    # check if the bag is being post-processed
+    elif _is_postprocessing(bag):
+        bag.status = ROSBag.Status.POSTPROCESSING
+    # check if the bag is being post-processed
+    elif _is_ready(bag):
+        bag.status = ROSBag.Status.READY
+    else:
+        bag.status = ROSBag.Status.ERROR
     # extra data
     extra = {}
     if bag.status == ROSBag.Status.READY:
