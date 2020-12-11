@@ -58,6 +58,8 @@ def _rosbag_start():
     cmd = [
         "rosbag",
         "record",
+        # this means infinite buffer size
+        "--buffsize=0",
         f"--output-name={bag_path}",
         f"--duration={BAG_RECORDER_MAX_DURATION_SECS}",
     ] + topics
