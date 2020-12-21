@@ -5,7 +5,8 @@ from duckietown.dtros import TopicType, TopicDirection, ParamType, NodeType, Nod
 from duckietown.dtros.constants import ROS_INFRA_NODES, ROS_INFRA_TOPICS
 
 
-BAG_RECORDER_DIR = "/data/logs/bag"
+FILES_API_DIR = "/data"
+BAG_RECORDER_DIR = f"{FILES_API_DIR}/bags"
 BAG_RECORDER_MAX_DURATION_SECS = 120
 
 

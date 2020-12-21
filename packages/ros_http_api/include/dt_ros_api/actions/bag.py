@@ -11,6 +11,7 @@ from flask import Blueprint, request
 from dt_device_utils import get_device_hostname
 from dt_ros_api.utils import response_ok, response_error
 from dt_ros_api.constants import (
+    FILES_API_DIR,
     BAG_RECORDER_DIR,
     BAG_RECORDER_MAX_DURATION_SECS
 )
@@ -41,18 +42,18 @@ class ROSBag:
     status: Status
 
 
-@rosbag.route('/bag/record/start', methods=['POST', 'GET'])
-def _rosbag_start():
+@rosbag.route('/bag/record/start/<path:experiment>', methods=['POST', 'GET'])
+def _rosbag_start(experiment: str):
     # record specified topics, or all if not specified
     if request.method == "POST":
         topics = request.form.get("topics", "--all").split(":")
     else:
         topics = request.args.get("topics", "--all").split(":")
-
+    destination_dir = os.path.join(BAG_RECORDER_DIR, experiment.lstrip('/'))
     # make sure target directory exists
-    subprocess.run(["mkdir", "-p", BAG_RECORDER_DIR])
+    subprocess.run(["mkdir", "-p", destination_dir])
     bag_name = datetime.datetime.now().isoformat().replace(':', '_').split('.')[0]
-    bag_path = os.path.abspath(os.path.join(BAG_RECORDER_DIR, f"{bag_name}.bag"))
+    bag_path = os.path.abspath(os.path.join(destination_dir, f"{bag_name}.bag"))
 
     # compile command
     cmd = [
@@ -76,7 +77,9 @@ def _rosbag_start():
     shelf[bag_name] = bag
     # return current API rosbag
     return response_ok({
-        'name': bag_name
+        'name': bag_name,
+        'local': bag_path,
+        'cmd': cmd
     })
 
 
@@ -118,7 +121,8 @@ def _rosbag_status(bag_name: str):
     # extra data
     extra = {}
     if bag.status == ROSBag.Status.READY:
-        extra['url'] = f'http://{get_device_hostname()}.local/files/logs/bag/{bag_name}.bag'
+        bag_uri = os.path.relpath(bag.path, FILES_API_DIR)
+        extra['url'] = f'http://{get_device_hostname()}.local/files/{bag_uri}'
     # return current API rosbag
     return response_ok({
         'name': bag_name,
