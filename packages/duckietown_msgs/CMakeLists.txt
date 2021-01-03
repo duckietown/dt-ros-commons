@@ -71,7 +71,6 @@ add_message_files(
   StopLineReading.msg
   TagInfo.msg
   ThetaDotSample.msg
-  ToFStamped.msg
   Trajectory.msg
   TurnIDandType.msg
   Twist2DStamped.msg
