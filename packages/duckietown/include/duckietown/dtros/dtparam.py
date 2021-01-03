@@ -68,6 +68,8 @@ class DTParam:
         if rospy.has_param(self._name):
             self._value = rospy.__get_param__(self._name)
         else:
+            if default is None:
+                raise KeyError(f"Parameter `{self._name}` not found.")
             self._value = self._default_value
             rospy.set_param(self._name, self._default_value)
         # add param to current node
