@@ -32,6 +32,7 @@ add_message_files(
   DiagnosticsRosParameterArray.msg
   DiagnosticsRosTopic.msg
   DiagnosticsRosTopicArray.msg
+  DisplayFragment.msg
   DroneControl.msg
   DroneMode.msg
   NodeParameter.msg
