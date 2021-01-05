@@ -1,10 +1,13 @@
 Header header
 
-# Enum: regions
+# Enum: region
 uint8 REGION_FULL=0
 uint8 REGION_HEADER=1
 uint8 REGION_BODY=2
 uint8 REGION_FOOTER=3
+
+# Enum: screen
+uint8 SCREEN_ALL=255
 
 # fragment ID and destination screen and region
 string id
