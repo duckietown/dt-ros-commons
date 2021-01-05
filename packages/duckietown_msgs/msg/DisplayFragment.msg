@@ -4,10 +4,12 @@ Header header
 uint8 REGION_FULL=0
 uint8 REGION_HEADER=1
 uint8 REGION_BODY=2
+uint8 REGION_FOOTER=3
 
-# fragment ID and destination region
+# fragment ID and destination screen and region
 string id
 uint8 region
+uint8 screen
 
 # fragment content
 sensor_msgs/Image data
