@@ -21,6 +21,7 @@ add_message_files(
   AprilTagDetectionArray.msg
   AprilTagsWithInfos.msg
   BoolStamped.msg
+  ButtonEvent.msg
   CarControl.msg
   CoordinationClearance.msg
   CoordinationSignal.msg
