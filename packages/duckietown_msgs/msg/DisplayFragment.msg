@@ -6,8 +6,8 @@ uint8 REGION_HEADER=1
 uint8 REGION_BODY=2
 uint8 REGION_FOOTER=3
 
-# Enum: screen
-uint8 SCREEN_ALL=255
+# Enum: page
+uint8 PAGE_ALL=255
 
 # fragment ID and destination page and region
 string id
