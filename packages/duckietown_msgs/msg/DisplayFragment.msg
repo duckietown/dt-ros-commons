@@ -9,10 +9,10 @@ uint8 REGION_FOOTER=3
 # Enum: screen
 uint8 SCREEN_ALL=255
 
-# fragment ID and destination screen and region
+# fragment ID and destination page and region
 string id
 uint8 region
-uint8 screen
+uint8 page
 
 # fragment content
 sensor_msgs/Image data
