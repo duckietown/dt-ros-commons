@@ -122,7 +122,7 @@ def _rosbag_status(bag_name: str):
     extra = {}
     if bag.status == ROSBag.Status.READY:
         bag_uri = os.path.relpath(bag.path, FILES_API_DIR)
-        extra['url'] = f'http://{get_device_hostname()}.local/files/{bag_uri}'
+        extra['url'] = f'http://{get_device_hostname()}.local/files/data/{bag_uri}'
     # return current API rosbag
     return response_ok({
         'name': bag_name,
