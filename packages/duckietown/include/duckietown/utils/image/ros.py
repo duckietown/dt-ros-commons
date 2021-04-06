@@ -163,7 +163,7 @@ def imgmsg_to_mono1(msg: ImageMsg) -> np.ndarray:
 
 
 def _compressed_imgmsg_to_np(msg: CompressedImageMsg) -> np.ndarray:
-    assert msg.encoding == "jpeg"
+    assert msg.format == "jpeg"
     return jpeg_to_rgb(msg.data)
 
 
