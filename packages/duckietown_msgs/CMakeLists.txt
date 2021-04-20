@@ -39,6 +39,7 @@ add_message_files(
   NodeParameter.msg
   DuckiebotLED.msg
   EncoderStamped.msg
+  EpisodeStart.msg
   FSMState.msg
   IntersectionPose.msg
   IntersectionPoseImg.msg
