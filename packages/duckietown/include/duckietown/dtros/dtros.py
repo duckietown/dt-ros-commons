@@ -345,7 +345,7 @@ class DTROS(object):
         self._parameters[param.name] = param
 
     def _has_param(self, param):
-        return param in self._parameters
+        return rospy.names.resolve_name(param) in self._parameters
 
     def _register_publisher(self, publisher):
         self._publishers.append(publisher)
