@@ -153,16 +153,15 @@ def _rosbag_stop(bag_name: str):
 
 @rosbag.route('/bag/delete/<string:bag_name>')
 def _rosbag_delete(bag_name: str):
-    bag = shelf.get(bag_name, None)
+    bag: ROSBag = shelf.get(bag_name, None)
     if bag is None:
         return response_error(f"No bag with name `{bag_name}` is being recorded")
     # make sure the recording is over
     if not _is_ready(bag):
         return response_error(f"Bag is still recording")
     # delete recording
-    bag_path = os.path.abspath(os.path.join(BAG_RECORDER_DIR, f"{bag_name}.bag"))
     try:
-        os.remove(bag_path)
+        os.remove(bag.path)
     except BaseException as e:
         return response_error(f"Error: {str(e)}")
     # return current API rosbag
