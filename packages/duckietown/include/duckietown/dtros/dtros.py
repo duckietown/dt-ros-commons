@@ -250,6 +250,12 @@ class DTROS(object):
     def logdebug(self, msg):
         self.log(msg, type='debug')
 
+    def on_switch_on(self):
+        pass
+
+    def on_switch_off(self):
+        pass
+
     def _srv_switch(self, request):
         """
         Args:
@@ -266,6 +272,12 @@ class DTROS(object):
             pub.active = self._switch
         for sub in self.subscribers:
             sub.active = self._switch
+        # tell the node about the switch
+        on_switch_fcn = {
+            False: self.on_switch_off,
+            True: self.on_switch_on
+        }[self._switch]
+        on_switch_fcn()
         # update node switch in the diagnostics manager
         if DTROSDiagnostics.enabled():
             DTROSDiagnostics.getInstance().update_node(
