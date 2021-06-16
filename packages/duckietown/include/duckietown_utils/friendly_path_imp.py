@@ -7,7 +7,7 @@ Author: Andrea Censi
 
 '''
 
-__version__ = '1.0'
+__version__ = "1.0"
 import os
 
 # TODO: cache the results?
