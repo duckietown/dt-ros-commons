@@ -6,13 +6,17 @@ pybase64==1.0.1
 
 osrf-pycommon
 frozendict
-PyGeometry-z6==2.0.1
-QuickApp-z6==6.0.5
-compmake-z6==6.0.8
-SystemCmd-z6==3.0.4
+# PyGeometry-z6==2.0.1
+# QuickApp-z6==6.0.5
+# compmake-z6==6.0.8
+# SystemCmd-z6==3.0.4
+# PyContracts3==3.0.2
+PyGeometry-z6
+QuickApp-z6
+compmake-z6
+SystemCmd-z6
+PyContracts3
 picamera==1.13
-PyContracts3==3.0.2
-
 # Package: ros_http_api
 flask
 flask-cors
