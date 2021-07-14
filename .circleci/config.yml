@@ -42,5 +42,5 @@ jobs:
 
       - store_artifacts:
           path: html/out/package.tgz
-          destination: dt-ros-commons/package.tgz
+          destination: out/package.tgz
 
