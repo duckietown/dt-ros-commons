@@ -5,13 +5,13 @@ ARG DESCRIPTION="Base image containing common libraries and environment setup fo
 ARG ICON="square"
 
 ARG ARCH=arm32v7
-ARG DISTRO=ente
+ARG DISTRO=daffy
 ARG BASE_TAG=${DISTRO}-${ARCH}
 ARG BASE_IMAGE=dt-commons
 ARG LAUNCHER=default
 
 # define base image
-FROM duckietown/${BASE_IMAGE}:${BASE_TAG}
+FROM duckietown/${BASE_IMAGE}:${BASE_TAG} as BASE
 
 # recall all arguments
 ARG REPO_NAME
@@ -54,10 +54,10 @@ RUN dt-apt-install "${REPO_PATH}/dependencies-apt.txt"
 
 # install python dependencies
 COPY ./dependencies-py3.txt "${REPO_PATH}/"
-RUN pip3 install -r ${REPO_PATH}/dependencies-py3.txt
+RUN pip3 install --use-feature=2020-resolver -r ${REPO_PATH}/dependencies-py3.txt
 
 # copy the source code
-COPY . "${REPO_PATH}/"
+COPY ./packages "${REPO_PATH}/packages"
 
 # build packages
 RUN . /opt/ros/${ROS_DISTRO}/setup.sh && \

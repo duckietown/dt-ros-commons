@@ -9,9 +9,7 @@ from duckietown_msgs.srv import \
     NodeRequestParamsUpdate, \
     NodeRequestParamsUpdateResponse
 from duckietown_msgs.msg import \
-    NodeParameter, \
-    DiagnosticsPhaseTiming, \
-    DiagnosticsPhaseTimingArray
+    NodeParameter
 from duckietown.dtros.constants import \
     NODE_GET_PARAM_SERVICE_NAME, \
     NODE_REQUEST_PARAM_UPDATE_SERVICE_NAME, \
@@ -20,8 +18,7 @@ from .dtparam import DTParam
 from .constants import NodeHealth, NodeType
 from .diagnostics import DTROSDiagnostics
 from .utils import get_ros_handler
-from .phase_timing import PhaseTimer
-from .constants import TopicType
+from .profiler import CodeProfiler
 
 
 class DTROS(object):
@@ -35,20 +32,16 @@ class DTROS(object):
 
     In particular, the DTROS class provides:
 
-    - Logging: DTROS provides the :py:meth:`log` method as a wrapper around the ROS logging
-      services. It will automatically append the ROS node name to the message.
-    - Parameters handling:  DTROS provides the :py:attr:`parameters` and :py:attr:`parametersChanged` attributes
-      and automatically updates them if it detects a change in the Parameter Server.
-    - Shutdown procedure: a common shutdown procedure for ROS nodes. Should be attached
-      via ``rospy.on_shutdown(nodeobject.onShutdown)``.
+    - Logging: By providing utility functions for logging such as `loginfo`, `logwarn`, etc.
+    - Shutdown procedure: A common shutdown procedure for ROS nodes.
     - Switchable Subscribers and Publishers: :py:meth:`publisher` and :py:meth:`subscriber` return
-      modified subscribers and publishers that can be dynamically deactivated and reactivated
-      by requesting ``False`` or ``True`` to the ``~switch`` service respectively.
+      decorated subscribers and publishers that can be dynamically deactivated and reactivated.
     - Node deactivation and reactivation: through requesting ``False`` to the ``~switch``
-      service all subscribers and publishers obtained through :py:meth:`publisher` and :py:meth:`subscriber`
-      will be deactivated and the ``switch`` attribute will be set to ``False``. This switch can be
-      used by computationally expensive parts of the node code that are not in callbacks in order to
-      to pause their execution.
+      service all subscribers and publishers obtained through :py:meth:`publisher`
+      and :py:meth:`subscriber` will be deactivated and the ``switch`` attribute will be set
+      to ``False``. This switch can be
+      used by computationally expensive parts of the node code that are not in callbacks in
+      order to pause their execution.
 
     Every children node should call the initializer of DTROS. This should be done
     by having the following line at the top of the children node ``__init__`` method::
@@ -60,28 +53,26 @@ class DTROS(object):
     - Initialize the ROS node with name ``node_name``
     - Setup the ``node_name`` attribute to the node name passed by ROS (using ``rospy.get_name()``)
     - Add a ``rospy.on_shutdown`` hook to the node's :py:meth:`onShutdown` method
-    - Initialize an empty :py:attr:`parameters` dictionary where all configurable ROS parameters should
-      be stored. A boolean attribute :py:attr:`parametersChanged` is also initialized. This will be set to
-      ``True`` when the :py:meth:`updateParameters` callback detects a change in a parameter value in the
-      `ROS Parameter Server <https://wiki.ros.org/Parameter%20Server>`_ and changes the value
-      of at least one parameter.
-      Additionally,
-      the :py:meth:`cbParametersChanged` method will be called. This can be redefined by children classes
-      in order to implement custom behavior when a change in the parameters is detected.
-
-      Note:
-          Implementing the :py:meth:`cbParametersChanged` callback will not
-          automatically set :py:attr:`parametersChanged` to ``False``! If you rely on such behavior, you need to
-          set it in your redefined callback.
-    - Start a recurrent timer that calls :py:meth:`updateParameters` regularly to
-      check if any parameter has been updated
     - Setup a ``~switch`` service that can be used to deactivate and reactivate the node
 
     Args:
-       node_name (:obj:`str`): a unique, descriptive name for the node that ROS will use
+       node_name (:obj:`str`): a unique, descriptive name for the ROS node
+       node_type (:py:class:`duckietown.dtros.NodeType`): a node type
+       help (:obj: `str`): a node description
+       dt_ghost (:obj: `bool`): (Internal use only) excludes the node from the diagnostics
 
     Attributes:
-       node_name (:obj:`str`): the name of the node
+        node_name (:obj:`str`): the name of the node
+        node_help (:obj:`str`): the description of the node
+        node_type (:py:class:`duckietown.dtros.NodeType`): the node type
+        is_shutdown (:obj:`bool`): whether the node is shutdown
+
+    Properties:
+        is_ghost:   (:obj:`bool`): (Internal use only) whether the node is a ghost
+        switch:     (:obj:`bool`): current state of the switch (`true=ON`, `false=OFF`)
+        parameters: (:obj:`list`): list of parameters defined within the node
+        subscribers: (:obj:`list`): list of subscribers defined within the node
+        publishers: (:obj:`list`): list of publishers defined within the node
 
     Service:
         ~switch:
@@ -160,18 +151,8 @@ class DTROS(object):
                 health=self._health
             )
 
-        # Add a phase timer for profiling and a publisher topic
-        self._pub_phase_timer = rospy.Publisher(
-            "~diagnostics/phase_times",
-            DiagnosticsPhaseTimingArray,
-            queue_size=10,
-            dt_topic_type=TopicType.DEBUG
-        )
-        self._pub_phase_timer.register_subscribers_changed_cb(self._cb_phase_timing_subs_update)
-        self._phasetimeTimer = None
-        # provides both a pointer to _phase_timer (for internal use)
-        # and a public interface to the context manager `with self.timed_phase("PHASE")`
-        self.timed_phase = self._phase_timer = PhaseTimer()
+        # provide a public interface to the context manager to use as `with self.profiler("PHASE")`
+        self.profiler = CodeProfiler()
 
         # mark node as healthy and STARTED
         self.set_health(NodeHealth.STARTED)
@@ -269,10 +250,16 @@ class DTROS(object):
     def logdebug(self, msg):
         self.log(msg, type='debug')
 
+    def on_switch_on(self):
+        pass
+
+    def on_switch_off(self):
+        pass
+
     def _srv_switch(self, request):
         """
         Args:
-            request (:obj:`std_srvs.srv.SetBool`): The switch request from the ``~switch`` callback.
+            request (:obj:`std_srvs.srv.SetBool`): The switch request from the ``~switch`` callback
 
         Returns:
             :obj:`std_srvs.srv.SetBoolResponse`: Response for successful feedback
@@ -285,6 +272,12 @@ class DTROS(object):
             pub.active = self._switch
         for sub in self.subscribers:
             sub.active = self._switch
+        # tell the node about the switch
+        on_switch_fcn = {
+            False: self.on_switch_off,
+            True: self.on_switch_on
+        }[self._switch]
+        on_switch_fcn()
         # update node switch in the diagnostics manager
         if DTROSDiagnostics.enabled():
             DTROSDiagnostics.getInstance().update_node(
@@ -364,7 +357,7 @@ class DTROS(object):
         self._parameters[param.name] = param
 
     def _has_param(self, param):
-        return param in self._parameters
+        return rospy.names.resolve_name(param) in self._parameters
 
     def _register_publisher(self, publisher):
         self._publishers.append(publisher)
@@ -372,50 +365,9 @@ class DTROS(object):
     def _register_subscriber(self, subscriber):
         self._subscribers.append(subscriber)
 
-    def _publish_phase_timing(self, event=None):
-        with self.timed_phase("Preparing phase timing message"):
-            phase_timings = self._phase_timer.get_statistics()
-            # create timing array
-            array_msg = DiagnosticsPhaseTimingArray()
-            array_msg.header.stamp = rospy.Time.now()
-            for phase_name in sorted(phase_timings.keys()):
-                single_phase_stats = phase_timings[phase_name]
-                # create phase object
-                single_phase_msg = DiagnosticsPhaseTiming()
-                single_phase_msg.node = self.node_name
-                single_phase_msg.name = phase_name
-                single_phase_msg.num_events = single_phase_stats.num_events
-                single_phase_msg.frequency = single_phase_stats.frequency
-                single_phase_msg.avg_duration = single_phase_stats.avg_duration
-                single_phase_msg.filename = single_phase_stats.filename
-                single_phase_msg.line_nums = [
-                    single_phase_stats.line_nums[0], single_phase_stats.line_nums[1]
-                ]
-                # add phase to array message
-                array_msg.phases.append(single_phase_msg)
-            # publish phase timing
-            self._pub_phase_timer.publish(array_msg)
-
-    def _cb_phase_timing_subs_update(self, publisher):
-        if not publisher.anybody_listening():
-            self.loginfo('Phase Timing Recording switched OFF')
-            self._phase_timer.stop_recording()
-            if self._phasetimeTimer is not None and not self._phasetimeTimer._shutdown:
-                self._phasetimeTimer.shutdown()
-        else:
-            self.loginfo('Phase Timing Recording switched ON')
-            self._phase_timer.start_recording()
-            if self._phasetimeTimer is None or self._phasetimeTimer._shutdown:
-                self._phasetimeTimer = rospy.Timer(period=rospy.Duration.from_sec(5),
-                                                   callback=self._publish_phase_timing,
-                                                   oneshot=False)
-
     def _on_shutdown(self):
         self.log('Received shutdown request.')
         self.is_shutdown = True
-        # turn off phase timer
-        if self._phasetimeTimer is not None and not self._phasetimeTimer._shutdown:
-            self._phasetimeTimer.shutdown()
         # call node on_shutdown
         self.on_shutdown()
 

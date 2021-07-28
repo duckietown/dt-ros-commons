@@ -27,5 +27,4 @@ float32 frequency               # Topic frequency (Hz)
 float32 effective_frequency     # Topic (effective) frequency (Hz)
 float32 healthy_frequency       # Frequency at which this topic can be considered healthy
 float32 bandwidth               # Topic bandwidth (byte/s)
-float32 processing_time         # Callback time (for INBOUND topics only)
 bool enabled                    # Topic switch

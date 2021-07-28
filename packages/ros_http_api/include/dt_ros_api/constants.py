@@ -5,6 +5,11 @@ from duckietown.dtros import TopicType, TopicDirection, ParamType, NodeType, Nod
 from duckietown.dtros.constants import ROS_INFRA_NODES, ROS_INFRA_TOPICS
 
 
+FILES_API_DIR = "/data"
+BAG_RECORDER_DIR = f"{FILES_API_DIR}/bags"
+BAG_RECORDER_MAX_DURATION_SECS = 120
+
+
 class DataProvider(object):
 
     def __init__(self):
@@ -42,7 +47,6 @@ def default_topic_info(name, direction, node_agnostic=False):
     if not node_agnostic:
         info.update({
             'healthy_frequency': None,
-            'processing_time': None,
             'enabled': True
         })
     if direction:

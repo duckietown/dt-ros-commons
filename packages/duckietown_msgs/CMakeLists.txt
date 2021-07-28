@@ -21,24 +21,25 @@ add_message_files(
   AprilTagDetectionArray.msg
   AprilTagsWithInfos.msg
   BoolStamped.msg
+  ButtonEvent.msg
   CarControl.msg
   CoordinationClearance.msg
   CoordinationSignal.msg
-  DiagnosticsPhaseTiming.msg
-  DiagnosticsPhaseTimingArray.msg
+  DiagnosticsCodeProfiling.msg
+  DiagnosticsCodeProfilingArray.msg
   DiagnosticsRosLink.msg
   DiagnosticsRosLinkArray.msg
   DiagnosticsRosNode.msg
   DiagnosticsRosParameterArray.msg
-  DiagnosticsRosProfiling.msg
-  DiagnosticsRosProfilingUnit.msg
   DiagnosticsRosTopic.msg
   DiagnosticsRosTopicArray.msg
+  DisplayFragment.msg
   DroneControl.msg
   DroneMode.msg
   NodeParameter.msg
   DuckiebotLED.msg
   EncoderStamped.msg
+  EpisodeStart.msg
   FSMState.msg
   IntersectionPose.msg
   IntersectionPoseImg.msg
@@ -73,7 +74,6 @@ add_message_files(
   StopLineReading.msg
   TagInfo.msg
   ThetaDotSample.msg
-  ToFStamped.msg
   Trajectory.msg
   TurnIDandType.msg
   Twist2DStamped.msg

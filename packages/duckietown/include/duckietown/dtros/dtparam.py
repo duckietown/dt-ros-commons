@@ -1,3 +1,4 @@
+import json
 import rospy
 
 from . import get_instance
@@ -68,6 +69,8 @@ class DTParam:
         if rospy.has_param(self._name):
             self._value = rospy.__get_param__(self._name)
         else:
+            if default is None:
+                raise KeyError(f"Parameter `{self._name}` not found.")
             self._value = self._default_value
             rospy.set_param(self._name, self._default_value)
         # add param to current node
@@ -167,3 +170,15 @@ class DTParam:
     @property
     def type(self):
         return self._type
+
+    def __str__(self):
+        return json.dumps({
+            "name": self.name,
+            "help": self.help,
+            "value": self.value,
+            "default": self.default,
+            "min_value": self.min_value,
+            "max_value": self.max_value,
+            "type": self.type.name,
+            "_editable": self._editable,
+        }, sort_keys=True, indent=4)

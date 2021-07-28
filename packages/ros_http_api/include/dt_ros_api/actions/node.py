@@ -47,7 +47,7 @@ def _info(node):
         info = KnowledgeBase.get(key('info'), DEFAULT_NODE_INFO)
         info['node'] = node
         # get topics
-        info['topics'] = KnowledgeBase.get(key('topics'), {}).keys()
+        info['topics'] = list(KnowledgeBase.get(key('topics'), {}).keys())
         # get links
         # TODO: links are not reported for now
         # info['links'] = KnowledgeBase.get(key('links'), [])

@@ -1,16 +1,21 @@
 # LIST YOUR PYTHON PACKAGES HERE
+
+# pinned dependencies due to PEP517
+setproctitle==1.1.10
+pybase64==1.0.1
+
 osrf-pycommon
 frozendict
-#PyGeometry==1.5.6
 PyGeometry-z6==2.0.1
 QuickApp-z6==6.0.5
-#compmake==3.5.23
 compmake-z6==6.0.8
 SystemCmd-z6==3.0.4
 picamera==1.13
-#PyContracts==1.8.12
 PyContracts3==3.0.2
 
 # Package: ros_http_api
 flask
 flask-cors
+
+# this is for DTROS and buff_size input
+humanfriendly

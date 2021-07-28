@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 import signal
@@ -148,7 +148,6 @@ class ROS_HTTP_API_Node(DTROS):
             topics[topic.name] = {
                 'direction': TopicDirection(topic.direction).name,
                 'healthy_frequency': topic.healthy_frequency,
-                'processing_time': topic.processing_time,
                 'enabled': topic.enabled
             }
             topics[topic.name].update(info)

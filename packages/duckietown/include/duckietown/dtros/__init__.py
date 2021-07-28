@@ -1,16 +1,15 @@
 """
-The `duckietown.dtros` library provides the parent class for all Duckietown ROS Nodes: `DTROS`,
-as well as customized ROS Publisher (`DTPublisher`) and ROS Subscriber (`DTSubscriber`) classes.
-These classes extend the original ROS classes by adding an `active` property that can set the
-subscriber or publisher on or off in a smart way (reducing significantly processing and network
-overhead).
+The ``duckietown.dtros`` library provides the parent class for all Duckietown ROS Nodes
+(i.e., ``DTROS``), as well as decorated ROS Publisher (``DTPublisher``) and ROS
+Subscriber (``DTSubscriber``) classes.
+These classes extend the original ROS classes by adding extra functionalities.
 
 
-.. autoclass:: duckietown.DTROS
+.. autoclass:: duckietown.dtros.DTROS
 
-.. autoclass:: duckietown.DTPublisher
+.. autoclass:: duckietown.dtros.dtpublisher.DTPublisher
 
-.. autoclass:: duckietown.DTSubscriber
+.. autoclass:: duckietown.dtros.dtsubscriber.DTSubscriber
 
 
 """
