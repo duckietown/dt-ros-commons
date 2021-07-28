@@ -4,14 +4,15 @@ ARG MAINTAINER="Andrea F. Daniele (afdaniele@ttic.edu)"
 ARG DESCRIPTION="Base image containing common libraries and environment setup for ROS applications."
 ARG ICON="square"
 
-ARG ARCH=arm32v7
+ARG ARCH=arm64v8
 ARG DISTRO=ente
 ARG BASE_TAG=${DISTRO}-${ARCH}
 ARG BASE_IMAGE=dt-commons
 ARG LAUNCHER=default
 
 # define base image
-FROM duckietown/${BASE_IMAGE}:${BASE_TAG} as BASE
+ARG DOCKER_REGISTRY=docker.io
+FROM ${DOCKER_REGISTRY}/duckietown/${BASE_IMAGE}:${BASE_TAG} as BASE
 
 # recall all arguments
 ARG REPO_NAME
