@@ -1,5 +1,10 @@
 # LIST YOUR APT PACKAGES HERE
-ros-noetic-joystick-drivers
+
+# TODO: This was originally `ros-noetic-joystick-drivers` but temporarily pointing
+# TODO:      to `ros-noetic-joy`, as some deps are missing in the APT sources list.
+ros-noetic-joy
+
+# commons
 gfortran
 
 # these are pretty small, they can stay in the ros-commons image
