@@ -1,3 +1,4 @@
+# TEMPLATED
 version: 2.1
 workflows:
   version: 2
@@ -16,35 +17,48 @@ workflows:
 jobs:
   build: &build
     docker:
-    - image: ubuntu:20.04
-
+    - image: ${DOCKER_REGISTRY}/duckietown/aido-submission-ci-test:daffy-amd64
+      auth:
+        username: $DOCKER_USERNAME
+        password: $DOCKER_PASSWORD
     steps:
     - setup_remote_docker
     - checkout
 
+    #    - run:
+    #        name: Install dependencies
+    #        command: |
+    #          apt update && \
+    #          apt install -y python3-pip git git-lfs curl && \
+    #          rm -rf /var/lib/apt/lists/*
+    #
+    #    - run:
+    #        name: Install Docker
+    #        command: |
+    #          curl -fsSL https://get.docker.com -o get-docker.sh
+    #          sh get-docker.sh
+    #          rm get-docker.sh
+    #
+    #    - run:
+    #        name: Install dts
+    #        command: |
+    #          python3 -m pip install -U pip
+    #          python3 -m pip check
+    #          python3 -m pip install --no-cache-dir -U duckietown-shell
+    #          python3 -m pip check
+    #          export PATH="$PATH:$HOME/.local/bin"
     - run:
-        name: Install dependencies
+        name: Install dts commands
         command: |
-          apt update && \
-          apt install -y python3-pip git git-lfs curl && \
-          rm -rf /var/lib/apt/lists/*
+          dts --debug --set-version "$DTS_VERSION" exit
+    - run:
+        name: config
+        command: |
+          dts --debug challenges config \
+            --docker-server "$DOCKER_REGISTRY" \
+            --docker-username "$DOCKER_USERNAME" \
+            --docker-password "$DOCKER_PASSWORD"
 
-    - run:
-        name: Install Docker
-        command: |
-          curl -fsSL https://get.docker.com -o get-docker.sh
-          sh get-docker.sh
-          rm get-docker.sh
-
-    - run:
-        name: Install dts
-        command: |
-          python3 -m pip install -U pip
-          python3 -m pip check
-          python3 -m pip install --no-cache-dir --user -U duckietown-shell
-          python3 -m pip check
-          export PATH="$PATH:$HOME/.local/bin"
-          dts --set-version "$DTS_VERSION" exit
     - run:
         name: Python stats
         command: |
@@ -52,22 +66,20 @@ jobs:
           env | sort | tee  build-stats/env.txt
           pip list   | sort | tee  build-stats/pip-list.txt
           pip freeze | sort | tee  build-stats/pip-freeze.txt
+
     - store_artifacts:
         path: build-stats
         destination: build-stats
 
-
     - run:
         name: Pull the image
         command: |
-          export PATH="$PATH:$HOME/.local/bin"
-          dts devel pull
+          dts devel pull --tag daffy
 
     - run:
         name: Build the docs
         command: |
-          export PATH="$PATH:$HOME/.local/bin"
-          dts devel docs build
+          dts devel docs build --tag daffy -f
 
     - store_artifacts:
         path: html
