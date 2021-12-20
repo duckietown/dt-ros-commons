@@ -38,7 +38,7 @@ add_message_files(
   DroneMode.msg
   NodeParameter.msg
   DuckiebotLED.msg
-  DuckiematrixConnectorsDescription.msg
+  DuckiematrixLinkDescription.msg
   EncoderStamped.msg
   EpisodeStart.msg
   FSMState.msg
