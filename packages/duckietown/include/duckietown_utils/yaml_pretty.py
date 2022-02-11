@@ -49,10 +49,3 @@ def remove_unicode(x):
 
     return x
 
-# else:
-#     import yaml  # @Reimport
-#     def yaml_load(s):
-#         return yaml.load(s)
-#
-#     def yaml_dump(s):
-#         return yaml.dump(s)

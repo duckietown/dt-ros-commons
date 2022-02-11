@@ -6,6 +6,7 @@ many Python modules in Duckietown.
 """
 
 import geometry as geo
+_ = geo
 
 from .tcp_communication import *
 from .bag_info import *

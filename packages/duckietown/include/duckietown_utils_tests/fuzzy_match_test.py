@@ -12,9 +12,9 @@ def expect(data, query, result_keys, filters=None):
 
     if True:
         spec = dtu.parse_match_spec(query, filters=filters)
-        print '-----'
-        print 'Query: %s' % query
-        print dtu.indent(spec, '', 'Spec: ')
+        # print '-----'
+        # print 'Query: %s' % query
+        # print dtu.indent(spec, '', 'Spec: ')
 
     res = dtu.fuzzy_match(query, data, filters=filters)
     check_isinstance(res, OrderedDict)

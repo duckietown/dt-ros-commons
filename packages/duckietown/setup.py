@@ -10,6 +10,7 @@ setup_args = generate_distutils_setup(
     ],
     install_requires=[
         'comptests',
+        'ruamel.yaml',
     ],
     package_dir={'': 'include'},
 )
