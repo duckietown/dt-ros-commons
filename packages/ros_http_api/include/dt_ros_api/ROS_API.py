@@ -21,6 +21,11 @@ class ROS_HTTP_API(Flask):
         self.register_blueprint(rosservice)
         self.register_blueprint(rosgraph)
         self.register_blueprint(rosbag)
+        # register a blueprint for the duckiematrix API
+        #   NOTE: Make sure that this import is always executed after rospy.init_node,
+        #         some actions spin up publishers/subscribers.
+        from .actions.duckiematrix import duckiematrix
+        self.register_blueprint(duckiematrix)
         # apply CORS settings
         CORS(self)
         # configure logging
