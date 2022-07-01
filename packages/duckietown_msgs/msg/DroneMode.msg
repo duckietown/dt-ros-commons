@@ -1,7 +1,7 @@
-# Power supply status constants
-uint8 DRONE_MODE_DISARMED = 0
-uint8 DRONE_MODE_ARMED = 1
-uint8 DRONE_MODE_FLYING = 2
+# constants
+uint8 MODE_DISARMED = 0
+uint8 MODE_ARMED = 1
+uint8 MODE_FLYING = 2
 
 # The drone status  as reported. Values defined above
-uint8 drone_mode
+uint8 mode
