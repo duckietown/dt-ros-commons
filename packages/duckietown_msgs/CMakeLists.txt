@@ -36,6 +36,7 @@ add_message_files(
   DisplayFragment.msg
   DroneControl.msg
   DroneMode.msg
+  DroneMotorCommand.msg
   NodeParameter.msg
   DuckiebotLED.msg
   DuckiematrixLinkDescription.msg
