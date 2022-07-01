@@ -99,6 +99,7 @@ add_service_files(
   NodeRequestParamsUpdate.srv
   SensorsStatus.srv
   SetCustomLEDPattern.srv
+  SetDroneMode.srv
   SetFSMState.srv
   SetValue.srv
   SetVariable.srv
