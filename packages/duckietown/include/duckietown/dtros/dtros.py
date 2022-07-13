@@ -392,6 +392,13 @@ class DTROS(object):
             self.loginfo('Parameter "%s" has now the value [%s]' % (
                 param_name, str(self._parameters[param_name].value)
             ))
+        else:
+            # check if the parameter is the child of a monitored parameter
+            for p in self._parameters.values():
+                if param_name.startswith(p.name):
+                    p.force_update()
+                    self.loginfo(f"Detected change in child of '{p.name}'. Parameter '{p.name}' "
+                                 f"has now value [{str(self._parameters[p.name].value)}]")
 
     def _add_param(self, param):
         if not isinstance(param, DTParam):
