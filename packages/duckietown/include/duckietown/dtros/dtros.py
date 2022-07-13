@@ -1,7 +1,9 @@
+import glob
 import os
 import rospy
 from copy import copy
 
+import yaml
 from std_srvs.srv import SetBool, SetBoolResponse
 from duckietown_msgs.srv import \
     NodeGetParamsList, \
@@ -19,6 +21,9 @@ from .constants import NodeHealth, NodeType
 from .diagnostics import DTROSDiagnostics
 from .utils import get_ros_handler
 from .profiler import CodeProfiler
+
+
+NODE_USER_CONFIG_LOCATION = "/data/config/nodes"
 
 
 class DTROS(object):
@@ -93,6 +98,7 @@ class DTROS(object):
                  node_type,
                  help=None,
                  dt_ghost=False):
+
         # configure singleton
         if rospy.__instance__ is not None:
             raise RuntimeError('You cannot instantiate two objects of type DTROS')
@@ -102,6 +108,7 @@ class DTROS(object):
                 "DTROS 'node_type' parameter must be of type 'duckietown.NodeType', "
                 "got %s instead." % str(type(node_type))
             )
+
         # Initialize the node
         log_level = rospy.INFO
         if os.environ.get('DEBUG', 0) in ['1', 'true', 'True', 'enabled', 'Enabled', 'on', 'On']:
@@ -124,15 +131,21 @@ class DTROS(object):
             # decorate the XMLRPC paramUpdate function
             self._rh_paramUpdate = self._ros_handler.paramUpdate
             setattr(self._ros_handler, 'paramUpdate', self._param_update)
+
         # Handle publishers, subscribers, and the state switch
         self._switch = True
         self._subscribers = list()
         self._publishers = list()
+
+        # Load user configuration files
+        self._load_user_parameter_files()
+
         # create switch service for node
         self.srv_switch = rospy.Service(
             "~%s" % NODE_SWITCH_SERVICE_NAME,
             SetBool, self._srv_switch
         )
+
         # create services to manage parameters
         self._srv_get_params = rospy.Service(
             "~%s" % NODE_GET_PARAM_SERVICE_NAME,
@@ -142,6 +155,7 @@ class DTROS(object):
             "~%s" % NODE_REQUEST_PARAM_UPDATE_SERVICE_NAME,
             NodeRequestParamsUpdate, self._srv_request_param_update
         )
+
         # register node against the diagnostics manager
         if DTROSDiagnostics.enabled():
             DTROSDiagnostics.getInstance().register_node(
@@ -156,8 +170,36 @@ class DTROS(object):
 
         # mark node as healthy and STARTED
         self.set_health(NodeHealth.STARTED)
+
         # register shutdown callback
         rospy.on_shutdown(self._on_shutdown)
+
+    def _load_user_parameter_files(self):
+        node_name_lvl1 = self.node_name.split("/", maxsplit=2)[-1]
+        user_cfg_dir = os.path.join(NODE_USER_CONFIG_LOCATION, node_name_lvl1)
+        user_cfg_star = os.path.join(user_cfg_dir, "*.yaml")
+        user_cfg_files = sorted(glob.glob(user_cfg_star))
+        # accumulate configs here
+        user_cfg = {}
+        # load configuration files
+        i = 1
+        t = len(user_cfg_files)
+        self.loginfo(f"Found {t} user configuration files in '{user_cfg_dir}'")
+        for user_cfg_file in user_cfg_files:
+            self.loginfo(f"Loading user configuration file {i}/{t}: {user_cfg_file}")
+            try:
+                with open(user_cfg_file, "rt") as fin:
+                    user_cfg.update(yaml.safe_load(fin))
+            except Exception as e:
+                self.logerr(f"Skipping user configuration file '{user_cfg_file}' because we "
+                            f"failed loading it. The error reads: {str(e)}")
+            i += 1
+        # update ros parameters
+        for k, v in user_cfg.items():
+            k = f"~{k}"
+            self.logdebug(f"User configuration files update parameter '{k}': "
+                          f"{rospy.get_param(k, None)} -> {v} ")
+            rospy.set_param(k, v)
 
     # Read-only properties for the private attributes
     @property
