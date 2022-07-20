@@ -43,6 +43,7 @@ add_message_files(
   EncoderStamped.msg
   EpisodeStart.msg
   FSMState.msg
+  H264MotionVectors.msg
   IntersectionPose.msg
   IntersectionPoseImg.msg
   IntersectionPoseImgDebug.msg
