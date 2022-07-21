@@ -24,6 +24,7 @@ from .profiler import CodeProfiler
 
 
 NODE_USER_CONFIG_LOCATION = "/data/config/nodes"
+NODE_USER_GENERIC_CONFIG_NAME = "generic"
 
 
 class DTROS(object):
@@ -175,16 +176,24 @@ class DTROS(object):
         rospy.on_shutdown(self._on_shutdown)
 
     def _load_user_parameter_files(self):
-        node_name_lvl1 = self.node_name.split("/", maxsplit=2)[-1]
-        user_cfg_dir = os.path.join(NODE_USER_CONFIG_LOCATION, node_name_lvl1)
-        user_cfg_star = os.path.join(user_cfg_dir, "*.yaml")
+        # load user configurations
+        # - node-agnostic parameters
+        generic_cfg_dir = os.path.join(NODE_USER_CONFIG_LOCATION, NODE_USER_GENERIC_CONFIG_NAME)
+        self._load_user_parameter_files_from(generic_cfg_dir)
+        # - node-specific parameters
+        node_name = self.node_name.split("/", maxsplit=2)[-1]
+        node_cfg_dir = os.path.join(NODE_USER_CONFIG_LOCATION, node_name)
+        self._load_user_parameter_files_from(node_cfg_dir)
+
+    def _load_user_parameter_files_from(self, path: str):
+        user_cfg_star = os.path.join(path, "*.yaml")
         user_cfg_files = sorted(glob.glob(user_cfg_star))
         # accumulate configs here
         user_cfg = {}
         # load configuration files
         i = 1
         t = len(user_cfg_files)
-        self.loginfo(f"Found {t} user configuration files in '{user_cfg_dir}'")
+        self.loginfo(f"Found {t} user configuration files in '{path}'")
         for user_cfg_file in user_cfg_files:
             self.loginfo(f"Loading user configuration file {i}/{t}: {user_cfg_file}")
             try:
