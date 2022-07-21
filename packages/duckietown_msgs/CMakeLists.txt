@@ -124,7 +124,8 @@ catkin_package(
 #  LIBRARIES duckietown_msgs
    CATKIN_DEPENDS
    geometry_msgs
-   roscpp rospy
+   roscpp
+   rospy
    sensor_msgs
    std_msgs
    message_runtime
