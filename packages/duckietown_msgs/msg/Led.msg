@@ -1,0 +1,2 @@
+std_msgs/ColorRGBA rgba
+float32 frequency

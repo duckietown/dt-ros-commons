@@ -47,6 +47,7 @@ add_message_files(
   KinematicsParameters.msg
   KinematicsWeights.msg
   LanePose.msg
+  Led.msg
   LEDDetection.msg
   LEDDetectionArray.msg
   LEDDetectionDebugInfo.msg
