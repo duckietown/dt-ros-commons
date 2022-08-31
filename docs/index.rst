@@ -12,6 +12,7 @@ Welcome to dt-ros-commons's documentation!
    :caption: Contents:
 
    packages
+   ../packages/duckietown_msgs/msg/AntiInstagramThresholds
 
 Indices and tables
 ==================

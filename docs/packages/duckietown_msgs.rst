@@ -10,5 +10,25 @@ via ROS in Duckietown.
 Messages
 --------
 
-Note:
-    Unfortunately the Duckietown messages are not duckumented yet. We'd appreciate it if you volunteer yourself ;)
+..
+    TODO: Fix relative linking to literalinclude messages and then add full message list
+
+Led
+^^^
+
+File: ``duckietown_msgs/AntiInstagramThresholds.msg``
+
+.. code-block:: none
+    std_msgs/ColorRGBA rgba
+    float32 frequency
+
+Led Pattern
+^^^^^^^^^^^
+
+File: ``duckietown_msgs/AntiInstagramThresholds.msg``
+
+.. code-block:: none
+    Header header
+    uint8 priority
+    float32 lifespan
+    duckietown_msgs/Led[] leds
