@@ -27,7 +27,6 @@ ARG BASE_IMAGE
 ARG LAUNCHER
 
 # configure environment
-ENV CATKIN_WS_DIR "${SOURCE_DIR}/catkin_ws"
 ENV ROS_LANG_DISABLE gennodejs:geneus:genlisp
 
 # define and create repository path
