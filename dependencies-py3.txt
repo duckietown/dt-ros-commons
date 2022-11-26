@@ -1,4 +1,5 @@
 # LIST YOUR PYTHON PACKAGES HERE
+# NOTE: only place non-Duckietown libraries here; pin versions only if necessary
 
 # pinned dependencies due to PEP517
 setproctitle==1.1.10
@@ -12,6 +13,7 @@ compmake-z6
 SystemCmd-z6
 PyContracts3
 picamera==1.13
+
 # Package: ros_http_api
 flask
 flask-cors
