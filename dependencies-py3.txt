@@ -6,11 +6,6 @@ pybase64==1.0.1
 
 osrf-pycommon
 frozendict
-# PyGeometry-z6==2.0.1
-# QuickApp-z6==6.0.5
-# compmake-z6==6.0.8
-# SystemCmd-z6==3.0.4
-# PyContracts3==3.0.2
 PyGeometry-z6
 QuickApp-z6
 compmake-z6
