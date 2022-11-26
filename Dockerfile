@@ -1,6 +1,6 @@
 # parameters
 ARG REPO_NAME="dt-ros-commons"
-ARG MAINTAINER="Andrea F. Daniele (afdaniele@ttic.edu)"
+ARG MAINTAINER="Andrea F. Daniele (afdaniele@duckietown.com)"
 ARG DESCRIPTION="Base image containing common libraries and environment setup for ROS applications."
 ARG ICON="square"
 
@@ -85,4 +85,3 @@ LABEL org.duckietown.label.module.type="${REPO_NAME}" \
     org.duckietown.label.base.image="${BASE_IMAGE}" \
     org.duckietown.label.base.tag="${BASE_TAG}" \
     org.duckietown.label.maintainer="${MAINTAINER}"
-
