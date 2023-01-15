@@ -129,23 +129,20 @@ class DTROS(object):
         self._health_reason = None
         self._ros_handler = get_ros_handler()
 
-        if pkg_name is not None:
-            rospack = rospkg.RosPack()
-            veh_name = self.node_name.split("/")[1]
-            pkg_path = rospack.get_path(pkg_name)
-            param_file_folder = f"{pkg_path}/config/{node_name}"
-            robot_param_file = param_file_folder + "/" + veh_name + ".yaml"
-            if os.path.isfile(robot_param_file):
-                rospy.loginfo("found robot specific parameter file.. loading")
-                try:
-                    with open(robot_param_file, "r") as stream:
-                        new_params = yaml.load(stream, Loader=yaml.Loader)
-                except yaml.YAMLError:
-                    msg = f"Error in parsing calibration file {robot_param_file}.. skipping"
-                    rospy.logerr(msg)
-                    rospy.signal_shutdown(msg)
-                for key in new_params:
-                    rospy.set_param(key, new_params[key])
+        veh_name = self.node_name.split("/")[1]
+        param_file_folder = f"{self.package_path}/config/{node_name}"
+        robot_param_file = param_file_folder + "/" + veh_name + ".yaml"
+        if os.path.isfile(robot_param_file):
+            rospy.loginfo(f"[{self.package_name}] found robot specific parameter file.. loading")
+            try:
+                with open(robot_param_file, "r") as stream:
+                    new_params = yaml.load(stream, Loader=yaml.Loader)
+            except yaml.YAMLError:
+                msg = f"[{self.package_name}] Error in parsing calibration file {robot_param_file}.. skipping"
+                rospy.logerr(msg)
+                rospy.signal_shutdown(msg)
+            for key in new_params:
+                rospy.set_param(key, new_params[key])
 
         # Initialize parameters handling
         self._parameters = dict()
