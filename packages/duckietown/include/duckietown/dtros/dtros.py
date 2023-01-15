@@ -142,7 +142,7 @@ class DTROS(object):
                 rospy.logerr(msg)
                 rospy.signal_shutdown(msg)
             for key in new_params:
-                rospy.set_param(key, new_params[key])
+                rospy.set_param(f"{node_name}/{key}", new_params[key])
 
         # Initialize parameters handling
         self._parameters = dict()
