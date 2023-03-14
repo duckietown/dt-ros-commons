@@ -1,4 +1,8 @@
+import inspect
 import os
+from pathlib import Path
+from typing import Optional
+
 import rospy
 import rospkg
 from copy import copy
@@ -125,23 +129,19 @@ class DTROS(object):
         self._health_reason = None
         self._ros_handler = get_ros_handler()
 
-        if pkg_name is not None:
-            rospack = rospkg.RosPack()
-            veh_name = self.node_name.split("/")[1]
-            pkg_path = rospack.get_path(pkg_name)
-            param_file_folder = f"{pkg_path}/config/{node_name}"
-            robot_param_file = param_file_folder + "/" + veh_name + ".yaml"
-            if os.path.isfile(robot_param_file):
-                rospy.loginfo("found robot specific parameter file.. loading")
-                try:
-                    with open(robot_param_file, "r") as stream:
-                        new_params = yaml.load(stream, Loader=yaml.Loader)
-                except yaml.YAMLError:
-                    msg = f"Error in parsing calibration file {robot_param_file}.. skipping"
-                    rospy.logerr(msg)
-                    rospy.signal_shutdown(msg)
-                for key in new_params:
-                    rospy.set_param(key, new_params[key])
+        veh_name = self.node_name.split("/")[1]
+        robot_param_file = f"{self.package_path}/config/{node_name}/{veh_name}.yaml
+        if os.path.isfile(robot_param_file):
+            rospy.loginfo(f"[{self.package_name}] found robot specific parameter file.. loading")
+            try:
+                with open(robot_param_file, "r") as stream:
+                    new_params = yaml.load(stream, Loader=yaml.Loader)
+            except yaml.YAMLError:
+                msg = f"[{self.package_name}] Error in parsing calibration file {robot_param_file}.. skipping"
+                rospy.logerr(msg)
+                rospy.signal_shutdown(msg)
+            for key in new_params:
+                rospy.set_param(f"{node_name}/{key}", new_params[key])
 
         # Initialize parameters handling
         self._parameters = dict()
@@ -206,6 +206,35 @@ class DTROS(object):
     def publishers(self):
         """A list of all the publishers of the node"""
         return self._publishers
+
+    @property
+    def package_path(self) -> Optional[str]:
+        """The path to the catkin package this node belongs to"""
+        # get all active locations where ROS packages are stored
+        ROS_PACKAGE_PATH = os.environ.get("ROS_PACKAGE_PATH", "")
+        package_paths = ROS_PACKAGE_PATH.split(":")
+        # get the path to the file containing the child class (whoever is inheriting from this class)
+        try:
+            child_class_path: str = os.path.realpath(inspect.getfile(self.__class__))
+        except Exception as e:
+            self.logwarn(f"Could not determine the file hosting the subclass of DTROS. Error: {str(e)}")
+            return None
+        # match the subclass path with the places where packages are stored
+        for package_path in package_paths:
+            package_path = os.path.realpath(package_path)
+            if child_class_path.startswith(package_path):
+                # we have a match
+                return package_path
+        return None
+
+    @property
+    def package_name(self) -> Optional[str]:
+        """The name of the catkin package this node belongs to"""
+        package_path = self.package_path
+        if not package_path:
+            return None
+        # the name of the package is simply the name of the directory containing it
+        return Path(package_path).stem
 
     def set_health(self, health, reason=None):
         if not isinstance(health, NodeHealth):
