@@ -130,7 +130,7 @@ class DTROS(object):
         self._ros_handler = get_ros_handler()
 
         veh_name = self.node_name.split("/")[1]
-        robot_param_file = f"{self.package_path}/config/{node_name}/{veh_name}.yaml
+        robot_param_file = f"{self.package_path}/config/{node_name}/{veh_name}.yaml"
         if os.path.isfile(robot_param_file):
             rospy.loginfo(f"[{self.package_name}] found robot specific parameter file.. loading")
             try:
