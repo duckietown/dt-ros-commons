@@ -15,9 +15,9 @@ workflows:
           branches:
             ignore: /ente-staging.*/
 jobs:
-  build: &build
+  build: &build_template
     docker:
-    - image: ${DOCKER_REGISTRY}/duckietown/aido-submission-ci-test:ente-amd64
+    - image: ${DOCKER_REGISTRY}/duckietown/aido-submission-ci-test:ente
       auth:
         username: $DOCKER_USERNAME
         password: $DOCKER_PASSWORD
@@ -27,6 +27,7 @@ jobs:
     - run:
         name: Install dts commands
         command: |
+          pip install -U duckietown-shell
           dts --debug --set-version "$DTS_VERSION" exit
     - run:
         name: config
@@ -61,9 +62,16 @@ jobs:
     - store_artifacts:
         path: html
         destination: html
-
+    - run:
+        name: Create a .tgz of  the folder `html` into html/package.tgz
+        command: |
+          # XXX: this a workaround for bugs in devel docs
+          rm -f html/package.tgz
+          tar -czf package.tgz -C html .
+          mv package.tgz html/package.tgz
+          tar tfz html/package.tgz
     - store_artifacts:
         path: html/package.tgz
         destination: out/package.tgz
-  build-ente-prod: *build
-  build-ente-staging: *build
+  build-ente-prod: *build_template
+  build-ente-staging: *build_template

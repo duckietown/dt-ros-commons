@@ -1,19 +1,26 @@
+import inspect
 import os
+from pathlib import Path
+from typing import Optional
+
 import rospy
+import rospkg
 from copy import copy
+import yaml
 
 from std_srvs.srv import SetBool, SetBoolResponse
-from duckietown_msgs.srv import \
-    NodeGetParamsList, \
-    NodeGetParamsListResponse, \
-    NodeRequestParamsUpdate, \
-    NodeRequestParamsUpdateResponse
-from duckietown_msgs.msg import \
-    NodeParameter
-from duckietown.dtros.constants import \
-    NODE_GET_PARAM_SERVICE_NAME, \
-    NODE_REQUEST_PARAM_UPDATE_SERVICE_NAME, \
-    NODE_SWITCH_SERVICE_NAME
+from duckietown_msgs.srv import (
+    NodeGetParamsList,
+    NodeGetParamsListResponse,
+    NodeRequestParamsUpdate,
+    NodeRequestParamsUpdateResponse,
+)
+from duckietown_msgs.msg import NodeParameter
+from duckietown.dtros.constants import (
+    NODE_GET_PARAM_SERVICE_NAME,
+    NODE_REQUEST_PARAM_UPDATE_SERVICE_NAME,
+    NODE_SWITCH_SERVICE_NAME,
+)
 from .dtparam import DTParam
 from .constants import NodeHealth, NodeType
 from .diagnostics import DTROSDiagnostics
@@ -42,6 +49,8 @@ class DTROS(object):
       to ``False``. This switch can be
       used by computationally expensive parts of the node code that are not in callbacks in
       order to pause their execution.
+    - We look for a robot specific parameter file and overwrite the default parameters
+      if it exists
 
     Every children node should call the initializer of DTROS. This should be done
     by having the following line at the top of the children node ``__init__`` method::
@@ -87,15 +96,18 @@ class DTROS(object):
 
     """
 
-    def __init__(self,
-                 node_name,
-                 # DT parameters from here
-                 node_type,
-                 help=None,
-                 dt_ghost=False):
+    def __init__(
+        self,
+        node_name,
+        # DT parameters from here
+        node_type,
+        pkg_name=None,
+        help=None,
+        dt_ghost=False,
+    ):
         # configure singleton
         if rospy.__instance__ is not None:
-            raise RuntimeError('You cannot instantiate two objects of type DTROS')
+            raise RuntimeError("You cannot instantiate two objects of type DTROS")
         rospy.__instance__ = self
         if not isinstance(node_type, NodeType):
             raise ValueError(
@@ -104,18 +116,32 @@ class DTROS(object):
             )
         # Initialize the node
         log_level = rospy.INFO
-        if os.environ.get('DEBUG', 0) in ['1', 'true', 'True', 'enabled', 'Enabled', 'on', 'On']:
+        if os.environ.get("DEBUG", 0) in ["1", "true", "True", "enabled", "Enabled", "on", "On"]:
             log_level = rospy.DEBUG
         rospy.init_node(node_name, log_level=log_level, __dtros__=True)
         self.node_name = rospy.get_name()
         self.node_help = help
         self.node_type = node_type
-        self.log('Initializing...')
+        self.log("Initializing...")
         self.is_shutdown = False
         self._is_ghost = dt_ghost
         self._health = NodeHealth.STARTING
         self._health_reason = None
         self._ros_handler = get_ros_handler()
+
+        veh_name = self.node_name.split("/")[1]
+        robot_param_file = f"{self.package_path}/config/{node_name}/{veh_name}.yaml"
+        if os.path.isfile(robot_param_file):
+            rospy.loginfo(f"[{self.package_name}] found robot specific parameter file.. loading")
+            try:
+                with open(robot_param_file, "r") as stream:
+                    new_params = yaml.load(stream, Loader=yaml.Loader)
+            except yaml.YAMLError:
+                msg = f"[{self.package_name}] Error in parsing calibration file {robot_param_file}.. skipping"
+                rospy.logerr(msg)
+                rospy.signal_shutdown(msg)
+            for key in new_params:
+                rospy.set_param(f"{node_name}/{key}", new_params[key])
 
         # Initialize parameters handling
         self._parameters = dict()
@@ -123,32 +149,27 @@ class DTROS(object):
         if self._ros_handler is not None:
             # decorate the XMLRPC paramUpdate function
             self._rh_paramUpdate = self._ros_handler.paramUpdate
-            setattr(self._ros_handler, 'paramUpdate', self._param_update)
+            setattr(self._ros_handler, "paramUpdate", self._param_update)
+
         # Handle publishers, subscribers, and the state switch
         self._switch = True
         self._subscribers = list()
         self._publishers = list()
         # create switch service for node
-        self.srv_switch = rospy.Service(
-            "~%s" % NODE_SWITCH_SERVICE_NAME,
-            SetBool, self._srv_switch
-        )
+        self.srv_switch = rospy.Service("~%s" % NODE_SWITCH_SERVICE_NAME, SetBool, self._srv_switch)
         # create services to manage parameters
         self._srv_get_params = rospy.Service(
-            "~%s" % NODE_GET_PARAM_SERVICE_NAME,
-            NodeGetParamsList, self._srv_get_params_list
+            "~%s" % NODE_GET_PARAM_SERVICE_NAME, NodeGetParamsList, self._srv_get_params_list
         )
         self._srv_request_params_update = rospy.Service(
             "~%s" % NODE_REQUEST_PARAM_UPDATE_SERVICE_NAME,
-            NodeRequestParamsUpdate, self._srv_request_param_update
+            NodeRequestParamsUpdate,
+            self._srv_request_param_update,
         )
         # register node against the diagnostics manager
         if DTROSDiagnostics.enabled():
             DTROSDiagnostics.getInstance().register_node(
-                self.node_name,
-                self.node_help,
-                self.node_type,
-                health=self._health
+                self.node_name, self.node_help, self.node_type, health=self._health
             )
 
         # provide a public interface to the context manager to use as `with self.profiler("PHASE")`
@@ -186,22 +207,50 @@ class DTROS(object):
         """A list of all the publishers of the node"""
         return self._publishers
 
+    @property
+    def package_path(self) -> Optional[str]:
+        """The path to the catkin package this node belongs to"""
+        # get all active locations where ROS packages are stored
+        ROS_PACKAGE_PATH = os.environ.get("ROS_PACKAGE_PATH", "")
+        package_paths = ROS_PACKAGE_PATH.split(":")
+        # get the path to the file containing the child class (whoever is inheriting from this class)
+        try:
+            child_class_path: str = os.path.realpath(inspect.getfile(self.__class__))
+        except Exception as e:
+            self.logwarn(f"Could not determine the file hosting the subclass of DTROS. Error: {str(e)}")
+            return None
+        # match the subclass path with the places where packages are stored
+        for package_path in package_paths:
+            package_path = os.path.realpath(package_path)
+            if child_class_path.startswith(package_path):
+                # we have a match
+                return package_path
+        return None
+
+    @property
+    def package_name(self) -> Optional[str]:
+        """The name of the catkin package this node belongs to"""
+        package_path = self.package_path
+        if not package_path:
+            return None
+        # the name of the package is simply the name of the directory containing it
+        return Path(package_path).stem
+
     def set_health(self, health, reason=None):
         if not isinstance(health, NodeHealth):
-            raise ValueError('Argument \'health\' must be of type duckietown.NodeHealth. '
-                             'Got %s instead' % str(type(health)))
-        self.log('Health status changed [%s] -> [%s]' % (self._health.name, health.name))
+            raise ValueError(
+                "Argument 'health' must be of type duckietown.NodeHealth. "
+                "Got %s instead" % str(type(health))
+            )
+        self.log("Health status changed [%s] -> [%s]" % (self._health.name, health.name))
         self._health = health
         self._health_reason = None if reason is None else str(reason)
         # update node health in the diagnostics manager
         if DTROSDiagnostics.enabled():
-            DTROSDiagnostics.getInstance().update_node(
-                health=self._health,
-                health_reason=self._health_reason
-            )
+            DTROSDiagnostics.getInstance().update_node(health=self._health, health_reason=self._health_reason)
 
-    def log(self, msg, type='info'):
-        """ Passes a logging message to the ROS logging methods.
+    def log(self, msg, type="info"):
+        """Passes a logging message to the ROS logging methods.
 
         Attaches the ros name to the beginning of the message and passes it to
         a suitable ROS logging method. Use the `type` argument to select the method
@@ -217,38 +266,38 @@ class DTROS(object):
             ValueError: if the ``type`` argument is not one of the supported types
 
         """
-        full_msg = '[%s] %s' % (self.node_name, msg)
+        full_msg = "[%s] %s" % (self.node_name, msg)
         # pipe to the right logger
-        if type == 'debug':
+        if type == "debug":
             rospy.logdebug(full_msg)
-        elif type == 'info':
+        elif type == "info":
             rospy.loginfo(full_msg)
-        elif type == 'warn' or type == 'warning':
+        elif type == "warn" or type == "warning":
             self.set_health(NodeHealth.WARNING, full_msg)
             rospy.logwarn(full_msg)
-        elif type == 'err' or type == 'error':
+        elif type == "err" or type == "error":
             self.set_health(NodeHealth.ERROR, full_msg)
             rospy.logerr(full_msg)
-        elif type == 'fatal':
+        elif type == "fatal":
             self.set_health(NodeHealth.FATAL, full_msg)
             rospy.logfatal(full_msg)
         else:
-            raise ValueError('Type argument value %s is not supported!' % type)
+            raise ValueError("Type argument value %s is not supported!" % type)
 
     def loginfo(self, msg):
-        self.log(msg, type='info')
+        self.log(msg, type="info")
 
     def logerr(self, msg):
-        self.log(msg, type='err')
+        self.log(msg, type="err")
 
     def logfatal(self, msg):
-        self.log(msg, type='fatal')
+        self.log(msg, type="fatal")
 
     def logwarn(self, msg):
-        self.log(msg, type='warn')
+        self.log(msg, type="warn")
 
     def logdebug(self, msg):
-        self.log(msg, type='debug')
+        self.log(msg, type="debug")
 
     def on_switch_on(self):
         pass
@@ -273,21 +322,13 @@ class DTROS(object):
         for sub in self.subscribers:
             sub.active = self._switch
         # tell the node about the switch
-        on_switch_fcn = {
-            False: self.on_switch_off,
-            True: self.on_switch_on
-        }[self._switch]
+        on_switch_fcn = {False: self.on_switch_off, True: self.on_switch_on}[self._switch]
         on_switch_fcn()
         # update node switch in the diagnostics manager
         if DTROSDiagnostics.enabled():
-            DTROSDiagnostics.getInstance().update_node(
-                enabled=self._switch
-            )
+            DTROSDiagnostics.getInstance().update_node(enabled=self._switch)
         # create a response to the service call
-        msg = 'Node switched from [%s] to [%s]' % (
-            'on' if old_state else 'off',
-            'on' if new_state else 'off'
-        )
+        msg = "Node switched from [%s] to [%s]" % ("on" if old_state else "off", "on" if new_state else "off")
         # print out the change in state
         self.log(msg)
         # reply to the service call
@@ -308,12 +349,9 @@ class DTROS(object):
         return NodeGetParamsListResponse(
             parameters=[
                 NodeParameter(
-                    node=rospy.get_name(),
-                    name=p.name,
-                    help=p.help,
-                    type=p.type.value,
-                    **p.options()
-                ) for p in self.parameters
+                    node=rospy.get_name(), name=p.name, help=p.help, type=p.type.value, **p.options()
+                )
+                for p in self.parameters
             ]
         )
 
@@ -338,22 +376,23 @@ class DTROS(object):
             self._rh_paramUpdate(*args, **kwargs)
         # check data
         if len(args) < 3:
-            self.logdebug('Received invalid paramUpdate call from Master')
+            self.logdebug("Received invalid paramUpdate call from Master")
             return
         # get what changed
         _, param_name, param_value = args[:3]
-        param_name = param_name.rstrip('/')
+        param_name = param_name.rstrip("/")
         self.logdebug('Received paramUpdate("%s", %s)' % (param_name, str(param_value)))
         # update parameter value
         if param_name in self._parameters:
             self._parameters[param_name].set_value(param_value)
-            self.loginfo('Parameter "%s" has now the value [%s]' % (
-                param_name, str(self._parameters[param_name].value)
-            ))
+            self.loginfo(
+                'Parameter "%s" has now the value [%s]'
+                % (param_name, str(self._parameters[param_name].value))
+            )
 
     def _add_param(self, param):
         if not isinstance(param, DTParam):
-            raise ValueError('Expected type duckietown.DTParam, got %s instead' % str(type(param)))
+            raise ValueError("Expected type duckietown.DTParam, got %s instead" % str(type(param)))
         self._parameters[param.name] = param
 
     def _has_param(self, param):
@@ -366,7 +405,7 @@ class DTROS(object):
         self._subscribers.append(subscriber)
 
     def _on_shutdown(self):
-        self.log('Received shutdown request.')
+        self.log("Received shutdown request.")
         self.is_shutdown = True
         # call node on_shutdown
         self.on_shutdown()

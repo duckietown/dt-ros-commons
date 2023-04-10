@@ -1,6 +1,6 @@
 # parameters
 ARG REPO_NAME="dt-ros-commons"
-ARG MAINTAINER="Andrea F. Daniele (afdaniele@ttic.edu)"
+ARG MAINTAINER="Andrea F. Daniele (afdaniele@duckietown.com)"
 ARG DESCRIPTION="Base image containing common libraries and environment setup for ROS applications."
 ARG ICON="square"
 
@@ -12,7 +12,7 @@ ARG LAUNCHER=default
 
 # define base image
 ARG DOCKER_REGISTRY=docker.io
-FROM ${DOCKER_REGISTRY}/duckietown/${BASE_IMAGE}:${BASE_TAG} as BASE
+FROM ${DOCKER_REGISTRY}/duckietown/${BASE_IMAGE}:${BASE_TAG} as base
 
 # recall all arguments
 ARG REPO_NAME
@@ -27,7 +27,6 @@ ARG BASE_IMAGE
 ARG LAUNCHER
 
 # configure environment
-ENV CATKIN_WS_DIR "${SOURCE_DIR}/catkin_ws"
 ENV ROS_LANG_DISABLE gennodejs:geneus:genlisp
 
 # define and create repository path
@@ -54,12 +53,11 @@ COPY ./dependencies-apt.txt "${REPO_PATH}/"
 RUN dt-apt-install "${REPO_PATH}/dependencies-apt.txt"
 
 # install python dependencies
-ARG PIP_INDEX_URL="https://pypi.org/simple"
+ARG PIP_INDEX_URL="https://pypi.org/simple/"
 ENV PIP_INDEX_URL=${PIP_INDEX_URL}
-RUN echo PIP_INDEX_URL=${PIP_INDEX_URL}
 
 COPY ./dependencies-py3.* "${REPO_PATH}/"
-RUN python3 -m pip install  -r ${REPO_PATH}/dependencies-py3.txt
+RUN dt-pip3-install "${REPO_PATH}/dependencies-py3.*"
 
 # copy the source code
 COPY ./packages "${REPO_PATH}/packages"
@@ -86,4 +84,3 @@ LABEL org.duckietown.label.module.type="${REPO_NAME}" \
     org.duckietown.label.base.image="${BASE_IMAGE}" \
     org.duckietown.label.base.tag="${BASE_TAG}" \
     org.duckietown.label.maintainer="${MAINTAINER}"
-
