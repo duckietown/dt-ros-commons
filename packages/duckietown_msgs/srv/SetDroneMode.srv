@@ -1,0 +1,4 @@
+duckietown_msgs/DroneMode mode
+---
+duckietown_msgs/DroneMode previous_mode
+duckietown_msgs/DroneMode current_mode
