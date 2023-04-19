@@ -1,7 +1,7 @@
 # This file performs the decoration of rospy upon import
 
 # TODO: update this to point to the documentation about DTROS once ready
-DOCS_DTROS = 'http://docs.duckietown.org'
+DOCS_DTROS = 'https://docs.duckietown.com'
 
 import rospy
 
