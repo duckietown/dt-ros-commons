@@ -26,6 +26,7 @@ setattr(rospy, '__Subscriber__', rospy.Subscriber)
 from .dtros import DTROS
 from .dtparam import DTParam
 from .constants import TopicType, NodeType, ParamType, NodeHealth, TopicDirection
+from .hardware_tests import HWTest, HWTestJsonParamType
 
 # perform rospy decoration
 from .decoration import rospy_decorate
