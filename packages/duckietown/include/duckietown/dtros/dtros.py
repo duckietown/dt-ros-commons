@@ -430,14 +430,15 @@ class DTROS(object):
         self.logdebug('Received paramUpdate("%s", %s)' % (param_name, str(param_value)))
         # update parameter value
         if param_name in self._parameters:
-            self._parameters[param_name].set_value(param_value)
-            self.loginfo(
-                'Parameter "%s" has now the value [%s]'
-                % (param_name, str(self._parameters[param_name].value))
-            )
-            self.loginfo('Parameter "%s" has now the value [%s]' % (
-                param_name, str(self._parameters[param_name].value)
-            ))
+            param = self._parameters[param_name]
+            # BUG: If we remove this IF, we get periodic update events with the same value again and again
+            #       this should be fixed at the root
+            # do not trigger an update event if the value has not changed
+            if param.value != param_value:
+                param.set_value(param_value)
+                self.loginfo('Parameter "%s" has now the value [%s]' % (
+                    param_name, str(self._parameters[param_name].value)
+                ))
         else:
             # check if the parameter is the child of a monitored parameter
             for p in self._parameters.values():

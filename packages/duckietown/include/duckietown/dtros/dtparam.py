@@ -95,6 +95,7 @@ class DTParam:
             )
 
     def set_value(self, value):
+        # update internal value
         self._value = value
         # notify listeners
         for cb in self._update_listeners:
