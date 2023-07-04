@@ -1,3 +1,5 @@
+from typing import Optional
+
 import rospy
 
 from .constants import TopicDirection
@@ -43,16 +45,19 @@ class DTPublisher(DTTopic, rospy.__Publisher__):
         # call super constructor
         DTTopic.__init__(self)
         rospy.__Publisher__.__init__(self, *args, **ros_args)
-        # dt arguments
-        self.active = True
+        # dtros instance
+        from .dtros import DTROS
+        self._dtros: Optional[DTROS] = get_instance()
+        # initialize 'acive' according to the node switch
+        self.active: bool = self._dtros.switch if self._dtros else True
         # parse dt arguments
         self._parse_dt_args(kwargs)
         # register dt topic
         if not self._dt_is_ghost:
             self._register_dt_topic(TopicDirection.OUTBOUND)
         # register publisher
-        if get_instance() is not None:
-            get_instance()._register_publisher(self)
+        if self._dtros is not None:
+            self._dtros._register_publisher(self)
         # TODO: register for new subscriptions and publish new links on event
 
         # Setup callbacks for when the number of subscribers changes

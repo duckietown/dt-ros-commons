@@ -1,7 +1,7 @@
 import inspect
 import os
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List
 
 import rospy
 import rospkg
@@ -24,8 +24,16 @@ from duckietown.dtros.constants import (
 from .dtparam import DTParam
 from .constants import NodeHealth, NodeType
 from .diagnostics import DTROSDiagnostics
+from .dtpublisher import DTPublisher
+from .dtsubscriber import DTSubscriber
 from .utils import get_ros_handler
 from .profiler import CodeProfiler
+
+
+NODE_USER_CONFIG_LOCATION = "/data/config/nodes"
+NODE_USER_GENERIC_CONFIG_NAME = "generic"
+
+FSM_NODE_CONTROL: bool = os.environ.get("FSM_NODE_CONTROL", "0").lower() in ["1", "y", "yes"]
 
 
 class DTROS(object):
@@ -104,6 +112,7 @@ class DTROS(object):
         pkg_name=None,
         help=None,
         dt_ghost=False,
+        fsm_controlled: bool = False,
     ):
         # configure singleton
         if rospy.__instance__ is not None:
@@ -152,7 +161,11 @@ class DTROS(object):
             setattr(self._ros_handler, "paramUpdate", self._param_update)
 
         # Handle publishers, subscribers, and the state switch
-        self._switch = True
+        self._switch: bool = False if (fsm_controlled and FSM_NODE_CONTROL) else True
+        self.loginfo(f"Node starting with switch={self._switch}")
+        self.logdebug(f"Switch configuration: "
+                      f"fsm_controlled:{fsm_controlled}, env[FSM_NODE_CONTROL]:{FSM_NODE_CONTROL}")
+
         self._subscribers = list()
         self._publishers = list()
         # create switch service for node
@@ -198,12 +211,12 @@ class DTROS(object):
         return copy(list(self._parameters.values()))
 
     @property
-    def subscribers(self):
+    def subscribers(self) -> List[DTSubscriber]:
         """A list of all the subscribers of the node"""
         return self._subscribers
 
     @property
-    def publishers(self):
+    def publishers(self) -> List[DTPublisher]:
         """A list of all the publishers of the node"""
         return self._publishers
 
