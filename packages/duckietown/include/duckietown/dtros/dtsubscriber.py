@@ -1,4 +1,5 @@
-import time
+from typing import Optional
+
 import rospy
 from rospy.impl.tcpros import DEFAULT_BUFF_SIZE
 from rospy.impl.registration import get_topic_manager
@@ -68,8 +69,12 @@ class DTSubscriber(DTTopic, rospy.__Subscriber__):
             buff_size=buff_size,
             tcp_nodelay=tcp_nodelay
         )
-        # dt parameters
-        self._active = True
+
+        # dtros instance
+        from .dtros import DTROS
+        self._dtros: Optional[DTROS] = get_instance()
+        # initialize 'active' according to the node switch
+        self._active: bool = self._dtros.switch if self._dtros else True
 
         # parse dt arguments
         self._parse_dt_args(kwargs)
@@ -77,8 +82,8 @@ class DTSubscriber(DTTopic, rospy.__Subscriber__):
         if not self._dt_is_ghost:
             self._register_dt_topic(TopicDirection.INBOUND)
         # register subscriber
-        if get_instance() is not None:
-            get_instance()._register_subscriber(self)
+        if self._dtros:
+            self._dtros._register_subscriber(self)
         # store attributes
         self._attributes_keeper = {
             'name': name,
