@@ -27,7 +27,7 @@ def rospy_decorate():
 def __rospy__init_node__(*args, **kwargs):
     if '__dtros__' not in kwargs:
         print('[WARNING]: You are calling the function rospy.init_node() directly. '
-              'This is fine, but your are missing out a lot of Duckietown features '
+              'This is fine, but your are missing out on a lot of Duckietown features '
               'by not using the class DTROS instead. Check out the documentation '
               'at %s' % DOCS_DTROS)
     else:
