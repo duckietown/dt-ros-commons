@@ -7,3 +7,6 @@
 !dependencies-apt.txt
 !dependencies-py3.*
 !launchers
+
+# YOUR FILES LISTED BELOW THIS LINE (IMPORTANT: PREPEND !)
+# ----------------------------------------------------------------------------
