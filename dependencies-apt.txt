@@ -70,6 +70,7 @@ ros-noetic-robot
 ros-noetic-cv-bridge
 ros-noetic-image-transport
 ros-noetic-image-transport-plugins
+ros-noetic-tf-conversions
 
 
 # TODO: This was originally `ros-noetic-joystick-drivers` but temporarily pointing

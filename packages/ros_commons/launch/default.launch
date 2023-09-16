@@ -7,6 +7,18 @@
     <arg name="robot_configuration" default="$(env ROBOT_CONFIGURATION)"
          doc="The configuration of the robot (e.g., DB19, DB20, WT18, ...)"/>
 
+    <!-- Car interface: for Duckiebots only -->
+    <include file="$(find car_interface)/launch/default.launch">
+        <arg name="veh" value="$(arg veh)"/>
+        <arg name="param_file_name" value="$(arg param_file_name)"/>
+    </include>
+
+    <!-- Drone interface: for Duckiedrones only -->
+    <include file="$(find drone_interface)/launch/default.launch">
+        <arg name="veh" value="$(arg veh)"/>
+        <arg name="param_file_name" value="$(arg param_file_name)"/>
+    </include>
+
     <!-- ROS HTTP API: provides an HTTP API through which we can monitor the ROS network -->
     <include file="$(find ros_http_api)/launch/ros_http_api_node.launch">
         <arg name="veh" value="$(arg veh)"/>
