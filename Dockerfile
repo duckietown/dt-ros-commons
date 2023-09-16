@@ -7,7 +7,7 @@ ARG BASE_ORGANIZATION=duckietown
 ARG BASE_TAG=${DISTRO}-${ARCH}
 ARG LAUNCHER=default
 ARG OS_FAMILY=ubuntu
-ARG OS_DISTRO=jammy
+ARG OS_DISTRO=focal
 ARG ROS_DISTRO=noetic
 # ---
 ARG PROJECT_NAME
@@ -63,12 +63,10 @@ ENV OS_FAMILY="${OS_FAMILY}" \
     OS_DISTRO="${OS_DISTRO}"
 
 # code environment
-ENV SOURCE_DIR="/code" \
+ENV SOURCE_DIR="/code/src" \
     LAUNCHERS_DIR="/launch" \
+    USER_WS_DIR="/user_ws" \
     MINIMUM_DTPROJECT_FORMAT_VERSION="4"
-
-# user workspaces
-ENV USER_WS_DIR "${SOURCE_DIR}/user_ws"
 
 # start inside the course code directory
 WORKDIR "${SOURCE_DIR}"
@@ -82,11 +80,15 @@ RUN cp ${SOURCE_DIR}/dt-base-environment/assets/qemu/${TARGETPLATFORM}/* /usr/bi
 
 # Install gnupg required for apt-key (not in base image since Focal)
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends gnupg \
+  && apt-get install -y --no-install-recommends \
+        gnupg \
+        python3-dev \
+        python3-pip \
+        make \
+        cmake \
+        gcc \
+        sudo \
   && rm -rf /var/lib/apt/lists/*
-
-# install dependencies (APT)
-RUN dt-apt-install "${SOURCE_DIR}/dt-base-environment/dependencies-apt.txt"
 
 # upgrade PIP
 RUN python3 -m pip install pip==22.2 && \
@@ -99,8 +101,8 @@ RUN dt-pip3-install "${SOURCE_DIR}/dt-base-environment/dependencies-py3.*"
 ENV COLUMNS 160
 
 # install launcher scripts
-COPY --from=duckietown "${LAUNCH_DIR}/dt-base-environment" "${LAUNCH_DIR}/dt-base-environment"
-RUN dt-install-launchers "${LAUNCH_DIR}/dt-base-environment"
+COPY --from=duckietown "${LAUNCHERS_DIR}/dt-base-environment" "${LAUNCHERS_DIR}/dt-base-environment"
+RUN dt-install-launchers "${LAUNCHERS_DIR}/dt-base-environment"
 
 # <===== Replicate the configuration from dt-base-environment ==============================
 #
@@ -118,23 +120,8 @@ ENV DT_USER_NAME="duckie" \
     DT_GROUP_GID=2222 \
     DT_USER_HOME="/home/duckie"
 
-# install dependencies (APT)
-RUN dt-apt-install "${SOURCE_DIR}/dt-commons/dependencies-apt.txt"
-
 # install dependencies (PIP3)
 RUN dt-pip3-install "${SOURCE_DIR}/dt-commons/dependencies-py3.*"
-
-# install LCM
-ENV LCM_VERSION="1.5.0"
-RUN cd /tmp/ \
-    && git clone -b "v${LCM_VERSION}" https://github.com/lcm-proj/lcm \
-    && mkdir -p lcm/build \
-    && cd lcm/build \
-    && cmake .. \
-    && make \
-    && make install \
-    && cd ~ \
-    && rm -rf /tmp/lcm
 
 # create `duckie` user
 RUN addgroup --gid ${DT_GROUP_GID} "${DT_GROUP_NAME}" && \
@@ -163,8 +150,8 @@ RUN echo "source /environment.sh" >> ~/.bashrc
 ENTRYPOINT ["/entrypoint.sh"]
 
 # install launcher scripts
-COPY --from=duckietown "${LAUNCH_DIR}/dt-commons" "${LAUNCH_DIR}/dt-commons"
-RUN dt-install-launchers "${LAUNCH_DIR}/dt-commons"
+COPY --from=duckietown "${LAUNCHERS_DIR}/dt-commons" "${LAUNCHERS_DIR}/dt-commons"
+RUN dt-install-launchers "${LAUNCHERS_DIR}/dt-commons"
 
 # create health file
 RUN echo ND > /health &&  \
@@ -186,17 +173,21 @@ HEALTHCHECK \
 # recall arguments
 ARG ARCH
 ARG DISTRO
+ARG DOCKER_REGISTRY
 ARG PROJECT_NAME
 ARG PROJECT_DESCRIPTION
 ARG PROJECT_MAINTAINER
 ARG PROJECT_ICON
 ARG PROJECT_FORMAT_VERSION
-ARG DOCKER_REGISTRY
+ARG BASE_TAG
+ARG BASE_REPOSITORY
+ARG BASE_ORGANIZATION
 ARG LAUNCHER
 ARG ROS_DISTRO
 
 # ROS info
-ENV ROS_DISTRO="${ROS_DISTRO}"
+ENV ROS_DISTRO="${ROS_DISTRO}" \
+    CATKIN_WS_DIR="/code"
 
 # check build arguments
 RUN dt-args-check \
@@ -233,28 +224,40 @@ RUN apt-key adv \
     && echo "deb http://packages.ros.org/ros/ubuntu ${OS_DISTRO} main" >> /etc/apt/sources.list.d/ros.list
 
 # install dependencies (APT)
-COPY ./dependencies-apt.txt "${REPO_PATH}/"
-RUN dt-apt-install "${REPO_PATH}/dependencies-apt.txt"
+COPY ./dependencies-apt.txt "${PROJECT_PATH}/"
+RUN dt-apt-install "${PROJECT_PATH}/dependencies-apt.txt"
 
 # install dependencies (PIP3)
-COPY ./dependencies-py3.* "${REPO_PATH}/"
-RUN dt-pip3-install "${REPO_PATH}/dependencies-py3.*"
+COPY ./dependencies-py3.* "${PROJECT_PATH}/"
+RUN dt-pip3-install "${PROJECT_PATH}/dependencies-py3.*"
+
+# install LCM
+ENV LCM_VERSION="1.5.0"
+RUN cd /tmp/ \
+    && git clone -b "v${LCM_VERSION}" https://github.com/lcm-proj/lcm \
+    && mkdir -p lcm/build \
+    && cd lcm/build \
+    && cmake .. \
+    && make \
+    && make install \
+    && cd ~ \
+    && rm -rf /tmp/lcm
 
 # copy the source code
-COPY ./packages "${REPO_PATH}/packages"
+COPY ./packages "${PROJECT_PATH}/packages"
 
 # build packages
 RUN . /opt/ros/${ROS_DISTRO}/setup.sh && \
   catkin build \
-    --workspace ${SOURCE_DIR}/
+    --workspace ${CATKIN_WS_DIR}/
 
 # install launcher scripts
-COPY ./launchers/. "${LAUNCH_PATH}/"
-RUN dt-install-launchers "${LAUNCH_PATH}"
+COPY ./launchers/. "${PROJECT_LAUNCHERS_PATH}/"
+RUN dt-install-launchers "${PROJECT_LAUNCHERS_PATH}"
 
 # install scripts
-COPY ./assets/entrypoint.d "${REPO_PATH}/assets/entrypoint.d"
-COPY ./assets/environment.d "${REPO_PATH}/assets/environment.d"
+COPY ./assets/entrypoint.d "${PROJECT_PATH}/assets/entrypoint.d"
+COPY ./assets/environment.d "${PROJECT_PATH}/assets/environment.d"
 
 # define default command
 CMD ["bash", "-c", "dt-launcher-${DT_LAUNCHER}"]
