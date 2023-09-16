@@ -125,8 +125,9 @@ RUN dt-apt-install "${SOURCE_DIR}/dt-commons/dependencies-apt.txt"
 RUN dt-pip3-install "${SOURCE_DIR}/dt-commons/dependencies-py3.*"
 
 # install LCM
+ENV LCM_VERSION="1.5.0"
 RUN cd /tmp/ \
-    && git clone -b v1.4.0 https://github.com/lcm-proj/lcm \
+    && git clone -b "v${LCM_VERSION}" https://github.com/lcm-proj/lcm \
     && mkdir -p lcm/build \
     && cd lcm/build \
     && cmake .. \
