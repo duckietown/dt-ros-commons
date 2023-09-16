@@ -1,0 +1,8 @@
+name: "dt-ros-commons"
+maintainer:
+    name: "Andrea F. Daniele"
+    email: "afdaniele@duckietown.com"
+description: "Base image containing common libraries and environment setup for ROS applications"
+version: 4.2.3
+# pick an icon from: https://fontawesome.com/v4.7.0/icons/
+icon: square

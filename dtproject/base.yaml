@@ -1,0 +1,4 @@
+registry: docker.io
+#organization: <arch>
+repository: ubuntu
+tag: focal
