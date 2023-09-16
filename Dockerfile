@@ -3,8 +3,11 @@ ARG ARCH
 ARG DISTRO
 ARG DOCKER_REGISTRY
 ARG BASE_REPOSITORY
-ARG BASE_TAG
+ARG BASE_ORGANIZATION=duckietown
+ARG BASE_TAG=${DISTRO}-${ARCH}
 ARG LAUNCHER=default
+ARG OS_FAMILY=ubuntu
+ARG OS_DISTRO=jammy
 ARG ROS_DISTRO=noetic
 # ---
 ARG PROJECT_NAME
@@ -13,14 +16,12 @@ ARG PROJECT_DESCRIPTION
 ARG PROJECT_ICON="square"
 ARG PROJECT_FORMAT_VERSION
 
-ARG DUCKIETOWN_BASE_REPOSITORY=dt-commons
-ARG DUCKIETOWN_BASE_TAG=${DISTRO}-${ARCH}
 
 # duckietown environment image
-FROM ${DOCKER_REGISTRY}/duckietown/${DUCKIETOWN_BASE_REPOSITORY}:${DUCKIETOWN_BASE_TAG} as duckietown
+FROM ${DOCKER_REGISTRY}/${BASE_ORGANIZATION}/${BASE_REPOSITORY}:${BASE_TAG} as duckietown
 
 # base image
-FROM docker.io/${ARCH}/${BASE_REPOSITORY}:${BASE_TAG}
+FROM docker.io/${ARCH}/${OS_FAMILY}:${OS_DISTRO}
 
 # configure pip
 ARG PIP_INDEX_URL="https://pypi.org/simple"
@@ -30,8 +31,8 @@ ENV PIP_INDEX_URL=${PIP_INDEX_URL}
 # =====> Replicate the configuration from dt-base-environment ==============================
 
 # recall arguments
-ARG BASE_TAG
-ARG BASE_REPOSITORY
+ARG OS_FAMILY
+ARG OS_DISTRO
 # - buildkit
 ARG TARGETPLATFORM
 ARG TARGETOS
@@ -58,8 +59,8 @@ ENV NVIDIA_VISIBLE_DEVICES="all" \
     NVIDIA_DRIVER_CAPABILITIES="all"
 
 # OS info
-ENV OS_FAMILY="${BASE_REPOSITORY}" \
-    OS_DISTRO="${BASE_TAG}"
+ENV OS_FAMILY="${OS_FAMILY}" \
+    OS_DISTRO="${OS_DISTRO}"
 
 # code environment
 ENV SOURCE_DIR="/code" \
