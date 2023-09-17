@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="veh" doc="Name of vehicle. ex: megaman"/>
+
+    <group ns="$(arg veh)">
+        <node pkg="test_ros" type="talker.py" name="talker" output="screen" required="true" />
+        <node pkg="test_ros" type="listener.py" name="listener" output="screen" required="true" />
+    </group>
+</launch>
