@@ -74,6 +74,9 @@ WORKDIR "${SOURCE_DIR}"
 # copy entire project
 COPY --from=duckietown "${SOURCE_DIR}/dt-base-environment" "${SOURCE_DIR}/dt-base-environment"
 
+# remove packages that are not supported by catkin
+RUN rm -rf "${SOURCE_DIR}/dt-base-environment/packages"
+
 # copy assets
 RUN cp ${SOURCE_DIR}/dt-base-environment/assets/qemu/${TARGETPLATFORM}/* /usr/bin/ && \
     cp ${SOURCE_DIR}/dt-base-environment/assets/bin/* /usr/local/bin/
