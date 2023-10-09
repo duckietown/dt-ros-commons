@@ -147,7 +147,7 @@ RUN cp ${SOURCE_DIR}/dt-commons/assets/bin/* /usr/local/bin/ && \
     cp ${SOURCE_DIR}/dt-commons/assets/environment.sh /environment.sh
 
 # source environment on every bash session
-RUN echo "source /environment.sh" >> ~/.bashrc
+RUN echo "source /environment.sh" >> /etc/bash.bashrc
 
 # configure entrypoint
 ENTRYPOINT ["/entrypoint.sh"]
