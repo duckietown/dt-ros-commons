@@ -1,0 +1,4 @@
+string sitl_ip
+string sitl_config_path
+---
+bool success
