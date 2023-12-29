@@ -1,4 +1,4 @@
-# PWM commands from the range defined on cleanflight for each motor and two AUX channels
+# PWM commands from the range defined on cleanflight for each motor
 Header header
 
 # range defined on cleanflight
@@ -10,7 +10,3 @@ int16 m1
 int16 m2
 int16 m3
 int16 m4
-
-# AUX commands
-int16 aux1
-int16 aux2
