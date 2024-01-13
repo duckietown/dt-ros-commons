@@ -5,18 +5,18 @@
 setproctitle==1.1.10
 pybase64==1.0.1
 
-osrf-pycommon
-frozendict
-PyGeometry-z6
-QuickApp-z6
-compmake-z6
-SystemCmd-z6
-PyContracts3
+osrf-pycommon==2.0.2
+frozendict==2.3.8
+PyGeometry-z6==2.1.4
+QuickApp-z6==6.0.5
+compmake-z6==6.1.5
+SystemCmd-z6==3.0.5
+pycontracts3==7.2
 picamera==1.13
 
 # Package: ros_http_api
-flask
-flask-cors
+Flask==3.0.0
+Flask-Cors==4.0.0
 
 # this is for DTROS and buff_size input
-humanfriendly
+humanfriendly==10.0
