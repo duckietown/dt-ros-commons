@@ -6,7 +6,8 @@ setup_args = generate_distutils_setup(
     packages=[
         'duckietown_utils',
         'duckietown_utils_tests',
-        'duckietown',
+        'duckietown.dtros',
+        'duckietown.utils.image',
     ],
     install_requires=[
         'comptests',
