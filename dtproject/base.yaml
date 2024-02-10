@@ -1,4 +1,4 @@
 #registry: docker.io
 #organization: duckietown
 #tag: <distro>-<arch>
-repository: dt-commons
+repository: dt-legacy-py38-environment
