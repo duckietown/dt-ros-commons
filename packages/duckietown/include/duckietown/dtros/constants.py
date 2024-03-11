@@ -58,6 +58,7 @@ class NodeType(Enum):
     INFRASTRUCTURE = 10
     COMMUNICATION = 11
     DIAGNOSTICS = 12
+    CALIBRATION = 13
     DEBUG = 20
 
 
