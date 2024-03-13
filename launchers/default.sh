@@ -2,9 +2,6 @@
 
 source /environment.sh
 
-# initialize launch file
-dt-launchfile-init
-
 # YOUR CODE BELOW THIS LINE
 # ----------------------------------------------------------------------------
 
@@ -12,15 +9,9 @@ dt-launchfile-init
 # NOTE: Use the variable DT_PROJECT_PATH to know the absolute path to your code
 # NOTE: Use `dt-exec COMMAND` to run the main process (blocking process)
 
-# set module's health
-dt-set-module-healthy
-
-# launching app
-dt-exec roslaunch ros_commons default.launch veh:="$VEHICLE_NAME"
+# run roscore
+exec roscore
 
 
 # ----------------------------------------------------------------------------
 # YOUR CODE ABOVE THIS LINE
-
-# wait for app to end
-dt-launchfile-join
