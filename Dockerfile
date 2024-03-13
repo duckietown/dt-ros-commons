@@ -44,7 +44,8 @@ ARG ROS_DISTRO
 
 # ROS info
 ENV ROS_DISTRO="${ROS_DISTRO}" \
-    CATKIN_WS_DIR="/code"
+    CATKIN_WS_DIR="/catkin" \
+    SOURCE_DIR="/catkin/src"
 
 # check build arguments
 RUN dt-args-check \
