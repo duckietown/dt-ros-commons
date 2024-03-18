@@ -30,7 +30,7 @@ from .utils import get_ros_handler
 from .profiler import CodeProfiler
 
 
-NODE_USER_CONFIG_LOCATION = "/data/config/nodes"
+NODE_USER_CONFIG_LOCATION = "/data/config/ros/nodes"
 NODE_USER_GENERIC_CONFIG_NAME = "generic"
 
 FSM_NODE_CONTROL: bool = os.environ.get("FSM_NODE_CONTROL", "0").lower() in ["1", "y", "yes"]
