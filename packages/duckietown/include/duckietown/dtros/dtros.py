@@ -36,7 +36,7 @@ NODE_USER_GENERIC_CONFIG_NAME = "generic"
 FSM_NODE_CONTROL: bool = os.environ.get("FSM_NODE_CONTROL", "0").lower() in ["1", "y", "yes"]
 
 
-class DTROS(object):
+class DTROS:
     """
     Parent class for all Duckietown ROS nodes
 
