@@ -1,10 +1,10 @@
 import inspect
+import glob
 import os
 from pathlib import Path
 from typing import Optional, List
 
 import rospy
-import rospkg
 from copy import copy
 import yaml
 
@@ -123,6 +123,7 @@ class DTROS(object):
                 "DTROS 'node_type' parameter must be of type 'duckietown.NodeType', "
                 "got %s instead." % str(type(node_type))
             )
+
         # Initialize the node
         log_level = rospy.INFO
         if os.environ.get("DEBUG", 0) in ["1", "true", "True", "enabled", "Enabled", "on", "On"]:
@@ -168,6 +169,10 @@ class DTROS(object):
 
         self._subscribers = list()
         self._publishers = list()
+
+        # Load user configuration files
+        self._load_user_parameter_files()
+
         # create switch service for node
         self.srv_switch = rospy.Service("~%s" % NODE_SWITCH_SERVICE_NAME, SetBool, self._srv_switch)
         # create services to manage parameters
@@ -179,6 +184,7 @@ class DTROS(object):
             NodeRequestParamsUpdate,
             self._srv_request_param_update,
         )
+
         # register node against the diagnostics manager
         if DTROSDiagnostics.enabled():
             DTROSDiagnostics.getInstance().register_node(
@@ -190,8 +196,44 @@ class DTROS(object):
 
         # mark node as healthy and STARTED
         self.set_health(NodeHealth.STARTED)
+
         # register shutdown callback
         rospy.on_shutdown(self._on_shutdown)
+
+    def _load_user_parameter_files(self):
+        # load user configurations
+        # - node-agnostic parameters
+        generic_cfg_dir = os.path.join(NODE_USER_CONFIG_LOCATION, NODE_USER_GENERIC_CONFIG_NAME)
+        self._load_user_parameter_files_from(generic_cfg_dir)
+        # - node-specific parameters
+        node_name = self.node_name.split("/", maxsplit=2)[-1]
+        node_cfg_dir = os.path.join(NODE_USER_CONFIG_LOCATION, node_name)
+        self._load_user_parameter_files_from(node_cfg_dir)
+
+    def _load_user_parameter_files_from(self, path: str):
+        user_cfg_star = os.path.join(path, "*.yaml")
+        user_cfg_files = sorted(glob.glob(user_cfg_star))
+        # accumulate configs here
+        user_cfg = {}
+        # load configuration files
+        i = 1
+        t = len(user_cfg_files)
+        self.loginfo(f"Found {t} user configuration files in '{path}'")
+        for user_cfg_file in user_cfg_files:
+            self.loginfo(f"Loading user configuration file {i}/{t}: {user_cfg_file}")
+            try:
+                with open(user_cfg_file, "rt") as fin:
+                    user_cfg.update(yaml.safe_load(fin))
+            except Exception as e:
+                self.logerr(f"Skipping user configuration file '{user_cfg_file}' because we "
+                            f"failed loading it. The error reads: {str(e)}")
+            i += 1
+        # update ros parameters
+        for k, v in user_cfg.items():
+            k = f"~{k}"
+            self.logdebug(f"User configuration files update parameter '{k}': "
+                          f"{rospy.get_param(k, None)} -> {v} ")
+            rospy.set_param(k, v)
 
     # Read-only properties for the private attributes
     @property
@@ -397,11 +439,22 @@ class DTROS(object):
         self.logdebug('Received paramUpdate("%s", %s)' % (param_name, str(param_value)))
         # update parameter value
         if param_name in self._parameters:
-            self._parameters[param_name].set_value(param_value)
-            self.loginfo(
-                'Parameter "%s" has now the value [%s]'
-                % (param_name, str(self._parameters[param_name].value))
-            )
+            param = self._parameters[param_name]
+            # BUG: If we remove this IF, we get periodic update events with the same value again and again
+            #       this should be fixed at the root
+            # do not trigger an update event if the value has not changed
+            if param.value != param_value:
+                param.set_value(param_value)
+                self.loginfo('Parameter "%s" has now the value [%s]' % (
+                    param_name, str(self._parameters[param_name].value)
+                ))
+        else:
+            # check if the parameter is the child of a monitored parameter
+            for p in self._parameters.values():
+                if param_name.startswith(p.name):
+                    p.force_update()
+                    self.loginfo(f"Detected change in child of '{p.name}'. Parameter '{p.name}' "
+                                 f"has now value [{str(self._parameters[p.name].value)}]")
 
     def _add_param(self, param):
         if not isinstance(param, DTParam):

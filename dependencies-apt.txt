@@ -1,12 +1,78 @@
 # LIST YOUR APT PACKAGES HERE
 
-# TODO: This was originally `ros-noetic-joystick-drivers` but temporarily pointing
-# TODO:      to `ros-noetic-joy`, as some deps are missing in the APT sources list.
-ros-noetic-joy
+## FROM dt-base-environment
+
+# development tools & libraries
+build-essential
+apt-utils
+git
+git-lfs
+unzip
+vim
+wget
+sudo
+nano
+make
+cmake
+locales
+locales-all
+i2c-tools
+libxslt-dev
+libffi-dev
+libturbojpeg
+libblas-dev
+liblapack-dev
+libatlas-base-dev
+libssl-dev
+
+# Python dependencies
+python3-pip
+python3-dev
+
+# this is for dt-advertise
+avahi-utils
+
+# this is for MDNS name resolution (still needs the avahi socket to be mounted)
+libnss-mdns
+
+# these are required to build `matplotlib` on Arm
+libfreetype6-dev
+pkg-config
+libpng-dev
+g++
+
+# these are required to build `Pillow` on Arm
+libjpeg-dev
+zlib1g-dev
+
+
+
+## FROM: dt-commons
+
+# dependencies for LCM
+build-essential
+libglib2.0-dev
+cmake
+
+# used to find out whether we are inside a net=host container in the entrypoint
+net-tools
+
+
+
+## THIS Project
 
 # commons
 gfortran
 
-# these are pretty small, they can stay in the ros-commons image
+# ROS packages
+ros-noetic-rospy
+ros-noetic-robot
+ros-noetic-cv-bridge
 ros-noetic-image-transport
 ros-noetic-image-transport-plugins
+ros-noetic-tf-conversions
+
+
+# TODO: This was originally `ros-noetic-joystick-drivers` but temporarily pointing
+# TODO:      to `ros-noetic-joy`, as some deps are missing in the APT sources list.
+ros-noetic-joy

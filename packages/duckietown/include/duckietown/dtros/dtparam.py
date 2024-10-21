@@ -95,6 +95,7 @@ class DTParam:
             )
 
     def set_value(self, value):
+        # update internal value
         self._value = value
         # notify listeners
         for cb in self._update_listeners:
@@ -107,7 +108,7 @@ class DTParam:
 
     def force_update(self):
         # get parameter value
-        self._value = rospy.__get_param__(self._name, self._default_value)
+        self.set_value(rospy.__get_param__(self._name, self._default_value))
 
     def options(self):
         options = {}

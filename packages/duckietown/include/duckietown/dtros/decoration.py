@@ -1,7 +1,7 @@
 # This file performs the decoration of rospy upon import
 
 # TODO: update this to point to the documentation about DTROS once ready
-DOCS_DTROS = 'http://docs.duckietown.com'
+DOCS_DTROS = 'https://docs.duckietown.com'
 
 import rospy
 
@@ -27,7 +27,7 @@ def rospy_decorate():
 def __rospy__init_node__(*args, **kwargs):
     if '__dtros__' not in kwargs:
         print('[WARNING]: You are calling the function rospy.init_node() directly. '
-              'This is fine, but your are missing out a lot of Duckietown features '
+              'This is fine, but your are missing out on a lot of Duckietown features '
               'by not using the class DTROS instead. Check out the documentation '
               'at %s' % DOCS_DTROS)
     else:

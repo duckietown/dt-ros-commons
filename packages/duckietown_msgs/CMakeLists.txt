@@ -36,11 +36,14 @@ add_message_files(
   DisplayFragment.msg
   DroneControl.msg
   DroneMode.msg
+  DroneMotorCommand.msg
   NodeParameter.msg
   DuckiebotLED.msg
+  DuckiematrixLinkDescription.msg
   EncoderStamped.msg
   EpisodeStart.msg
   FSMState.msg
+  H264MotionVectors.msg
   IntersectionPose.msg
   IntersectionPoseImg.msg
   IntersectionPoseImgDebug.msg
@@ -98,6 +101,8 @@ add_service_files(
   NodeRequestParamsUpdate.srv
   SensorsStatus.srv
   SetCustomLEDPattern.srv
+  SetDroneCommandsOverride.srv
+  SetDroneMode.srv
   SetFSMState.srv
   SetValue.srv
   SetVariable.srv
@@ -119,7 +124,8 @@ catkin_package(
 #  LIBRARIES duckietown_msgs
    CATKIN_DEPENDS
    geometry_msgs
-   roscpp rospy
+   roscpp
+   rospy
    sensor_msgs
    std_msgs
    message_runtime
