@@ -75,6 +75,10 @@ ENV DT_PROJECT_NAME="${PROJECT_NAME}" \
     DT_LAUNCHER="${LAUNCHER}"
 
 # setup ROS sources
+RUN apt update
+RUN apt install curl -y
+RUN curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
+
 RUN apt-key adv \
     --keyserver hkp://keyserver.ubuntu.com:80 \
     --recv-keys F42ED6FBAB17C654 \
