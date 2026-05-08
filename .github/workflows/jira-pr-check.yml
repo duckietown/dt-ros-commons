@@ -4,6 +4,8 @@ on:
   pull_request:
     types: [opened, edited, synchronize, reopened]
 
+permissions: {}
+
 jobs:
   check-jira-key:
     runs-on: ubuntu-latest
